@@ -115,15 +115,17 @@ class BinanceManager:
     """Manages Binance API interactions"""
     
     def __init__(self, api_key: str, api_secret: str, testnet: bool = False):
-        self.client = Client(api_key, api_secret)
         self.testnet = testnet
         
         # Configure Futures Testnet URLs if needed
         if testnet:
-            self.client.API_URL = 'https://testnet.binancefuture.com'
-            self.client.FUTURES_URL = 'https://testnet.binancefuture.com'
+            self.client = Client(api_key, api_secret, tld='com')
+            # Set correct Testnet Futures API URLs
+            self.client.FUTURES_URL = 'https://testnet.binancefuture.com/fapi'
             logger.info("[TESTNET] Binance Futures Testnet initialized")
+            logger.info(f"[TESTNET] Using URL: {self.client.FUTURES_URL}")
         else:
+            self.client = Client(api_key, api_secret)
             logger.info("[LIVE] Binance Futures Live initialized")
     
     def get_account_balance(self) -> float:
