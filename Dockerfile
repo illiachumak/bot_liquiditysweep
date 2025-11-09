@@ -10,29 +10,18 @@ LABEL version="1.0"
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies for TA-Lib
+# Install minimal system dependencies
+# Note: Using TA-Lib-binary (pre-compiled), so no compilation needed
 RUN apt-get update && apt-get install -y \
     wget \
-    build-essential \
     && rm -rf /var/lib/apt/lists/*
-
-# Install TA-Lib from source
-RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
-    tar -xzf ta-lib-0.4.0-src.tar.gz && \
-    cd ta-lib/ && \
-    ./configure --prefix=/usr && \
-    make && \
-    make install && \
-    cd .. && \
-    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
 
 # Copy requirements first (for better caching)
 COPY requirements_bot.txt .
 
 # Install Python dependencies
-# IMPORTANT: Install numpy first with compatible version for TA-Lib
+# Using TA-Lib-binary (pre-compiled wheel), much faster than compilation!
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir 'numpy>=1.26.0,<2.0.0' && \
     pip install --no-cache-dir -r requirements_bot.txt
 
 # Copy bot files
