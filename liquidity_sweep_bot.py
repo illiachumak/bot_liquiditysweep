@@ -120,8 +120,10 @@ class BinanceManager:
         # Configure Futures Testnet URLs if needed
         if testnet:
             self.client = Client(api_key, api_secret, tld='com')
-            # Set correct Testnet Futures API URLs
-            self.client.FUTURES_URL = 'https://testnet.binancefuture.com/fapi'
+            # Set correct Testnet Futures API URLs (without /fapi suffix - library adds it)
+            self.client.FUTURES_URL = 'https://testnet.binancefuture.com'
+            self.client.FUTURES_DATA_URL = 'https://testnet.binancefuture.com'
+            self.client.FUTURES_COIN_URL = 'https://testnet.binancefuture.com'
             logger.info("[TESTNET] Binance Futures Testnet initialized")
             logger.info(f"[TESTNET] Using URL: {self.client.FUTURES_URL}")
         else:
@@ -153,6 +155,8 @@ class BinanceManager:
     def get_historical_klines(self, symbol: str, interval: str, limit: int = 100) -> pd.DataFrame:
         """Fetch historical klines"""
         try:
+            if self.testnet:
+                logger.info(f"[TESTNET] Fetching klines from {self.client.FUTURES_URL}")
             klines = self.client.futures_klines(symbol=symbol, interval=interval, limit=limit)
             
             df = pd.DataFrame(klines, columns=[
