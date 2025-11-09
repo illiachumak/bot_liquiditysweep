@@ -29,10 +29,11 @@ client = Client(API_KEY, API_SECRET, tld='com')
 
 if TESTNET:
     print("\n📍 Configuring Testnet URLs...")
-    client.FUTURES_URL = 'https://testnet.binancefuture.com'
-    client.FUTURES_DATA_URL = 'https://testnet.binancefuture.com'
-    client.FUTURES_COIN_URL = 'https://testnet.binancefuture.com'
-    print(f"   Using: {client.FUTURES_URL}")
+    client.FUTURES_URL = 'https://testnet.binancefuture.com/fapi'
+    client.FUTURES_DATA_URL = 'https://testnet.binancefuture.com/fapi'
+    client.FUTURES_COIN_URL = 'https://testnet.binancefuture.com/dapi'
+    print(f"   Futures URL: {client.FUTURES_URL}")
+    print(f"   Data URL: {client.FUTURES_DATA_URL}")
 
 print("\n🔍 Testing connection...")
 

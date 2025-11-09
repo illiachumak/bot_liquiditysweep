@@ -119,13 +119,19 @@ class BinanceManager:
         
         # Configure Futures Testnet URLs if needed
         if testnet:
-            self.client = Client(api_key, api_secret, tld='com')
-            # Set correct Testnet Futures API URLs (without /fapi suffix - library adds it)
-            self.client.FUTURES_URL = 'https://testnet.binancefuture.com'
-            self.client.FUTURES_DATA_URL = 'https://testnet.binancefuture.com'
-            self.client.FUTURES_COIN_URL = 'https://testnet.binancefuture.com'
+            # For testnet, we need to manually configure the URLs
+            # The python-binance library doesn't have built-in testnet support
+            self.client = Client(api_key, api_secret, testnet=False, tld='com')
+            
+            # Override the futures URLs for testnet
+            # Note: python-binance appends /fapi/v1/, /dapi/v1/, etc. automatically
+            self.client.FUTURES_URL = 'https://testnet.binancefuture.com/fapi'
+            self.client.FUTURES_DATA_URL = 'https://testnet.binancefuture.com/fapi'
+            self.client.FUTURES_COIN_URL = 'https://testnet.binancefuture.com/dapi'
+            
             logger.info("[TESTNET] Binance Futures Testnet initialized")
-            logger.info(f"[TESTNET] Using URL: {self.client.FUTURES_URL}")
+            logger.info(f"[TESTNET] Futures URL: {self.client.FUTURES_URL}")
+            logger.info(f"[TESTNET] Data URL: {self.client.FUTURES_DATA_URL}")
         else:
             self.client = Client(api_key, api_secret)
             logger.info("[LIVE] Binance Futures Live initialized")
@@ -156,8 +162,12 @@ class BinanceManager:
         """Fetch historical klines"""
         try:
             if self.testnet:
-                logger.info(f"[TESTNET] Fetching klines from {self.client.FUTURES_URL}")
+                logger.info(f"[TESTNET] Fetching klines for {symbol}")
             klines = self.client.futures_klines(symbol=symbol, interval=interval, limit=limit)
+            
+            if not klines:
+                logger.error(f"Empty response from API for {symbol}")
+                return pd.DataFrame()
             
             df = pd.DataFrame(klines, columns=[
                 'open_time', 'open', 'high', 'low', 'close', 'volume',
@@ -177,8 +187,15 @@ class BinanceManager:
             logger.info(f"Fetched {len(df)} historical candles for {symbol}")
             return df
             
+        except BinanceAPIException as e:
+            logger.error(f"Binance API Error fetching klines: Code {e.code} - {e.message}")
+            if self.testnet:
+                logger.error(f"[TESTNET] Check if API URL is correct: {self.client.FUTURES_URL}")
+            return pd.DataFrame()
         except Exception as e:
-            logger.error(f"Error fetching klines: {e}")
+            logger.error(f"Error fetching klines: {type(e).__name__}: {e}")
+            if self.testnet:
+                logger.error(f"[TESTNET] URL: {self.client.FUTURES_URL}")
             return pd.DataFrame()
     
     def get_current_position(self, symbol: str) -> Dict:
