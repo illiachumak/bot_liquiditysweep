@@ -1,38 +1,26 @@
-# Liquidity Sweep Trading Bot - Docker Image (with compiled TA-Lib)
+# Liquidity Sweep Trading Bot - Docker Image (Simple - without TA-Lib)
 # Base: Python 3.10 slim
 FROM python:3.10-slim
 
 # Metadata
 LABEL maintainer="trading-bot"
-LABEL description="Liquidity Sweep Trading Bot for Binance Futures"
-LABEL version="1.0"
+LABEL description="Liquidity Sweep Trading Bot for Binance Futures (No TA-Lib)"
+LABEL version="1.0-simple"
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies for compiling TA-Lib
+# Install minimal system dependencies
 RUN apt-get update && apt-get install -y \
     wget \
-    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install TA-Lib C library
-RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
-    tar -xzf ta-lib-0.4.0-src.tar.gz && \
-    cd ta-lib/ && \
-    ./configure --prefix=/usr && \
-    make && \
-    make install && \
-    cd .. && \
-    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
-
 # Copy requirements first (for better caching)
-COPY requirements_bot.txt .
+COPY requirements_bot_simple.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
-    sed 's/TA-Lib-binary==0.4.25/TA-Lib==0.4.28/g' requirements_bot.txt > requirements_compiled.txt && \
-    pip install --no-cache-dir -r requirements_compiled.txt
+    pip install --no-cache-dir -r requirements_bot_simple.txt
 
 # Copy bot files
 COPY liquidity_sweep_bot.py .
@@ -44,6 +32,7 @@ RUN mkdir -p /app/logs
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV TZ=UTC
+ENV USE_PANDAS_ATR=1
 
 # Health check (optional - checks if bot process is running)
 HEALTHCHECK --interval=5m --timeout=10s --start-period=30s --retries=3 \

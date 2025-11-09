@@ -18,12 +18,40 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-import talib
+# Try to import talib, but provide fallback if not available
+try:
+    import talib
+    TALIB_AVAILABLE = True
+except ImportError:
+    TALIB_AVAILABLE = False
+    print("⚠️  TA-Lib not available, using pandas-based ATR calculation")
 from binance.client import Client
 from binance.enums import *
 from binance.exceptions import BinanceAPIException
 from dotenv import load_dotenv
 from termcolor import colored
+
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
+
+def calculate_atr_pandas(high: pd.Series, low: pd.Series, close: pd.Series, period: int = 14) -> pd.Series:
+    """
+    Calculate ATR (Average True Range) using pandas
+    Fallback when TA-Lib is not available
+    """
+    # Calculate True Range
+    high_low = high - low
+    high_close = np.abs(high - close.shift())
+    low_close = np.abs(low - close.shift())
+    
+    ranges = pd.concat([high_low, high_close, low_close], axis=1)
+    true_range = ranges.max(axis=1)
+    
+    # Calculate ATR as exponential moving average of True Range
+    atr = true_range.ewm(span=period, adjust=False).mean()
+    
+    return atr
 
 # ============================================================================
 # CONFIGURATION
@@ -285,7 +313,13 @@ class LiquiditySweepStrategy:
             return self.candles
         
         df = self.candles.copy()
-        df['atr'] = talib.ATR(df['high'].values, df['low'].values, df['close'].values, ATR_PERIOD)
+        
+        # Use TA-Lib if available, otherwise use pandas-based calculation
+        if TALIB_AVAILABLE:
+            df['atr'] = talib.ATR(df['high'].values, df['low'].values, df['close'].values, ATR_PERIOD)
+        else:
+            df['atr'] = calculate_atr_pandas(df['high'], df['low'], df['close'], ATR_PERIOD)
+        
         return df
     
     def find_swing_high(self, lookback: int = SWING_LOOKBACK) -> Optional[float]:

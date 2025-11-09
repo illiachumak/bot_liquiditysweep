@@ -16,13 +16,14 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install TA-Lib C library from source
+# Install TA-Lib C library from source (version 0.4.0)
 RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
     tar -xzf ta-lib-0.4.0-src.tar.gz && \
     cd ta-lib/ && \
     ./configure --prefix=/usr && \
     make && \
     make install && \
+    ldconfig && \
     cd .. && \
     rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
 
@@ -30,10 +31,11 @@ RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
 COPY requirements_bot.txt .
 
 # Install Python dependencies
-# Install numpy first (required for building TA-Lib)
+# Install numpy first (required for building TA-Lib), then install everything else
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir "numpy>=1.23.0,<2.0.0" && \
-    pip install --no-cache-dir -r requirements_bot.txt
+    pip install --no-cache-dir "numpy<2.0.0" "Cython<3.0.0" && \
+    pip install --no-cache-dir TA-Lib==0.4.19 && \
+    grep -v "TA-Lib" requirements_bot.txt | grep -v "^#" | grep -v "^$" | xargs -r pip install --no-cache-dir
 
 # Copy bot files
 COPY liquidity_sweep_bot.py .
