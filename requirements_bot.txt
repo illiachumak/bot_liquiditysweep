@@ -4,11 +4,11 @@
 python-binance==1.0.17
 
 # Data processing (IMPORTANT: numpy 1.x for TA-Lib compatibility)
-numpy==1.26.4
-pandas==2.0.3
+numpy>=1.23.0,<2.0.0
+pandas>=2.0.0,<3.0.0
 
-# Technical indicators (pre-compiled binary, no compilation needed)
-TA-Lib-binary==0.4.25
+# Technical indicators (requires TA-Lib C library to be installed)
+TA-Lib==0.4.28
 
 # Environment variables
 python-dotenv==1.0.0

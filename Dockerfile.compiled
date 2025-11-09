@@ -1,5 +1,5 @@
-# Liquidity Sweep Trading Bot - Docker Image
-# Base: Python 3.10 slim (better compatibility with TA-Lib-binary)
+# Liquidity Sweep Trading Bot - Docker Image (with compiled TA-Lib)
+# Base: Python 3.10 slim
 FROM python:3.10-slim
 
 # Metadata
@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install TA-Lib C library from source
+# Install TA-Lib C library
 RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
     tar -xzf ta-lib-0.4.0-src.tar.gz && \
     cd ta-lib/ && \
@@ -30,9 +30,9 @@ RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
 COPY requirements_bot.txt .
 
 # Install Python dependencies
-# TA-Lib Python wrapper will link to the C library installed above
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements_bot.txt
+    sed 's/TA-Lib-binary==0.4.25/TA-Lib==0.4.28/g' requirements_bot.txt > requirements_compiled.txt && \
+    pip install --no-cache-dir -r requirements_compiled.txt
 
 # Copy bot files
 COPY liquidity_sweep_bot.py .
