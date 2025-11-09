@@ -115,9 +115,16 @@ class BinanceManager:
     """Manages Binance API interactions"""
     
     def __init__(self, api_key: str, api_secret: str, testnet: bool = False):
-        self.client = Client(api_key, api_secret, testnet=testnet)
+        self.client = Client(api_key, api_secret)
         self.testnet = testnet
-        logger.info(f"{'[TESTNET]' if testnet else '[LIVE]'} Binance client initialized")
+        
+        # Configure Futures Testnet URLs if needed
+        if testnet:
+            self.client.API_URL = 'https://testnet.binancefuture.com'
+            self.client.FUTURES_URL = 'https://testnet.binancefuture.com'
+            logger.info("[TESTNET] Binance Futures Testnet initialized")
+        else:
+            logger.info("[LIVE] Binance Futures Live initialized")
     
     def get_account_balance(self) -> float:
         """Get USDT balance"""
@@ -126,6 +133,16 @@ class BinanceManager:
             for asset in account['assets']:
                 if asset['asset'] == 'USDT':
                     return float(asset['availableBalance'])
+            return 0.0
+        except BinanceAPIException as e:
+            if e.code == -5000:
+                logger.error(f"⚠️  API Error -5000: Invalid endpoint or API keys don't have Futures access")
+                logger.error(f"    Please check:")
+                logger.error(f"    1. API keys have 'Enable Futures' permission")
+                logger.error(f"    2. Using correct Testnet keys if BINANCE_TESTNET=True")
+                logger.error(f"    3. Testnet keys from: https://testnet.binancefuture.com/")
+            else:
+                logger.error(f"Error fetching balance: {e}")
             return 0.0
         except Exception as e:
             logger.error(f"Error fetching balance: {e}")
