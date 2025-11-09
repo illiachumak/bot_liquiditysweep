@@ -1,6 +1,6 @@
 # Liquidity Sweep Trading Bot - Docker Image
-# Base: Python 3.10 slim (better compatibility with TA-Lib-binary)
-FROM python:3.10-slim
+# Base: Python 3.13 slim
+FROM python:3.9.6
 
 # Metadata
 LABEL maintainer="trading-bot"
