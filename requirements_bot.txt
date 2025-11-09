@@ -3,11 +3,11 @@
 # Binance API
 python-binance==1.0.17
 
-# Data processing
+# Data processing (IMPORTANT: numpy 1.x for TA-Lib compatibility)
+numpy==1.26.4
 pandas==2.0.3
-numpy==1.24.3
 
-# Technical indicators
+# Technical indicators (install AFTER numpy)
 TA-Lib==0.4.28
 
 # Environment variables

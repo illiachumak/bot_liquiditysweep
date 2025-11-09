@@ -54,8 +54,15 @@ fi
 
 # Step 2: Check Docker Compose installation
 echo -e "\n${CYAN}[2/7] Checking Docker Compose installation...${NC}"
-if command_exists docker-compose || docker compose version >/dev/null 2>&1; then
-    echo -e "${GREEN}✅ Docker Compose is installed${NC}"
+
+# Check for docker compose (V2, built-in)
+if docker compose version >/dev/null 2>&1; then
+    echo -e "${GREEN}✅ Docker Compose V2 is installed${NC}"
+    COMPOSE_CMD="docker compose"
+# Check for docker-compose (V1, standalone)
+elif command_exists docker-compose; then
+    echo -e "${GREEN}✅ Docker Compose V1 is installed${NC}"
+    COMPOSE_CMD="docker-compose"
 else
     echo -e "${RED}❌ Docker Compose is not installed${NC}"
     echo -e "${YELLOW}Installing Docker Compose...${NC}"
@@ -64,7 +71,10 @@ else
     sudo chmod +x /usr/local/bin/docker-compose
     
     echo -e "${GREEN}✅ Docker Compose installed successfully${NC}"
+    COMPOSE_CMD="docker-compose"
 fi
+
+echo -e "${CYAN}Using: ${COMPOSE_CMD}${NC}"
 
 # Step 3: Check .env file
 echo -e "\n${CYAN}[3/7] Checking .env file...${NC}"
@@ -105,7 +115,7 @@ echo -e "${GREEN}✅ Directories created${NC}"
 echo -e "\n${CYAN}[5/7] Building Docker image...${NC}"
 echo -e "${YELLOW}This may take 5-10 minutes (installing TA-Lib)...${NC}"
 
-if docker-compose build; then
+if ${COMPOSE_CMD} build; then
     echo -e "${GREEN}✅ Docker image built successfully${NC}"
 else
     echo -e "${RED}❌ Failed to build Docker image${NC}"
@@ -123,20 +133,20 @@ echo
 case $REPLY in
     1)
         echo -e "\n${CYAN}[7/7] Starting bot in background...${NC}"
-        docker-compose up -d
+        ${COMPOSE_CMD} up -d
         echo -e "${GREEN}✅ Bot is running in background${NC}"
-        echo -e "${CYAN}View logs: docker-compose logs -f${NC}"
-        echo -e "${CYAN}Stop bot: docker-compose down${NC}"
-        echo -e "${CYAN}Restart bot: docker-compose restart${NC}"
+        echo -e "${CYAN}View logs: ${COMPOSE_CMD} logs -f${NC}"
+        echo -e "${CYAN}Stop bot: ${COMPOSE_CMD} down${NC}"
+        echo -e "${CYAN}Restart bot: ${COMPOSE_CMD} restart${NC}"
         ;;
     2)
         echo -e "\n${CYAN}[7/7] Starting bot in foreground...${NC}"
         echo -e "${YELLOW}Press Ctrl+C to stop${NC}"
-        docker-compose up
+        ${COMPOSE_CMD} up
         ;;
     3)
         echo -e "\n${GREEN}✅ Build complete${NC}"
-        echo -e "${CYAN}Start bot with: docker-compose up -d${NC}"
+        echo -e "${CYAN}Start bot with: ${COMPOSE_CMD} up -d${NC}"
         ;;
     *)
         echo -e "${RED}Invalid option${NC}"
@@ -151,12 +161,12 @@ echo "╚═══════════════════════�
 echo -e "${NC}"
 
 echo -e "${CYAN}Useful commands:${NC}"
-echo -e "  ${YELLOW}docker-compose ps${NC}              - Check bot status"
-echo -e "  ${YELLOW}docker-compose logs -f${NC}         - View live logs"
-echo -e "  ${YELLOW}docker-compose restart${NC}         - Restart bot"
-echo -e "  ${YELLOW}docker-compose stop${NC}            - Stop bot"
-echo -e "  ${YELLOW}docker-compose down${NC}            - Stop and remove container"
-echo -e "  ${YELLOW}docker-compose up -d --build${NC}   - Rebuild and restart"
+echo -e "  ${YELLOW}${COMPOSE_CMD} ps${NC}              - Check bot status"
+echo -e "  ${YELLOW}${COMPOSE_CMD} logs -f${NC}         - View live logs"
+echo -e "  ${YELLOW}${COMPOSE_CMD} restart${NC}         - Restart bot"
+echo -e "  ${YELLOW}${COMPOSE_CMD} stop${NC}            - Stop bot"
+echo -e "  ${YELLOW}${COMPOSE_CMD} down${NC}            - Stop and remove container"
+echo -e "  ${YELLOW}${COMPOSE_CMD} up -d --build${NC}   - Rebuild and restart"
 
 echo -e "\n${CYAN}Log files location:${NC}"
 echo -e "  ${YELLOW}./logs/liquidity_sweep_bot.log${NC}"

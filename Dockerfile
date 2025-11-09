@@ -30,7 +30,9 @@ RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
 COPY requirements_bot.txt .
 
 # Install Python dependencies
+# IMPORTANT: Install numpy first with compatible version for TA-Lib
 RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir 'numpy>=1.26.0,<2.0.0' && \
     pip install --no-cache-dir -r requirements_bot.txt
 
 # Copy bot files
