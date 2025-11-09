@@ -135,6 +135,27 @@ class BinanceManager:
         else:
             self.client = Client(api_key, api_secret)
             logger.info("[LIVE] Binance Futures Live initialized")
+        
+        # Check server time sync
+        self._check_time_sync()
+    
+    def _check_time_sync(self):
+        """Check if server time is in sync with Binance"""
+        try:
+            import time
+            server_time = self.client.futures_time()
+            local_time = int(time.time() * 1000)
+            time_diff = abs(server_time['serverTime'] - local_time)
+            
+            if time_diff > 5000:  # More than 5 seconds difference
+                logger.warning(f"⚠️  Time sync issue detected!")
+                logger.warning(f"    Local time diff: {time_diff}ms (should be < 5000ms)")
+                logger.warning(f"    This may cause authentication errors")
+                logger.warning(f"    Consider syncing server time: sudo timedatectl set-ntp true")
+            else:
+                logger.info(f"✅ Time sync OK (diff: {time_diff}ms)")
+        except Exception as e:
+            logger.warning(f"Could not check time sync: {e}")
     
     def get_account_balance(self) -> float:
         """Get USDT balance"""
@@ -146,13 +167,16 @@ class BinanceManager:
             return 0.0
         except BinanceAPIException as e:
             if e.code == -5000:
-                logger.error(f"⚠️  API Error -5000: Invalid endpoint or API keys don't have Futures access")
-                logger.error(f"    Please check:")
-                logger.error(f"    1. API keys have 'Enable Futures' permission")
-                logger.error(f"    2. Using correct Testnet keys if BINANCE_TESTNET=True")
-                logger.error(f"    3. Testnet keys from: https://testnet.binancefuture.com/")
+                logger.warning(f"⚠️  API Error -5000: Cannot fetch balance (might be server time sync issue)")
+                if self.testnet:
+                    logger.warning(f"    Testnet mode: continuing without balance check")
+                    logger.warning(f"    The bot will monitor market but won't place real orders")
+            elif e.code == -1021:
+                logger.error(f"⚠️  API Error -1021: Timestamp sync error")
+                logger.error(f"    Server time is out of sync. Please sync your server clock:")
+                logger.error(f"    sudo timedatectl set-ntp true")
             else:
-                logger.error(f"Error fetching balance: {e}")
+                logger.error(f"Error fetching balance: Code {e.code} - {e.message}")
             return 0.0
         except Exception as e:
             logger.error(f"Error fetching balance: {e}")
