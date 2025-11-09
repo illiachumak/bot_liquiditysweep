@@ -64,6 +64,26 @@ BINANCE_API_KEY = os.getenv('BINANCE_API_KEY')
 BINANCE_API_SECRET = os.getenv('BINANCE_API_SECRET')
 USE_TESTNET = os.getenv('BINANCE_TESTNET', 'True').lower() == 'true'
 
+# Validate that API keys are loaded
+if not BINANCE_API_KEY or not BINANCE_API_SECRET:
+    print("=" * 60)
+    print("❌ ERROR: API keys not found!")
+    print("=" * 60)
+    print("BINANCE_API_KEY:", "SET" if BINANCE_API_KEY else "NOT SET")
+    print("BINANCE_API_SECRET:", "SET" if BINANCE_API_SECRET else "NOT SET")
+    print("BINANCE_TESTNET:", USE_TESTNET)
+    print("=" * 60)
+    print("\nPlease check:")
+    print("1. .env file exists in the current directory")
+    print("2. .env file contains BINANCE_API_KEY and BINANCE_API_SECRET")
+    print("3. Docker run command uses: --env-file .env")
+    print("\nAlternatively, pass env vars directly:")
+    print("docker run -e BINANCE_API_KEY=... -e BINANCE_API_SECRET=...")
+    print("=" * 60)
+    exit(1)
+else:
+    print(f"✅ API Keys loaded: {BINANCE_API_KEY[:8]}...{BINANCE_API_KEY[-4:]}")
+
 # Trading parameters
 SYMBOL = 'BTCUSDT'
 TIMEFRAME = '4h'
