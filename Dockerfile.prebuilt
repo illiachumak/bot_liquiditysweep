@@ -1,0 +1,44 @@
+# Liquidity Sweep Trading Bot - Docker Image (Using pre-built TA-Lib base)
+# Base: Python 3.10 with TA-Lib pre-installed
+FROM quantopian/talib:latest
+
+# Install Python 3.10 if the base image doesn't have it
+RUN apt-get update && apt-get install -y \
+    python3.10 \
+    python3.10-dev \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Metadata
+LABEL maintainer="trading-bot"
+LABEL description="Liquidity Sweep Trading Bot for Binance Futures"
+LABEL version="1.0"
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements first (for better caching)
+COPY requirements_bot.txt .
+
+# Install Python dependencies
+RUN pip3 install --no-cache-dir --upgrade pip && \
+    pip3 install --no-cache-dir -r requirements_bot.txt
+
+# Copy bot files
+COPY liquidity_sweep_bot.py .
+COPY test_bot.py .
+
+# Create logs directory
+RUN mkdir -p /app/logs
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV TZ=UTC
+
+# Health check (optional - checks if bot process is running)
+HEALTHCHECK --interval=5m --timeout=10s --start-period=30s --retries=3 \
+    CMD ps aux | grep -q '[p]ython.*liquidity_sweep_bot' || exit 1
+
+# Run the bot
+CMD ["python3", "-u", "liquidity_sweep_bot.py"]
+
