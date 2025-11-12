@@ -1,6 +1,6 @@
 # SMC Optimized Trading Bot - Docker Image
-# Base: Python 3.9
-FROM python:3.9-slim
+# Base: Python 3.10 (required for smartmoneyconcepts 1.2.1+)
+FROM python:3.10-slim
 
 # Metadata
 LABEL maintainer="trading-bot"

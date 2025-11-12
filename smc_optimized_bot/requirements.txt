@@ -1,6 +1,6 @@
 python-binance==1.0.19
 pandas==2.0.3
 numpy==1.24.3
-smartmoneyconcepts==1.2.1
+smartmoneyconcepts>=0.0.26
 python-dotenv==1.0.0
 
