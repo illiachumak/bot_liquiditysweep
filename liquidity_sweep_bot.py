@@ -429,12 +429,21 @@ class LiquiditySweepStrategy:
         current = recent.iloc[-1]
         previous = recent.iloc[-2]
         
+        # CRITICAL: Must be bullish candle first!
         curr_bullish = current['close'] > current['open']
+        if not curr_bullish:
+            return False
+        
+        # Must have stronger body than previous candle
         strong_body = abs(current['close'] - current['open']) > abs(previous['close'] - previous['open'])
+        if not strong_body:
+            return False
+        
+        # Must close back above recent low
         recent_low = recent['low'].min()
         back_above = current['close'] > recent_low
         
-        return curr_bullish and back_above and strong_body
+        return back_above
     
     def detect_bearish_reversal(self) -> bool:
         """Detect bearish reversal pattern"""
@@ -445,12 +454,21 @@ class LiquiditySweepStrategy:
         current = recent.iloc[-1]
         previous = recent.iloc[-2]
         
+        # CRITICAL: Must be bearish candle first!
         curr_bearish = current['close'] < current['open']
+        if not curr_bearish:
+            return False
+        
+        # Must have stronger body than previous candle
         strong_body = abs(current['close'] - current['open']) > abs(previous['close'] - previous['open'])
+        if not strong_body:
+            return False
+        
+        # Must close back below recent high
         recent_high = recent['high'].max()
         back_below = current['close'] < recent_high
         
-        return curr_bearish and back_below and strong_body
+        return back_below
     
     def check_signals(self) -> Tuple[bool, Optional[Dict]]:
         """
