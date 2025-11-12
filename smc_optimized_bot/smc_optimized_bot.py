@@ -181,6 +181,29 @@ class TradeLogger:
         }
         self.log_trade(signal_data)
     
+    def log_binance_order(self, side: str, quantity: float, price: float, 
+                         order: 'LimitOrder', current_time: datetime, 
+                         dry_run: bool = False):
+        """Log a Binance order that would be created (or was created)"""
+        order_data = {
+            'event': 'BINANCE_ORDER',
+            'dry_run': dry_run,
+            'side': side,  # 'BUY' or 'SELL'
+            'quantity': quantity,
+            'price': price,
+            'type': order.order_type,  # 'LONG' or 'SHORT'
+            'level': order.level,
+            'sl': order.sl,
+            'tp1': order.tp_levels[0],
+            'tp2': order.tp_levels[1],
+            'tp3': order.tp_levels[2],
+            'placed_time': current_time.isoformat(),
+            'expiry_time': order.expiry_time.isoformat(),
+            'ob_id': order.ob_id,
+            'binance_order_id': order.binance_order_id if not dry_run else None
+        }
+        self.log_trade(order_data)
+    
     def log_fill(self, order: 'LimitOrder', size: float, current_time: datetime):
         """Log a limit order fill"""
         fill_data = {
@@ -639,11 +662,13 @@ class SMCOptimizedBot:
                  risk_per_trade: float = 0.02,
                  session_filter: bool = False,
                  testnet: bool = True,
-                 log_trades: bool = True):
+                 log_trades: bool = True,
+                 dry_run: bool = False):
         
         self.binance = BinanceClient(api_key, api_secret, testnet)
         self.strategy = SMCOptimizedStrategy(timeframe='15m', session_filter=session_filter)
         self.risk_per_trade = risk_per_trade
+        self.dry_run = dry_run
         
         self.pending_orders = []
         self.position = None
@@ -657,10 +682,16 @@ class SMCOptimizedBot:
         print(f"   Session filter: {'ON (NY hours)' if session_filter else 'OFF (24/7)'}")
         print(f"   Testnet: {testnet}")
         print(f"   Trade logging: {'ON' if log_trades else 'OFF'}")
+        print(f"   Dry run mode: {'ON (no real orders)' if dry_run else 'OFF (real orders)'}")
     
     def calculate_position_size(self, order: LimitOrder) -> float:
         """Calculate position size based on risk"""
-        balance = self.binance.get_balance()
+        if self.dry_run:
+            # Use fixed balance for dry run (e.g., $10,000)
+            balance = 10000.0
+        else:
+            balance = self.binance.get_balance()
+        
         risk_amount = balance * self.risk_per_trade
         risk_per_unit = abs(order.limit_price - order.sl)
         size = risk_amount / risk_per_unit
@@ -670,8 +701,11 @@ class SMCOptimizedBot:
         return size
     
     def place_binance_orders(self, orders: List[LimitOrder], current_time: datetime):
-        """Place REAL Binance limit orders for each LimitOrder"""
-        logger.info(f"📤 Placing {len(orders)} limit orders on Binance...")
+        """Place REAL Binance limit orders (or log in dry_run mode)"""
+        if self.dry_run:
+            logger.info(f"📝 DRY RUN: Would place {len(orders)} limit orders on Binance...")
+        else:
+            logger.info(f"📤 Placing {len(orders)} limit orders on Binance...")
         
         for order in orders:
             try:
@@ -681,18 +715,48 @@ class SMCOptimizedBot:
                 # Determine side
                 side = 'BUY' if order.order_type == 'LONG' else 'SELL'
                 
-                # Create order on Binance
-                binance_order = self.binance.create_limit_order(
-                    side=side,
-                    quantity=quantity,
-                    price=order.limit_price,
-                    time_in_force='GTC'  # Good Till Cancel (Binance will handle expiry via our logic)
-                )
-                
-                # Store Binance order ID
-                order.binance_order_id = binance_order['orderId']
-                
-                logger.info(f"✅ Order placed: {order.order_type} L{order.level} @ ${order.limit_price:.2f}, Order ID: {order.binance_order_id}")
+                if self.dry_run:
+                    # DRY RUN: Just log, don't create real order
+                    logger.info(f"📝 DRY RUN: Would create {side} limit order: {quantity:.4f} BTC @ ${order.limit_price:.2f}")
+                    
+                    # Log to trades_history
+                    if self.logger:
+                        self.logger.log_binance_order(
+                            side=side,
+                            quantity=quantity,
+                            price=order.limit_price,
+                            order=order,
+                            current_time=current_time,
+                            dry_run=True
+                        )
+                    
+                    # Simulate order ID for tracking
+                    order.binance_order_id = f"DRY_{int(time.time() * 1000)}"
+                    
+                else:
+                    # REAL MODE: Create order on Binance
+                    binance_order = self.binance.create_limit_order(
+                        side=side,
+                        quantity=quantity,
+                        price=order.limit_price,
+                        time_in_force='GTC'
+                    )
+                    
+                    # Store Binance order ID
+                    order.binance_order_id = binance_order['orderId']
+                    
+                    # Log to trades_history
+                    if self.logger:
+                        self.logger.log_binance_order(
+                            side=side,
+                            quantity=quantity,
+                            price=order.limit_price,
+                            order=order,
+                            current_time=current_time,
+                            dry_run=False
+                        )
+                    
+                    logger.info(f"✅ Order placed: {order.order_type} L{order.level} @ ${order.limit_price:.2f}, Order ID: {order.binance_order_id}")
                 
             except Exception as e:
                 logger.error(f"❌ Failed to place order {order.order_type} L{order.level} @ ${order.limit_price:.2f}: {e}")
@@ -700,8 +764,78 @@ class SMCOptimizedBot:
                 # Continue placing other orders
     
     def check_limit_orders(self, current_price: float, current_time: datetime):
+        """Check limit orders status (real Binance API or simulated in dry_run)"""
+        if self.dry_run:
+            logger.debug(f"🔍 DRY RUN: Checking {len(self.pending_orders)} pending limit orders (simulated)")
+            self._check_limit_orders_simulated(current_price, current_time)
+        else:
+            logger.debug(f"🔍 Checking {len(self.pending_orders)} pending limit orders via Binance API")
+            self._check_limit_orders_real(current_price, current_time)
+    
+    def _check_limit_orders_simulated(self, current_price: float, current_time: datetime):
+        """Simulated limit order checking (for dry_run mode)"""
+        filled_order = None
+        expired_orders = []
+        
+        for order in self.pending_orders:
+            # Check expiry
+            if order.is_expired(current_time):
+                logger.info(f"⌛ DRY RUN: Limit order expired: {order.order_type} L{order.level} @ ${order.limit_price:.2f}")
+                expired_orders.append(order)
+                continue
+            
+            # Check fill (simulated - price must reach limit)
+            if order.order_type == 'LONG':
+                if current_price <= order.limit_price:
+                    logger.info(f"🎯 DRY RUN: LONG LIMIT HIT! Price ${current_price:.2f} <= Limit ${order.limit_price:.2f} (Level {order.level})")
+                    order.filled = True
+                    order.filled_price = order.limit_price
+                    order.filled_time = current_time
+                    filled_order = order
+                    break
+                else:
+                    logger.debug(f"   ⏳ LONG L{order.level}: ${order.limit_price:.2f} (need price <= this)")
+            else:  # SHORT
+                if current_price >= order.limit_price:
+                    logger.info(f"🎯 DRY RUN: SHORT LIMIT HIT! Price ${current_price:.2f} >= Limit ${order.limit_price:.2f} (Level {order.level})")
+                    order.filled = True
+                    order.filled_price = order.limit_price
+                    order.filled_time = current_time
+                    filled_order = order
+                    break
+                else:
+                    logger.debug(f"   ⏳ SHORT L{order.level}: ${order.limit_price:.2f} (need price >= this)")
+        
+        # Process filled order
+        if filled_order:
+            self.pending_orders = [o for o in self.pending_orders 
+                                 if o.ob_id != filled_order.ob_id]
+            
+            size = self.calculate_position_size(filled_order)
+            self.position = Position(filled_order, size, current_time)
+            
+            # Log fill
+            if self.logger:
+                self.logger.log_fill(filled_order, size, current_time)
+            
+            print(f"\n✅ DRY RUN: LIMIT ORDER FILLED (SIMULATED)")
+            print(f"   Type: {filled_order.order_type}")
+            print(f"   Level: {filled_order.level}/3")
+            print(f"   Price: ${filled_order.filled_price:.2f}")
+            print(f"   Size: {size:.4f} BTC")
+            print(f"   SL: ${self.position.sl:.2f}")
+            print(f"   TP1: ${self.position.tp_levels[0]:.2f} (50%)")
+            print(f"   TP2: ${self.position.tp_levels[1]:.2f} (30%)")
+            print(f"   TP3: ${self.position.tp_levels[2]:.2f} (20%)")
+        
+        # Remove expired
+        for order in expired_orders:
+            if order in self.pending_orders:
+                self.pending_orders.remove(order)
+                print(f"⏰ DRY RUN: Limit order expired (Level {order.level})")
+    
+    def _check_limit_orders_real(self, current_price: float, current_time: datetime):
         """Check REAL Binance limit orders status"""
-        logger.debug(f"🔍 Checking {len(self.pending_orders)} pending limit orders via Binance API")
         
         filled_order = None
         expired_orders = []
@@ -724,45 +858,85 @@ class SMCOptimizedBot:
                     logger.error(f"❌ Error cancelling expired order {order.binance_order_id}: {e}")
                 continue
             
-            # Check order status on Binance
-            try:
-                binance_order = self.binance.get_order_status(order.binance_order_id)
-                status = binance_order['status']
+            # Check order status on Binance (with retry and fallback)
+            binance_order = None
+            status = None
+            
+            # Retry logic (3 attempts)
+            for attempt in range(3):
+                try:
+                    binance_order = self.binance.get_order_status(order.binance_order_id)
+                    status = binance_order['status']
+                    break  # Success
+                except Exception as e:
+                    if attempt < 2:
+                        logger.warning(f"⚠️  Attempt {attempt+1}/3 failed for order {order.binance_order_id}: {e}. Retrying...")
+                        time.sleep(1)  # Wait 1s before retry
+                    else:
+                        logger.error(f"❌ All 3 attempts failed for order {order.binance_order_id}: {e}")
+                        # Fallback: check via get_open_orders
+                        try:
+                            logger.info(f"🔄 Fallback: Checking via get_open_orders()...")
+                            open_orders = self.binance.get_open_orders()
+                            open_order_ids = [int(o['orderId']) for o in open_orders]
+                            
+                            if order.binance_order_id not in open_order_ids:
+                                # Order not in open orders - might be filled!
+                                logger.warning(f"⚠️  Order {order.binance_order_id} not in open orders. Checking recent orders...")
+                                recent_orders = self.binance.get_all_orders(limit=50)
+                                
+                                for recent in recent_orders:
+                                    if int(recent['orderId']) == order.binance_order_id:
+                                        status = recent['status']
+                                        binance_order = recent
+                                        logger.info(f"✅ Found order in recent orders: {status}")
+                                        break
+                                
+                                if not binance_order:
+                                    logger.error(f"❌ Order {order.binance_order_id} not found in recent orders. Skipping this check.")
+                                    continue  # Skip this order, try next iteration
+                            else:
+                                # Still open
+                                status = 'NEW'
+                                logger.debug(f"   Order {order.binance_order_id} still in open orders")
+                        except Exception as fallback_error:
+                            logger.error(f"❌ Fallback also failed: {fallback_error}")
+                            continue  # Skip this order
+            
+            if not status or not binance_order:
+                logger.error(f"❌ Could not determine status for order {order.binance_order_id}. Skipping.")
+                continue
+            
+            logger.debug(f"   Order {order.binance_order_id} ({order.order_type} L{order.level}): {status}")
+            
+            if status == 'FILLED':
+                # Order filled on Binance!
+                filled_qty = float(binance_order.get('executedQty', binance_order.get('cumulativeFilledQty', 0)))
+                avg_price = float(binance_order.get('price', binance_order.get('avgPrice', order.limit_price)))
                 
-                logger.debug(f"   Order {order.binance_order_id} ({order.order_type} L{order.level}): {status}")
+                logger.info(f"🎯 ORDER FILLED ON BINANCE! Order ID: {order.binance_order_id}")
+                logger.info(f"   Type: {order.order_type}, Level: {order.level}")
+                logger.info(f"   Quantity: {filled_qty} BTC, Price: ${avg_price:.2f}")
                 
-                if status == 'FILLED':
-                    # Order filled on Binance!
-                    filled_qty = float(binance_order['executedQty'])
-                    avg_price = float(binance_order['price'])  # Limit price
-                    
-                    logger.info(f"🎯 ORDER FILLED ON BINANCE! Order ID: {order.binance_order_id}")
-                    logger.info(f"   Type: {order.order_type}, Level: {order.level}")
-                    logger.info(f"   Quantity: {filled_qty} BTC, Price: ${avg_price:.2f}")
-                    
-                    order.filled = True
-                    order.filled_price = avg_price
-                    order.filled_time = current_time
-                    filled_order = order
-                    orders_to_remove.append(order)
-                    break
-                    
-                elif status == 'CANCELED':
-                    logger.info(f"❌ Order {order.binance_order_id} was cancelled")
-                    orders_to_remove.append(order)
-                    
-                elif status == 'EXPIRED':
-                    logger.info(f"⌛ Order {order.binance_order_id} expired on Binance")
-                    expired_orders.append(order)
-                    orders_to_remove.append(order)
-                    
-                elif status == 'NEW' or status == 'PARTIALLY_FILLED':
-                    # Still active
-                    logger.debug(f"   ⏳ Order {order.binance_order_id} still active: {status}")
-                    
-            except Exception as e:
-                logger.error(f"❌ Error checking order {order.binance_order_id}: {e}")
-                # Continue checking other orders
+                order.filled = True
+                order.filled_price = avg_price
+                order.filled_time = current_time
+                filled_order = order
+                orders_to_remove.append(order)
+                break
+                
+            elif status == 'CANCELED':
+                logger.info(f"❌ Order {order.binance_order_id} was cancelled")
+                orders_to_remove.append(order)
+                
+            elif status == 'EXPIRED':
+                logger.info(f"⌛ Order {order.binance_order_id} expired on Binance")
+                expired_orders.append(order)
+                orders_to_remove.append(order)
+                
+            elif status == 'NEW' or status == 'PARTIALLY_FILLED':
+                # Still active
+                logger.debug(f"   ⏳ Order {order.binance_order_id} still active: {status}")
         
         # Remove filled and related orders (same OB)
         if filled_order:
@@ -934,6 +1108,74 @@ class SMCOptimizedBot:
         except Exception as e:
             logger.error(f"❌ Error cleaning up old orders: {e}")
     
+    def sync_with_binance_orders(self):
+        """
+        Sync pending orders with Binance reality
+        Checks if any pending orders were filled while bot was down or API failed
+        """
+        if not self.pending_orders:
+            return
+        
+        logger.info(f"🔄 Syncing {len(self.pending_orders)} pending orders with Binance...")
+        
+        try:
+            # Get all recent orders from Binance
+            recent_orders = self.binance.get_all_orders(limit=100)
+            recent_order_dict = {int(o['orderId']): o for o in recent_orders}
+            
+            filled_orders_found = []
+            
+            for order in self.pending_orders:
+                if not order.binance_order_id:
+                    continue
+                
+                if order.binance_order_id in recent_order_dict:
+                    binance_order = recent_order_dict[order.binance_order_id]
+                    status = binance_order['status']
+                    
+                    if status == 'FILLED' and not order.filled:
+                        # Found a filled order that we missed!
+                        logger.warning(f"⚠️  FOUND MISSED FILL! Order {order.binance_order_id} was filled but not logged!")
+                        
+                        filled_qty = float(binance_order.get('executedQty', binance_order.get('cumulativeFilledQty', 0)))
+                        avg_price = float(binance_order.get('price', binance_order.get('avgPrice', order.limit_price)))
+                        
+                        order.filled = True
+                        order.filled_price = avg_price
+                        order.filled_time = datetime.utcnow()  # Approximate
+                        
+                        filled_orders_found.append(order)
+                        
+                        logger.info(f"✅ Recovered fill: Order {order.binance_order_id}, Price: ${avg_price:.2f}, Qty: {filled_qty} BTC")
+            
+            # Process found fills
+            if filled_orders_found:
+                logger.warning(f"⚠️  Found {len(filled_orders_found)} missed fills! Processing...")
+                # Process the first one (most recent)
+                filled_order = filled_orders_found[0]
+                
+                # Remove all orders from same OB
+                self.pending_orders = [o for o in self.pending_orders 
+                                     if o.ob_id != filled_order.ob_id]
+                
+                # Create position
+                size = self.calculate_position_size(filled_order)
+                self.position = Position(filled_order, size, datetime.utcnow())
+                
+                # Log fill
+                if self.logger:
+                    self.logger.log_fill(filled_order, size, datetime.utcnow())
+                
+                logger.warning(f"✅ RECOVERED POSITION: {filled_order.order_type} @ ${filled_order.filled_price:.2f}, Size: {size:.4f} BTC")
+                print(f"\n⚠️  RECOVERED MISSED FILL!")
+                print(f"   Order ID: {filled_order.binance_order_id}")
+                print(f"   Type: {filled_order.order_type}")
+                print(f"   Price: ${filled_order.filled_price:.2f}")
+                print(f"   Size: {size:.4f} BTC")
+                
+        except Exception as e:
+            logger.error(f"❌ Error syncing with Binance: {e}")
+    
     def run(self, check_interval: int = 60):
         """Main bot loop"""
         logger.info("="*80)
@@ -945,8 +1187,13 @@ class SMCOptimizedBot:
         logger.info(f"Log file: logs/smc_bot.log")
         logger.info("="*80)
         
-        # Cleanup old orders on startup
-        self.cleanup_old_binance_orders()
+        # Cleanup old orders on startup (only in real mode)
+        if not self.dry_run:
+            self.cleanup_old_binance_orders()
+            # Sync with Binance on startup (recover any missed fills)
+            self.sync_with_binance_orders()
+        else:
+            logger.info("📝 DRY RUN: Skipping Binance cleanup and sync")
         
         print(f"\n🚀 Bot started at {datetime.utcnow()}")
         print(f"   Check interval: {check_interval}s")
@@ -980,6 +1227,11 @@ class SMCOptimizedBot:
                         logger.info(f"   {order.order_type} L{order.level}: ${order.limit_price:.2f}")
                 else:
                     logger.info("💤 No position, no pending orders")
+                
+                # Periodic sync with Binance (every 10 iterations = ~10 minutes, only in real mode)
+                if not self.dry_run and iteration % 10 == 0 and self.pending_orders:
+                    logger.info("🔄 Periodic sync with Binance orders...")
+                    self.sync_with_binance_orders()
                 
                 # Check pending limit orders
                 if self.pending_orders and not self.position:
@@ -1040,17 +1292,22 @@ if __name__ == "__main__":
     API_KEY = os.getenv('BINANCE_API_KEY', '')
     API_SECRET = os.getenv('BINANCE_API_SECRET', '')
     
-    if not API_KEY or not API_SECRET:
+    # Dry run mode (default: True for testing)
+    DRY_RUN = os.getenv('DRY_RUN', 'true').lower() == 'true'
+    
+    if not DRY_RUN and (not API_KEY or not API_SECRET):
         print("❌ Please set BINANCE_API_KEY and BINANCE_API_SECRET environment variables")
+        print("   Or set DRY_RUN=true to test without real orders")
         exit(1)
     
     # Initialize bot
     bot = SMCOptimizedBot(
-        api_key=API_KEY,
-        api_secret=API_SECRET,
+        api_key=API_KEY or 'dummy',  # Dummy if dry_run
+        api_secret=API_SECRET or 'dummy',  # Dummy if dry_run
         risk_per_trade=0.02,  # 2% risk
         session_filter=False,  # Trade 24/7 (set True for NY only)
-        testnet=True  # Use testnet
+        testnet=True,  # Use testnet
+        dry_run=DRY_RUN  # Dry run mode (no real orders)
     )
     
     # Run
