@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  smc-optimized-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smc-optimized-bot
+    restart: unless-stopped
+    
+    # Environment variables from .env file
+    env_file:
+      - .env
+    
+    # Mount volumes to host
+    volumes:
+      - ./logs:/app/logs
+      - ./trades_history:/app/trades_history
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    
+    # Network mode
+    network_mode: bridge
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; exit(0 if os.path.exists('/app/logs') else 1)"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+# Volumes
+volumes:
+  logs:
+    driver: local
+  trades_history:
+    driver: local
+

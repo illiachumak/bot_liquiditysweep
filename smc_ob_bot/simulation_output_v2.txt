@@ -1,0 +1,2530 @@
+  warnings.warn(
+
+================================================================================
+🎮 SMC ORDER BLOCK BOT - SIMULATION
+================================================================================
+📊 Loading historical data from ../../backtest/data/btc_15m_data_2018_to_2025.csv...
+✅ Loaded 64990 candles
+   Period: 2024-01-01 00:00:00 to 2025-11-07 23:15:00
+
+================================================================================
+🎮 STARTING BOT SIMULATION
+================================================================================
+
+Period: 2024-01-01 00:00:00 to 2025-11-07 23:15:00
+Candles: 64990
+Initial Capital: $10,000.00
+Risk per Trade: 3.0%
+
+Strategy: Pure Order Block (97.56% WR version)
+  - swing_length: 10
+  - min_rr: 2.0
+  - ob_lookback: 15
+  - ob_proximity: 1%
+  - NY session only (13-20 UTC)
+
+================================================================================
+🔄 SIMULATING...
+================================================================================
+
+
+🔵 OPEN LONG POSITION
+   Time: 2024-01-04 19:45:00
+   Entry: $43956.48
+   SL: $43558.97
+   TP: $44751.50
+   Size: 0.754698 BTC
+   Risk: $397.51 (0.90%)
+   Capital: $10000.00
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-01-05 01:45:00
+   Exit: $43558.97
+   PnL: $-300.00 (-0.90%)
+   Capital: $9700.00
+   DD: 3.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-01-09 15:30:00
+   Entry: $46955.77
+   SL: $45222.75
+   TP: $50421.81
+   Size: 0.167915 BTC
+   Risk: $1733.02 (3.69%)
+   Capital: $9700.00
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-01-09 21:15:00
+   Exit: $45222.75
+   PnL: $-291.00 (-3.69%)
+   Capital: $9409.00
+   DD: 5.91%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-01-16 13:45:00
+   Entry: $42805.83
+   SL: $42539.78
+   TP: $43337.92
+   Size: 1.060978 BTC
+   Risk: $266.05 (0.62%)
+   Capital: $9409.00
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-01-16 14:30:00
+   Exit: $42539.78
+   PnL: $-282.27 (-0.62%)
+   Capital: $9126.73
+   DD: 8.73%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-01-16 15:30:00
+   Entry: $43118.00
+   SL: $43390.35
+   TP: $42573.29
+   Size: 1.005320 BTC
+   Risk: $272.35 (0.63%)
+   Capital: $9126.73
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-01-16 16:00:00
+   Exit: $43390.35
+   PnL: $-273.80 (-0.63%)
+   Capital: $8852.93
+   DD: 11.47%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-01-25 13:00:00
+   Entry: $39880.01
+   SL: $39757.65
+   TP: $40124.72
+   Size: 2.170619 BTC
+   Risk: $122.36 (0.31%)
+   Capital: $8852.93
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-01-25 13:45:00
+   Exit: $39757.65
+   PnL: $-265.59 (-0.31%)
+   Capital: $8587.34
+   DD: 14.13%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-01-30 14:30:00
+   Entry: $43416.84
+   SL: $44101.77
+   TP: $42046.98
+   Size: 0.376126 BTC
+   Risk: $684.93 (1.58%)
+   Capital: $8587.34
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2024-02-01 01:15:00
+   Exit: $42046.98
+   PnL: $515.24 (+3.16%)
+   Capital: $9102.58
+   DD: 8.97%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-02-02 15:30:00
+   Entry: $43208.61
+   SL: $43455.77
+   TP: $42714.29
+   Size: 1.104869 BTC
+   Risk: $247.16 (0.57%)
+   Capital: $9102.58
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-02-02 16:00:00
+   Exit: $43455.77
+   PnL: $-273.08 (-0.57%)
+   Capital: $8829.50
+   DD: 11.70%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-02-03 15:15:00
+   Entry: $43110.00
+   SL: $43308.99
+   TP: $42712.03
+   Size: 1.331167 BTC
+   Risk: $198.99 (0.46%)
+   Capital: $8829.50
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2024-02-04 19:00:00
+   Exit: $42712.03
+   PnL: $529.77 (+0.92%)
+   Capital: $9359.27
+   DD: 6.41%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-02-15 15:15:00
+   Entry: $52221.37
+   SL: $51817.61
+   TP: $53028.89
+   Size: 0.695409 BTC
+   Risk: $403.76 (0.77%)
+   Capital: $9359.27
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-02-15 15:30:00
+   Exit: $51817.61
+   PnL: $-280.78 (-0.77%)
+   Capital: $9078.50
+   DD: 9.22%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-02-15 15:30:00
+   Entry: $51959.45
+   SL: $51817.61
+   TP: $52243.13
+   Size: 1.920156 BTC
+   Risk: $141.84 (0.27%)
+   Capital: $9078.50
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-02-15 15:45:00
+   Exit: $51817.61
+   PnL: $-272.35 (-0.27%)
+   Capital: $8806.14
+   DD: 11.94%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-02-15 15:45:00
+   Entry: $51948.23
+   SL: $51817.61
+   TP: $52209.47
+   Size: 2.022540 BTC
+   Risk: $130.62 (0.25%)
+   Capital: $8806.14
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-02-15 16:00:00
+   Exit: $51817.61
+   PnL: $-264.18 (-0.25%)
+   Capital: $8541.96
+   DD: 14.58%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-02-19 17:30:00
+   Entry: $52140.80
+   SL: $52607.78
+   TP: $51206.84
+   Size: 0.548756 BTC
+   Risk: $466.98 (0.90%)
+   Capital: $8541.96
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-02-20 13:30:00
+   Exit: $52607.78
+   PnL: $-256.26 (-0.90%)
+   Capital: $8285.70
+   DD: 17.14%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-02-23 16:45:00
+   Entry: $51053.07
+   SL: $51590.14
+   TP: $49978.94
+   Size: 0.462831 BTC
+   Risk: $537.07 (1.05%)
+   Capital: $8285.70
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-02-24 17:30:00
+   Exit: $51590.14
+   PnL: $-248.57 (-1.05%)
+   Capital: $8037.13
+   DD: 19.63%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-02-25 15:30:00
+   Entry: $51555.11
+   SL: $51296.76
+   TP: $52071.81
+   Size: 0.933278 BTC
+   Risk: $258.35 (0.50%)
+   Capital: $8037.13
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-02-25 16:45:00
+   Exit: $51296.76
+   PnL: $-241.11 (-0.50%)
+   Capital: $7796.01
+   DD: 22.04%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-03-01 14:30:00
+   Entry: $61889.56
+   SL: $61501.96
+   TP: $62664.77
+   Size: 0.603401 BTC
+   Risk: $387.60 (0.63%)
+   Capital: $7796.01
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-03-01 15:30:00
+   Exit: $61501.96
+   PnL: $-233.88 (-0.63%)
+   Capital: $7562.13
+   DD: 24.38%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-03-04 13:45:00
+   Entry: $65111.21
+   SL: $64399.88
+   TP: $66533.86
+   Size: 0.318930 BTC
+   Risk: $711.33 (1.09%)
+   Capital: $7562.13
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-03-04 15:45:00
+   Exit: $66533.86
+   PnL: $453.73 (+2.18%)
+   Capital: $8015.86
+   DD: 19.84%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-03-08 16:30:00
+   Entry: $67284.76
+   SL: $70339.95
+   TP: $61174.38
+   Size: 0.078711 BTC
+   Risk: $3055.19 (4.54%)
+   Capital: $8015.86
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-03-11 07:00:00
+   Exit: $70339.95
+   PnL: $-240.48 (-4.54%)
+   Capital: $7775.38
+   DD: 22.25%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-03-20 17:15:00
+   Entry: $64086.21
+   SL: $64716.97
+   TP: $62824.68
+   Size: 0.369807 BTC
+   Risk: $630.76 (0.98%)
+   Capital: $7775.38
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-03-20 18:00:00
+   Exit: $64716.97
+   PnL: $-233.26 (-0.98%)
+   Capital: $7542.12
+   DD: 24.58%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-04-08 13:00:00
+   Entry: $72074.03
+   SL: $71433.10
+   TP: $73355.89
+   Size: 0.353025 BTC
+   Risk: $640.93 (0.89%)
+   Capital: $7542.12
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-04-08 14:15:00
+   Exit: $71433.10
+   PnL: $-226.26 (-0.89%)
+   Capital: $7315.86
+   DD: 26.84%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-04-14 18:30:00
+   Entry: $64505.16
+   SL: $65070.99
+   TP: $63373.51
+   Size: 0.387885 BTC
+   Risk: $565.83 (0.88%)
+   Capital: $7315.86
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2024-04-14 21:15:00
+   Exit: $63373.51
+   PnL: $438.95 (+1.75%)
+   Capital: $7754.81
+   DD: 22.45%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-04-23 13:15:00
+   Entry: $66118.01
+   SL: $66641.99
+   TP: $65070.05
+   Size: 0.443995 BTC
+   Risk: $523.98 (0.79%)
+   Capital: $7754.81
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-04-23 14:00:00
+   Exit: $66641.99
+   PnL: $-232.64 (-0.79%)
+   Capital: $7522.17
+   DD: 24.78%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-04-26 14:30:00
+   Entry: $64047.99
+   SL: $63367.51
+   TP: $65408.95
+   Size: 0.331627 BTC
+   Risk: $680.48 (1.06%)
+   Capital: $7522.17
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-04-26 15:15:00
+   Exit: $63367.51
+   PnL: $-225.66 (-1.06%)
+   Capital: $7296.50
+   DD: 27.03%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-04-26 15:15:00
+   Entry: $63432.20
+   SL: $63367.51
+   TP: $63561.58
+   Size: 3.383843 BTC
+   Risk: $64.69 (0.10%)
+   Capital: $7296.50
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-04-26 15:30:00
+   Exit: $63561.58
+   PnL: $437.79 (+0.20%)
+   Capital: $7734.29
+   DD: 22.66%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-04-26 15:30:00
+   Entry: $63568.75
+   SL: $63367.51
+   TP: $63971.23
+   Size: 1.153005 BTC
+   Risk: $201.24 (0.32%)
+   Capital: $7734.29
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-04-26 16:00:00
+   Exit: $63367.51
+   PnL: $-232.03 (-0.32%)
+   Capital: $7502.26
+   DD: 24.98%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-04-26 16:00:00
+   Entry: $63463.07
+   SL: $63367.51
+   TP: $63654.19
+   Size: 2.355294 BTC
+   Risk: $95.56 (0.15%)
+   Capital: $7502.26
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-04-26 16:15:00
+   Exit: $63654.19
+   PnL: $450.14 (+0.30%)
+   Capital: $7952.40
+   DD: 20.48%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-04-26 16:15:00
+   Entry: $63710.37
+   SL: $63367.51
+   TP: $64396.09
+   Size: 0.695833 BTC
+   Risk: $342.86 (0.54%)
+   Capital: $7952.40
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-04-27 00:30:00
+   Exit: $63367.51
+   PnL: $-238.57 (-0.54%)
+   Capital: $7713.83
+   DD: 22.86%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-05-01 19:45:00
+   Entry: $56954.47
+   SL: $56341.96
+   TP: $58179.48
+   Size: 0.377817 BTC
+   Risk: $612.51 (1.08%)
+   Capital: $7713.83
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-05-01 21:30:00
+   Exit: $58179.48
+   PnL: $462.83 (+2.15%)
+   Capital: $8176.66
+   DD: 18.23%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-05-08 13:45:00
+   Entry: $62447.61
+   SL: $62832.30
+   TP: $61678.23
+   Size: 0.637659 BTC
+   Risk: $384.69 (0.62%)
+   Capital: $8176.66
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2024-05-08 20:15:00
+   Exit: $61678.23
+   PnL: $490.60 (+1.23%)
+   Capital: $8667.26
+   DD: 13.33%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-05-23 13:00:00
+   Entry: $69399.34
+   SL: $69172.42
+   TP: $69853.17
+   Size: 1.145873 BTC
+   Risk: $226.92 (0.33%)
+   Capital: $8667.26
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-05-23 13:15:00
+   Exit: $69172.42
+   PnL: $-260.02 (-0.33%)
+   Capital: $8407.24
+   DD: 15.93%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-05-23 13:15:00
+   Entry: $69296.02
+   SL: $69172.42
+   TP: $69543.21
+   Size: 2.040647 BTC
+   Risk: $123.60 (0.18%)
+   Capital: $8407.24
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-05-23 13:30:00
+   Exit: $69172.42
+   PnL: $-252.22 (-0.18%)
+   Capital: $8155.02
+   DD: 18.45%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-05-28 19:00:00
+   Entry: $68241.16
+   SL: $68802.83
+   TP: $67117.81
+   Size: 0.435574 BTC
+   Risk: $561.67 (0.82%)
+   Capital: $8155.02
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-05-29 02:15:00
+   Exit: $68802.83
+   PnL: $-244.65 (-0.82%)
+   Capital: $7910.37
+   DD: 20.90%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-05-29 15:15:00
+   Entry: $67672.79
+   SL: $68621.40
+   TP: $65775.57
+   Size: 0.250167 BTC
+   Risk: $948.61 (1.40%)
+   Capital: $7910.37
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-05-30 13:45:00
+   Exit: $68621.40
+   PnL: $-237.31 (-1.40%)
+   Capital: $7673.06
+   DD: 23.27%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-06-14 14:15:00
+   Entry: $66697.73
+   SL: $66412.67
+   TP: $67267.86
+   Size: 0.807510 BTC
+   Risk: $285.06 (0.43%)
+   Capital: $7673.06
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-06-14 15:45:00
+   Exit: $66412.67
+   PnL: $-230.19 (-0.43%)
+   Capital: $7442.87
+   DD: 25.57%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-07-06 14:00:00
+   Entry: $56734.00
+   SL: $56217.50
+   TP: $57767.00
+   Size: 0.432306 BTC
+   Risk: $516.50 (0.91%)
+   Capital: $7442.87
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-07-06 16:15:00
+   Exit: $57767.00
+   PnL: $446.57 (+1.82%)
+   Capital: $7889.44
+   DD: 21.11%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-07-21 19:45:00
+   Entry: $67422.02
+   SL: $68051.56
+   TP: $66162.93
+   Size: 0.375959 BTC
+   Risk: $629.54 (0.93%)
+   Capital: $7889.44
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-07-21 20:15:00
+   Exit: $68051.56
+   PnL: $-236.68 (-0.93%)
+   Capital: $7652.76
+   DD: 23.47%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-07-23 16:30:00
+   Entry: $66101.35
+   SL: $65632.19
+   TP: $67039.67
+   Size: 0.489348 BTC
+   Risk: $469.16 (0.71%)
+   Capital: $7652.76
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-07-23 19:30:00
+   Exit: $65632.19
+   PnL: $-229.58 (-0.71%)
+   Capital: $7423.17
+   DD: 25.77%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-07-24 13:45:00
+   Entry: $66344.00
+   SL: $65815.97
+   TP: $67400.06
+   Size: 0.421747 BTC
+   Risk: $528.03 (0.80%)
+   Capital: $7423.17
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-07-24 18:45:00
+   Exit: $65815.97
+   PnL: $-222.70 (-0.80%)
+   Capital: $7200.48
+   DD: 28.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-07-26 14:15:00
+   Entry: $67220.26
+   SL: $66751.02
+   TP: $68158.74
+   Size: 0.460350 BTC
+   Risk: $469.24 (0.70%)
+   Capital: $7200.48
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-07-26 21:45:00
+   Exit: $68158.74
+   PnL: $432.03 (+1.40%)
+   Capital: $7632.51
+   DD: 23.67%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-08-09 13:45:00
+   Entry: $60450.01
+   SL: $61104.00
+   TP: $59142.03
+   Size: 0.350120 BTC
+   Risk: $653.99 (1.08%)
+   Capital: $7632.51
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-08-09 14:00:00
+   Exit: $61104.00
+   PnL: $-228.98 (-1.08%)
+   Capital: $7403.53
+   DD: 25.96%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-08-09 14:00:00
+   Entry: $60806.13
+   SL: $61104.00
+   TP: $60210.39
+   Size: 0.745647 BTC
+   Risk: $297.87 (0.49%)
+   Capital: $7403.53
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2024-08-09 14:30:00
+   Exit: $60210.39
+   PnL: $444.21 (+0.98%)
+   Capital: $7847.74
+   DD: 21.52%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-08-21 14:45:00
+   Entry: $59410.41
+   SL: $58555.75
+   TP: $61119.73
+   Size: 0.275469 BTC
+   Risk: $854.66 (1.44%)
+   Capital: $7847.74
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-08-21 19:00:00
+   Exit: $61119.73
+   PnL: $470.86 (+2.88%)
+   Capital: $8318.61
+   DD: 16.81%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-08-24 17:45:00
+   Entry: $64050.99
+   SL: $63552.64
+   TP: $65047.69
+   Size: 0.500769 BTC
+   Risk: $498.35 (0.78%)
+   Capital: $8318.61
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-08-24 21:45:00
+   Exit: $63552.64
+   PnL: $-249.56 (-0.78%)
+   Capital: $8069.05
+   DD: 19.31%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-09-09 14:15:00
+   Entry: $55137.04
+   SL: $54690.88
+   TP: $56029.36
+   Size: 0.542569 BTC
+   Risk: $446.16 (0.81%)
+   Capital: $8069.05
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-09-09 16:15:00
+   Exit: $56029.36
+   PnL: $484.14 (+1.62%)
+   Capital: $8553.19
+   DD: 14.47%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-09-11 15:30:00
+   Entry: $56898.61
+   SL: $57452.49
+   TP: $55790.84
+   Size: 0.463267 BTC
+   Risk: $553.88 (0.97%)
+   Capital: $8553.19
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-09-11 16:45:00
+   Exit: $57452.49
+   PnL: $-256.60 (-0.97%)
+   Capital: $8296.60
+   DD: 17.03%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-09-15 16:30:00
+   Entry: $59994.00
+   SL: $59571.64
+   TP: $60838.71
+   Size: 0.589310 BTC
+   Risk: $422.36 (0.70%)
+   Capital: $8296.60
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-09-15 21:00:00
+   Exit: $59571.64
+   PnL: $-248.90 (-0.70%)
+   Capital: $8047.70
+   DD: 19.52%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-10-04 13:00:00
+   Entry: $61778.00
+   SL: $60905.86
+   TP: $63522.28
+   Size: 0.276827 BTC
+   Risk: $872.14 (1.41%)
+   Capital: $8047.70
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-10-04 14:15:00
+   Exit: $60905.86
+   PnL: $-241.43 (-1.41%)
+   Capital: $7806.27
+   DD: 21.94%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-10-04 14:15:00
+   Entry: $60952.00
+   SL: $60905.86
+   TP: $61044.28
+   Size: 5.075846 BTC
+   Risk: $46.14 (0.08%)
+   Capital: $7806.27
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-10-04 14:30:00
+   Exit: $61044.28
+   PnL: $468.38 (+0.15%)
+   Capital: $8274.64
+   DD: 17.25%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-10-04 14:30:00
+   Entry: $61152.00
+   SL: $60905.86
+   TP: $61644.28
+   Size: 1.008538 BTC
+   Risk: $246.14 (0.40%)
+   Capital: $8274.64
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-10-04 15:00:00
+   Exit: $61644.28
+   PnL: $496.48 (+0.81%)
+   Capital: $8771.12
+   DD: 12.29%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-10-05 13:30:00
+   Entry: $62182.00
+   SL: $61858.68
+   TP: $62828.63
+   Size: 0.813858 BTC
+   Risk: $323.32 (0.52%)
+   Capital: $8771.12
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-10-05 18:45:00
+   Exit: $61858.68
+   PnL: $-263.13 (-0.52%)
+   Capital: $8507.99
+   DD: 14.92%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-10-15 14:30:00
+   Entry: $65590.62
+   SL: $64953.60
+   TP: $66864.66
+   Size: 0.400678 BTC
+   Risk: $637.02 (0.97%)
+   Capital: $8507.99
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-10-15 15:00:00
+   Exit: $64953.60
+   PnL: $-255.24 (-0.97%)
+   Capital: $8252.75
+   DD: 17.47%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-10-15 15:00:00
+   Entry: $65407.99
+   SL: $64953.60
+   TP: $66316.77
+   Size: 0.544868 BTC
+   Risk: $454.39 (0.69%)
+   Capital: $8252.75
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-10-15 16:00:00
+   Exit: $66316.77
+   PnL: $495.16 (+1.39%)
+   Capital: $8747.91
+   DD: 12.52%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-11-19 15:45:00
+   Entry: $92391.99
+   SL: $93251.94
+   TP: $90672.09
+   Size: 0.305178 BTC
+   Risk: $859.95 (0.93%)
+   Capital: $8747.91
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-11-19 17:30:00
+   Exit: $93251.94
+   PnL: $-262.44 (-0.93%)
+   Capital: $8485.48
+   DD: 15.15%
+
+🔵 OPEN SHORT POSITION
+   Time: 2024-11-23 20:30:00
+   Entry: $97691.54
+   SL: $98557.99
+   TP: $95958.63
+   Size: 0.293800 BTC
+   Risk: $866.45 (0.89%)
+   Capital: $8485.48
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-11-24 02:30:00
+   Exit: $98557.99
+   PnL: $-254.56 (-0.89%)
+   Capital: $8230.91
+   DD: 17.69%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-12-01 18:45:00
+   Entry: $97118.69
+   SL: $96475.71
+   TP: $98404.66
+   Size: 0.384033 BTC
+   Risk: $642.98 (0.66%)
+   Capital: $8230.91
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-12-02 03:45:00
+   Exit: $96475.71
+   PnL: $-246.93 (-0.66%)
+   Capital: $7983.99
+   DD: 20.16%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-12-09 15:15:00
+   Entry: $98283.72
+   SL: $97458.27
+   TP: $99934.62
+   Size: 0.290168 BTC
+   Risk: $825.45 (0.84%)
+   Capital: $7983.99
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-12-09 17:45:00
+   Exit: $97458.27
+   PnL: $-239.52 (-0.84%)
+   Capital: $7744.47
+   DD: 22.56%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-12-13 15:45:00
+   Entry: $99873.16
+   SL: $99436.57
+   TP: $100746.34
+   Size: 0.532154 BTC
+   Risk: $436.59 (0.44%)
+   Capital: $7744.47
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-12-13 16:30:00
+   Exit: $100746.34
+   PnL: $464.67 (+0.87%)
+   Capital: $8209.13
+   DD: 17.91%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-12-17 15:15:00
+   Entry: $106042.22
+   SL: $106001.62
+   TP: $106123.42
+   Size: 6.065507 BTC
+   Risk: $40.60 (0.04%)
+   Capital: $8209.13
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-12-17 15:30:00
+   Exit: $106123.42
+   PnL: $492.55 (+0.08%)
+   Capital: $8701.68
+   DD: 12.98%
+
+🔵 OPEN LONG POSITION
+   Time: 2024-12-17 15:30:00
+   Entry: $106505.95
+   SL: $106001.62
+   TP: $107514.61
+   Size: 0.517616 BTC
+   Risk: $504.33 (0.47%)
+   Capital: $8701.68
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-12-17 17:15:00
+   Exit: $107514.61
+   PnL: $522.10 (+0.95%)
+   Capital: $9223.78
+   DD: 7.76%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-01-16 15:45:00
+   Entry: $99296.17
+   SL: $100015.52
+   TP: $97857.47
+   Size: 0.384672 BTC
+   Risk: $719.35 (0.72%)
+   Capital: $9223.78
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-01-16 17:30:00
+   Exit: $100015.52
+   PnL: $-276.71 (-0.72%)
+   Capital: $8947.07
+   DD: 10.53%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-01-28 16:00:00
+   Entry: $102267.40
+   SL: $101306.18
+   TP: $104189.84
+   Size: 0.279241 BTC
+   Risk: $961.22 (0.94%)
+   Capital: $8947.07
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-01-28 20:45:00
+   Exit: $101306.18
+   PnL: $-268.41 (-0.94%)
+   Capital: $8678.66
+   DD: 13.21%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-01-29 19:30:00
+   Entry: $103448.29
+   SL: $103515.00
+   TP: $103314.87
+   Size: 3.902859 BTC
+   Risk: $66.71 (0.06%)
+   Capital: $8678.66
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-01-29 19:45:00
+   Exit: $103314.87
+   PnL: $520.72 (+0.13%)
+   Capital: $9199.38
+   DD: 8.01%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-01-29 20:00:00
+   Entry: $103443.44
+   SL: $103515.00
+   TP: $103300.32
+   Size: 3.856642 BTC
+   Risk: $71.56 (0.07%)
+   Capital: $9199.38
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-01-29 20:15:00
+   Exit: $103300.32
+   PnL: $551.96 (+0.14%)
+   Capital: $9751.34
+   DD: 2.49%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-02-08 14:15:00
+   Entry: $96018.17
+   SL: $95385.61
+   TP: $97283.30
+   Size: 0.462467 BTC
+   Risk: $632.56 (0.66%)
+   Capital: $9751.34
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-02-09 03:45:00
+   Exit: $97283.30
+   PnL: $585.08 (+1.32%)
+   Capital: $10336.42
+   DD: 0.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-02-10 14:45:00
+   Entry: $97270.64
+   SL: $96694.64
+   TP: $98422.63
+   Size: 0.538359 BTC
+   Risk: $576.00 (0.59%)
+   Capital: $10336.42
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-02-11 05:45:00
+   Exit: $98422.63
+   PnL: $620.19 (+1.18%)
+   Capital: $10956.61
+   DD: 0.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-02-12 14:30:00
+   Entry: $95542.00
+   SL: $95321.00
+   TP: $95984.00
+   Size: 1.487322 BTC
+   Risk: $221.00 (0.23%)
+   Capital: $10956.61
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-02-12 14:45:00
+   Exit: $95321.00
+   PnL: $-328.70 (-0.23%)
+   Capital: $10627.91
+   DD: 3.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-02-12 14:45:00
+   Entry: $95628.91
+   SL: $95321.00
+   TP: $96244.73
+   Size: 1.035488 BTC
+   Risk: $307.91 (0.32%)
+   Capital: $10627.91
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-02-12 15:00:00
+   Exit: $95321.00
+   PnL: $-318.84 (-0.32%)
+   Capital: $10309.07
+   DD: 5.91%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-02-13 15:45:00
+   Entry: $95998.00
+   SL: $94859.32
+   TP: $98275.36
+   Size: 0.271606 BTC
+   Risk: $1138.68 (1.19%)
+   Capital: $10309.07
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-02-14 17:45:00
+   Exit: $98275.36
+   PnL: $618.54 (+2.37%)
+   Capital: $10927.61
+   DD: 0.26%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-03-07 13:45:00
+   Entry: $89135.98
+   SL: $87851.00
+   TP: $91705.94
+   Size: 0.255123 BTC
+   Risk: $1284.98 (1.44%)
+   Capital: $10927.61
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-03-07 16:15:00
+   Exit: $87851.00
+   PnL: $-327.83 (-1.44%)
+   Capital: $10599.79
+   DD: 3.26%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-03-21 14:45:00
+   Entry: $84240.33
+   SL: $84780.30
+   TP: $83160.39
+   Size: 0.588909 BTC
+   Risk: $539.97 (0.64%)
+   Capital: $10599.79
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-03-23 11:00:00
+   Exit: $84780.30
+   PnL: $-317.99 (-0.64%)
+   Capital: $10281.79
+   DD: 6.16%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-03-25 20:45:00
+   Entry: $87849.98
+   SL: $87150.65
+   TP: $89248.64
+   Size: 0.441071 BTC
+   Risk: $699.33 (0.80%)
+   Capital: $10281.79
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-03-25 23:00:00
+   Exit: $87150.65
+   PnL: $-308.45 (-0.80%)
+   Capital: $9973.34
+   DD: 8.97%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-04-02 20:15:00
+   Entry: $85892.64
+   SL: $85755.26
+   TP: $86167.41
+   Size: 2.177847 BTC
+   Risk: $137.38 (0.16%)
+   Capital: $9973.34
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-04-02 20:30:00
+   Exit: $86167.41
+   PnL: $598.40 (+0.32%)
+   Capital: $10571.74
+   DD: 3.51%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-04-15 14:15:00
+   Entry: $84958.55
+   SL: $84924.24
+   TP: $85027.16
+   Size: 9.245071 BTC
+   Risk: $34.31 (0.04%)
+   Capital: $10571.74
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-04-15 14:30:00
+   Exit: $85027.16
+   PnL: $634.30 (+0.08%)
+   Capital: $11206.04
+   DD: 0.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-04-15 14:30:00
+   Entry: $85232.33
+   SL: $84924.24
+   TP: $85848.50
+   Size: 1.091197 BTC
+   Risk: $308.09 (0.36%)
+   Capital: $11206.04
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-04-15 15:30:00
+   Exit: $84924.24
+   PnL: $-336.18 (-0.36%)
+   Capital: $10869.86
+   DD: 3.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-04-16 13:00:00
+   Entry: $83736.85
+   SL: $83158.08
+   TP: $84894.39
+   Size: 0.563430 BTC
+   Risk: $578.77 (0.69%)
+   Capital: $10869.86
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-04-16 15:15:00
+   Exit: $84894.39
+   PnL: $652.19 (+1.38%)
+   Capital: $11522.05
+   DD: 0.00%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-04-16 18:15:00
+   Entry: $84386.81
+   SL: $85927.50
+   TP: $81305.43
+   Size: 0.224355 BTC
+   Risk: $1540.69 (1.83%)
+   Capital: $11522.05
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-04-21 00:15:00
+   Exit: $85927.50
+   PnL: $-345.66 (-1.83%)
+   Capital: $11176.39
+   DD: 3.00%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-04-23 16:30:00
+   Entry: $93541.68
+   SL: $95169.53
+   TP: $90285.99
+   Size: 0.205973 BTC
+   Risk: $1627.85 (1.74%)
+   Capital: $11176.39
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-04-25 14:00:00
+   Exit: $95169.53
+   PnL: $-335.29 (-1.74%)
+   Capital: $10841.10
+   DD: 5.91%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-04-29 16:45:00
+   Entry: $94954.74
+   SL: $94059.19
+   TP: $96745.84
+   Size: 0.363167 BTC
+   Risk: $895.55 (0.94%)
+   Capital: $10841.10
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-04-29 22:15:00
+   Exit: $94059.19
+   PnL: $-325.23 (-0.94%)
+   Capital: $10515.87
+   DD: 8.73%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-05-04 14:00:00
+   Entry: $95473.99
+   SL: $96073.22
+   TP: $94275.53
+   Size: 0.526470 BTC
+   Risk: $599.23 (0.63%)
+   Capital: $10515.87
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-05-04 23:30:00
+   Exit: $94275.53
+   PnL: $630.95 (+1.26%)
+   Capital: $11146.82
+   DD: 3.26%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-05-26 16:15:00
+   Entry: $109331.90
+   SL: $108947.27
+   TP: $110101.16
+   Size: 0.869415 BTC
+   Risk: $384.63 (0.35%)
+   Capital: $11146.82
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-05-26 17:45:00
+   Exit: $108947.27
+   PnL: $-334.40 (-0.35%)
+   Capital: $10812.41
+   DD: 6.16%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-06-13 14:45:00
+   Entry: $104970.74
+   SL: $105826.50
+   TP: $103259.22
+   Size: 0.379046 BTC
+   Risk: $855.76 (0.82%)
+   Capital: $10812.41
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-06-13 16:00:00
+   Exit: $105826.50
+   PnL: $-324.37 (-0.82%)
+   Capital: $10488.04
+   DD: 8.97%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-06-13 16:15:00
+   Entry: $105815.35
+   SL: $105826.50
+   TP: $105793.05
+   Size: 28.218947 BTC
+   Risk: $11.15 (0.01%)
+   Capital: $10488.04
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-06-13 16:30:00
+   Exit: $105793.05
+   PnL: $629.28 (+0.02%)
+   Capital: $11117.32
+   DD: 3.51%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-06-13 16:30:00
+   Entry: $105612.01
+   SL: $105826.50
+   TP: $105183.03
+   Size: 1.554943 BTC
+   Risk: $214.49 (0.20%)
+   Capital: $11117.32
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-06-13 17:15:00
+   Exit: $105183.03
+   PnL: $667.04 (+0.41%)
+   Capital: $11784.36
+   DD: 0.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-06-23 14:00:00
+   Entry: $102259.07
+   SL: $100288.20
+   TP: $106200.82
+   Size: 0.179378 BTC
+   Risk: $1970.87 (1.93%)
+   Capital: $11784.36
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-06-23 16:15:00
+   Exit: $100288.20
+   PnL: $-353.53 (-1.93%)
+   Capital: $11430.83
+   DD: 3.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-06-23 16:30:00
+   Entry: $100569.23
+   SL: $100288.20
+   TP: $101131.30
+   Size: 1.220224 BTC
+   Risk: $281.03 (0.28%)
+   Capital: $11430.83
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-06-23 16:45:00
+   Exit: $100288.20
+   PnL: $-342.92 (-0.28%)
+   Capital: $11087.91
+   DD: 5.91%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-06-23 16:45:00
+   Entry: $100692.10
+   SL: $100288.20
+   TP: $101499.91
+   Size: 0.823554 BTC
+   Risk: $403.90 (0.40%)
+   Capital: $11087.91
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-06-23 17:00:00
+   Exit: $101499.91
+   PnL: $665.27 (+0.80%)
+   Capital: $11753.18
+   DD: 0.26%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-06-27 15:30:00
+   Entry: $107187.02
+   SL: $107736.00
+   TP: $106089.06
+   Size: 0.642274 BTC
+   Risk: $548.98 (0.51%)
+   Capital: $11753.18
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-06-29 09:00:00
+   Exit: $107736.00
+   PnL: $-352.60 (-0.51%)
+   Capital: $11400.59
+   DD: 3.26%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-07-04 20:15:00
+   Entry: $107746.48
+   SL: $108462.11
+   TP: $106315.22
+   Size: 0.477924 BTC
+   Risk: $715.63 (0.66%)
+   Capital: $11400.59
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-07-06 13:15:00
+   Exit: $108462.11
+   PnL: $-342.02 (-0.66%)
+   Capital: $11058.57
+   DD: 6.16%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-07-15 16:30:00
+   Entry: $117665.27
+   SL: $119083.16
+   TP: $114829.48
+   Size: 0.233979 BTC
+   Risk: $1417.89 (1.21%)
+   Capital: $11058.57
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-07-16 09:15:00
+   Exit: $119083.16
+   PnL: $-331.76 (-1.21%)
+   Capital: $10726.81
+   DD: 8.97%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-07-24 16:30:00
+   Entry: $118380.00
+   SL: $117243.16
+   TP: $120653.68
+   Size: 0.283069 BTC
+   Risk: $1136.84 (0.96%)
+   Capital: $10726.81
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-07-25 01:45:00
+   Exit: $117243.16
+   PnL: $-321.80 (-0.96%)
+   Capital: $10405.01
+   DD: 11.70%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-08-24 17:00:00
+   Entry: $114459.49
+   SL: $115439.65
+   TP: $112499.18
+   Size: 0.318470 BTC
+   Risk: $980.16 (0.86%)
+   Capital: $10405.01
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-08-24 19:30:00
+   Exit: $112499.18
+   PnL: $624.30 (+1.71%)
+   Capital: $11029.31
+   DD: 6.41%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-09-05 13:00:00
+   Entry: $113048.51
+   SL: $111479.80
+   TP: $116185.93
+   Size: 0.210924 BTC
+   Risk: $1568.71 (1.39%)
+   Capital: $11029.31
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-09-05 14:15:00
+   Exit: $111479.80
+   PnL: $-330.88 (-1.39%)
+   Capital: $10698.43
+   DD: 9.22%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-09-11 13:15:00
+   Entry: $113719.28
+   SL: $115072.50
+   TP: $111012.84
+   Size: 0.237177 BTC
+   Risk: $1353.22 (1.19%)
+   Capital: $10698.43
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-09-11 22:15:00
+   Exit: $115072.50
+   PnL: $-320.95 (-1.19%)
+   Capital: $10377.48
+   DD: 11.94%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-09-15 14:15:00
+   Entry: $115017.56
+   SL: $115771.84
+   TP: $113509.00
+   Size: 0.412744 BTC
+   Risk: $754.28 (0.66%)
+   Capital: $10377.48
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-09-16 05:00:00
+   Exit: $115771.84
+   PnL: $-311.32 (-0.66%)
+   Capital: $10066.15
+   DD: 14.58%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-09-18 13:30:00
+   Entry: $117171.07
+   SL: $116392.71
+   TP: $118727.80
+   Size: 0.387973 BTC
+   Risk: $778.36 (0.66%)
+   Capital: $10066.15
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-09-19 11:15:00
+   Exit: $116392.71
+   PnL: $-301.98 (-0.66%)
+   Capital: $9764.17
+   DD: 17.14%
+
+🔵 OPEN SHORT POSITION
+   Time: 2025-09-23 15:00:00
+   Entry: $112949.20
+   SL: $113856.95
+   TP: $111133.70
+   Size: 0.322693 BTC
+   Risk: $907.75 (0.80%)
+   Capital: $9764.17
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-09-24 04:00:00
+   Exit: $111133.70
+   PnL: $585.85 (+1.61%)
+   Capital: $10350.02
+   DD: 12.17%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-10-03 13:30:00
+   Entry: $120280.19
+   SL: $119501.67
+   TP: $121837.23
+   Size: 0.398834 BTC
+   Risk: $778.52 (0.65%)
+   Capital: $10350.02
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-10-03 15:45:00
+   Exit: $121837.23
+   PnL: $621.00 (+1.29%)
+   Capital: $10971.02
+   DD: 6.90%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-10-22 14:15:00
+   Entry: $107940.55
+   SL: $106174.64
+   TP: $111472.37
+   Size: 0.186380 BTC
+   Risk: $1765.91 (1.64%)
+   Capital: $10971.02
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-10-24 06:30:00
+   Exit: $111472.37
+   PnL: $658.26 (+3.27%)
+   Capital: $11629.28
+   DD: 1.32%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-10-24 13:30:00
+   Entry: $110684.47
+   SL: $110047.00
+   TP: $111959.41
+   Size: 0.547286 BTC
+   Risk: $637.47 (0.58%)
+   Capital: $11629.28
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-10-24 14:15:00
+   Exit: $110047.00
+   PnL: $-348.88 (-0.58%)
+   Capital: $11280.40
+   DD: 4.28%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-10-24 14:30:00
+   Entry: $110060.01
+   SL: $110047.00
+   TP: $110086.03
+   Size: 26.011686 BTC
+   Risk: $13.01 (0.01%)
+   Capital: $11280.40
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-10-24 14:45:00
+   Exit: $110086.03
+   PnL: $676.82 (+0.02%)
+   Capital: $11957.23
+   DD: 0.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-10-24 14:45:00
+   Entry: $110219.17
+   SL: $110047.00
+   TP: $110563.51
+   Size: 2.083503 BTC
+   Risk: $172.17 (0.16%)
+   Capital: $11957.23
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-10-24 15:00:00
+   Exit: $110563.51
+   PnL: $717.43 (+0.31%)
+   Capital: $12674.66
+   DD: 0.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-10-31 16:30:00
+   Entry: $109716.08
+   SL: $108820.07
+   TP: $111508.10
+   Size: 0.424371 BTC
+   Risk: $896.01 (0.82%)
+   Capital: $12674.66
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-10-31 16:45:00
+   Exit: $108820.07
+   PnL: $-380.24 (-0.82%)
+   Capital: $12294.42
+   DD: 3.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-10-31 16:45:00
+   Entry: $108845.40
+   SL: $108820.07
+   TP: $108896.06
+   Size: 14.562084 BTC
+   Risk: $25.33 (0.02%)
+   Capital: $12294.42
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-10-31 17:00:00
+   Exit: $108896.06
+   PnL: $737.67 (+0.05%)
+   Capital: $13032.08
+   DD: 0.00%
+
+🔵 OPEN LONG POSITION
+   Time: 2025-11-02 13:15:00
+   Entry: $110407.23
+   SL: $109794.42
+   TP: $111632.85
+   Size: 0.637981 BTC
+   Risk: $612.81 (0.56%)
+   Capital: $13032.08
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-11-02 16:15:00
+   Exit: $109794.42
+   PnL: $-390.96 (-0.56%)
+   Capital: $12641.12
+   DD: 3.00%
+
+================================================================================
+📊 SIMULATION RESULTS
+================================================================================
+
+================================================================================
+PERFORMANCE SUMMARY
+================================================================================
+
+Total Trades:     103
+Wins:             38
+Losses:           65
+Win Rate:         36.89%
+
+Initial Capital:  $10,000.00
+Final Capital:    $12,641.12
+Total PnL:        $2,641.12
+Total Return:     +26.41%
+
+Average Win:      $552.41
+Average Loss:     $-282.31
+Profit Factor:    1.14
+Max Drawdown:     28.00%
+
+Trading Period:   667 days (21.9 months)
+Monthly Return:   1.21%
+Trades/Month:     4.7
+
+================================================================================
+TRADE BREAKDOWN
+================================================================================
+
+❌ Trade #1 - LONG
+   Entry: 2024-01-04 19:45:00 @ $43956.48
+   Exit:  2024-01-05 01:45:00 @ $43558.97
+   PnL:   $-300.00 (-0.90%)
+
+❌ Trade #2 - LONG
+   Entry: 2024-01-09 15:30:00 @ $46955.77
+   Exit:  2024-01-09 21:15:00 @ $45222.75
+   PnL:   $-291.00 (-3.69%)
+
+❌ Trade #3 - LONG
+   Entry: 2024-01-16 13:45:00 @ $42805.83
+   Exit:  2024-01-16 14:30:00 @ $42539.78
+   PnL:   $-282.27 (-0.62%)
+
+❌ Trade #4 - SHORT
+   Entry: 2024-01-16 15:30:00 @ $43118.00
+   Exit:  2024-01-16 16:00:00 @ $43390.35
+   PnL:   $-273.80 (-0.63%)
+
+❌ Trade #5 - LONG
+   Entry: 2024-01-25 13:00:00 @ $39880.01
+   Exit:  2024-01-25 13:45:00 @ $39757.65
+   PnL:   $-265.59 (-0.31%)
+
+✅ Trade #6 - SHORT
+   Entry: 2024-01-30 14:30:00 @ $43416.84
+   Exit:  2024-02-01 01:15:00 @ $42046.98
+   PnL:   $515.24 (+3.16%)
+
+❌ Trade #7 - SHORT
+   Entry: 2024-02-02 15:30:00 @ $43208.61
+   Exit:  2024-02-02 16:00:00 @ $43455.77
+   PnL:   $-273.08 (-0.57%)
+
+✅ Trade #8 - SHORT
+   Entry: 2024-02-03 15:15:00 @ $43110.00
+   Exit:  2024-02-04 19:00:00 @ $42712.03
+   PnL:   $529.77 (+0.92%)
+
+❌ Trade #9 - LONG
+   Entry: 2024-02-15 15:15:00 @ $52221.37
+   Exit:  2024-02-15 15:30:00 @ $51817.61
+   PnL:   $-280.78 (-0.77%)
+
+❌ Trade #10 - LONG
+   Entry: 2024-02-15 15:30:00 @ $51959.45
+   Exit:  2024-02-15 15:45:00 @ $51817.61
+   PnL:   $-272.35 (-0.27%)
+
+... and 93 more trades
+
+
+
+
+================================================================================
+📊 COMPARISON: Simulation vs Backtest
+================================================================================
+📊 Loading historical data from ../../backtest/data/btc_15m_data_2018_to_2025.csv...
+✅ Loaded 64990 candles
+   Period: 2024-01-01 00:00:00 to 2025-11-07 23:15:00
+
+================================================================================
+🎮 STARTING BOT SIMULATION
+================================================================================
+
+Period: 2024-01-01 00:00:00 to 2025-11-07 23:15:00
+Candles: 64990
+Initial Capital: $10,000.00
+Risk per Trade: 3.0%
+
+Strategy: Pure Order Block (97.56% WR version)
+  - swing_length: 10
+  - min_rr: 2.0
+  - ob_lookback: 15
+  - ob_proximity: 1%
+  - NY session only (13-20 UTC)
+
+================================================================================
+🔄 SIMULATING...
+================================================================================
+
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-01-05 01:45:00
+   Exit: $43558.97
+   PnL: $-300.00 (-0.90%)
+   Capital: $9700.00
+   DD: 3.00%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-01-09 21:15:00
+   Exit: $45222.75
+   PnL: $-291.00 (-3.69%)
+   Capital: $9409.00
+   DD: 5.91%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-01-16 14:30:00
+   Exit: $42539.78
+   PnL: $-282.27 (-0.62%)
+   Capital: $9126.73
+   DD: 8.73%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-01-16 16:00:00
+   Exit: $43390.35
+   PnL: $-273.80 (-0.63%)
+   Capital: $8852.93
+   DD: 11.47%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-01-25 13:45:00
+   Exit: $39757.65
+   PnL: $-265.59 (-0.31%)
+   Capital: $8587.34
+   DD: 14.13%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2024-02-01 01:15:00
+   Exit: $42046.98
+   PnL: $515.24 (+3.16%)
+   Capital: $9102.58
+   DD: 8.97%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-02-02 16:00:00
+   Exit: $43455.77
+   PnL: $-273.08 (-0.57%)
+   Capital: $8829.50
+   DD: 11.70%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2024-02-04 19:00:00
+   Exit: $42712.03
+   PnL: $529.77 (+0.92%)
+   Capital: $9359.27
+   DD: 6.41%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-02-15 15:30:00
+   Exit: $51817.61
+   PnL: $-280.78 (-0.77%)
+   Capital: $9078.50
+   DD: 9.22%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-02-15 15:45:00
+   Exit: $51817.61
+   PnL: $-272.35 (-0.27%)
+   Capital: $8806.14
+   DD: 11.94%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-02-15 16:00:00
+   Exit: $51817.61
+   PnL: $-264.18 (-0.25%)
+   Capital: $8541.96
+   DD: 14.58%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-02-20 13:30:00
+   Exit: $52607.78
+   PnL: $-256.26 (-0.90%)
+   Capital: $8285.70
+   DD: 17.14%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-02-24 17:30:00
+   Exit: $51590.14
+   PnL: $-248.57 (-1.05%)
+   Capital: $8037.13
+   DD: 19.63%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-02-25 16:45:00
+   Exit: $51296.76
+   PnL: $-241.11 (-0.50%)
+   Capital: $7796.01
+   DD: 22.04%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-03-01 15:30:00
+   Exit: $61501.96
+   PnL: $-233.88 (-0.63%)
+   Capital: $7562.13
+   DD: 24.38%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-03-04 15:45:00
+   Exit: $66533.86
+   PnL: $453.73 (+2.18%)
+   Capital: $8015.86
+   DD: 19.84%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-03-11 07:00:00
+   Exit: $70339.95
+   PnL: $-240.48 (-4.54%)
+   Capital: $7775.38
+   DD: 22.25%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-03-20 18:00:00
+   Exit: $64716.97
+   PnL: $-233.26 (-0.98%)
+   Capital: $7542.12
+   DD: 24.58%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-04-08 14:15:00
+   Exit: $71433.10
+   PnL: $-226.26 (-0.89%)
+   Capital: $7315.86
+   DD: 26.84%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2024-04-14 21:15:00
+   Exit: $63373.51
+   PnL: $438.95 (+1.75%)
+   Capital: $7754.81
+   DD: 22.45%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-04-23 14:00:00
+   Exit: $66641.99
+   PnL: $-232.64 (-0.79%)
+   Capital: $7522.17
+   DD: 24.78%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-04-26 15:15:00
+   Exit: $63367.51
+   PnL: $-225.66 (-1.06%)
+   Capital: $7296.50
+   DD: 27.03%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-04-26 15:30:00
+   Exit: $63561.58
+   PnL: $437.79 (+0.20%)
+   Capital: $7734.29
+   DD: 22.66%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-04-26 16:00:00
+   Exit: $63367.51
+   PnL: $-232.03 (-0.32%)
+   Capital: $7502.26
+   DD: 24.98%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-04-26 16:15:00
+   Exit: $63654.19
+   PnL: $450.14 (+0.30%)
+   Capital: $7952.40
+   DD: 20.48%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-04-27 00:30:00
+   Exit: $63367.51
+   PnL: $-238.57 (-0.54%)
+   Capital: $7713.83
+   DD: 22.86%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-05-01 21:30:00
+   Exit: $58179.48
+   PnL: $462.83 (+2.15%)
+   Capital: $8176.66
+   DD: 18.23%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2024-05-08 20:15:00
+   Exit: $61678.23
+   PnL: $490.60 (+1.23%)
+   Capital: $8667.26
+   DD: 13.33%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-05-23 13:15:00
+   Exit: $69172.42
+   PnL: $-260.02 (-0.33%)
+   Capital: $8407.24
+   DD: 15.93%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-05-23 13:30:00
+   Exit: $69172.42
+   PnL: $-252.22 (-0.18%)
+   Capital: $8155.02
+   DD: 18.45%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-05-29 02:15:00
+   Exit: $68802.83
+   PnL: $-244.65 (-0.82%)
+   Capital: $7910.37
+   DD: 20.90%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-05-30 13:45:00
+   Exit: $68621.40
+   PnL: $-237.31 (-1.40%)
+   Capital: $7673.06
+   DD: 23.27%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-06-14 15:45:00
+   Exit: $66412.67
+   PnL: $-230.19 (-0.43%)
+   Capital: $7442.87
+   DD: 25.57%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-07-06 16:15:00
+   Exit: $57767.00
+   PnL: $446.57 (+1.82%)
+   Capital: $7889.44
+   DD: 21.11%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-07-21 20:15:00
+   Exit: $68051.56
+   PnL: $-236.68 (-0.93%)
+   Capital: $7652.76
+   DD: 23.47%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-07-23 19:30:00
+   Exit: $65632.19
+   PnL: $-229.58 (-0.71%)
+   Capital: $7423.17
+   DD: 25.77%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-07-24 18:45:00
+   Exit: $65815.97
+   PnL: $-222.70 (-0.80%)
+   Capital: $7200.48
+   DD: 28.00%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-07-26 21:45:00
+   Exit: $68158.74
+   PnL: $432.03 (+1.40%)
+   Capital: $7632.51
+   DD: 23.67%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-08-09 14:00:00
+   Exit: $61104.00
+   PnL: $-228.98 (-1.08%)
+   Capital: $7403.53
+   DD: 25.96%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2024-08-09 14:30:00
+   Exit: $60210.39
+   PnL: $444.21 (+0.98%)
+   Capital: $7847.74
+   DD: 21.52%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-08-21 19:00:00
+   Exit: $61119.73
+   PnL: $470.86 (+2.88%)
+   Capital: $8318.61
+   DD: 16.81%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-08-24 21:45:00
+   Exit: $63552.64
+   PnL: $-249.56 (-0.78%)
+   Capital: $8069.05
+   DD: 19.31%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-09-09 16:15:00
+   Exit: $56029.36
+   PnL: $484.14 (+1.62%)
+   Capital: $8553.19
+   DD: 14.47%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-09-11 16:45:00
+   Exit: $57452.49
+   PnL: $-256.60 (-0.97%)
+   Capital: $8296.60
+   DD: 17.03%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-09-15 21:00:00
+   Exit: $59571.64
+   PnL: $-248.90 (-0.70%)
+   Capital: $8047.70
+   DD: 19.52%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-10-04 14:15:00
+   Exit: $60905.86
+   PnL: $-241.43 (-1.41%)
+   Capital: $7806.27
+   DD: 21.94%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-10-04 14:30:00
+   Exit: $61044.28
+   PnL: $468.38 (+0.15%)
+   Capital: $8274.64
+   DD: 17.25%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-10-04 15:00:00
+   Exit: $61644.28
+   PnL: $496.48 (+0.81%)
+   Capital: $8771.12
+   DD: 12.29%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-10-05 18:45:00
+   Exit: $61858.68
+   PnL: $-263.13 (-0.52%)
+   Capital: $8507.99
+   DD: 14.92%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-10-15 15:00:00
+   Exit: $64953.60
+   PnL: $-255.24 (-0.97%)
+   Capital: $8252.75
+   DD: 17.47%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-10-15 16:00:00
+   Exit: $66316.77
+   PnL: $495.16 (+1.39%)
+   Capital: $8747.91
+   DD: 12.52%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-11-19 17:30:00
+   Exit: $93251.94
+   PnL: $-262.44 (-0.93%)
+   Capital: $8485.48
+   DD: 15.15%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2024-11-24 02:30:00
+   Exit: $98557.99
+   PnL: $-254.56 (-0.89%)
+   Capital: $8230.91
+   DD: 17.69%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-12-02 03:45:00
+   Exit: $96475.71
+   PnL: $-246.93 (-0.66%)
+   Capital: $7983.99
+   DD: 20.16%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2024-12-09 17:45:00
+   Exit: $97458.27
+   PnL: $-239.52 (-0.84%)
+   Capital: $7744.47
+   DD: 22.56%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-12-13 16:30:00
+   Exit: $100746.34
+   PnL: $464.67 (+0.87%)
+   Capital: $8209.13
+   DD: 17.91%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-12-17 15:30:00
+   Exit: $106123.42
+   PnL: $492.55 (+0.08%)
+   Capital: $8701.68
+   DD: 12.98%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2024-12-17 17:15:00
+   Exit: $107514.61
+   PnL: $522.10 (+0.95%)
+   Capital: $9223.78
+   DD: 7.76%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-01-16 17:30:00
+   Exit: $100015.52
+   PnL: $-276.71 (-0.72%)
+   Capital: $8947.07
+   DD: 10.53%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-01-28 20:45:00
+   Exit: $101306.18
+   PnL: $-268.41 (-0.94%)
+   Capital: $8678.66
+   DD: 13.21%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-01-29 19:45:00
+   Exit: $103314.87
+   PnL: $520.72 (+0.13%)
+   Capital: $9199.38
+   DD: 8.01%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-01-29 20:15:00
+   Exit: $103300.32
+   PnL: $551.96 (+0.14%)
+   Capital: $9751.34
+   DD: 2.49%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-02-09 03:45:00
+   Exit: $97283.30
+   PnL: $585.08 (+1.32%)
+   Capital: $10336.42
+   DD: 0.00%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-02-11 05:45:00
+   Exit: $98422.63
+   PnL: $620.19 (+1.18%)
+   Capital: $10956.61
+   DD: 0.00%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-02-12 14:45:00
+   Exit: $95321.00
+   PnL: $-328.70 (-0.23%)
+   Capital: $10627.91
+   DD: 3.00%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-02-12 15:00:00
+   Exit: $95321.00
+   PnL: $-318.84 (-0.32%)
+   Capital: $10309.07
+   DD: 5.91%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-02-14 17:45:00
+   Exit: $98275.36
+   PnL: $618.54 (+2.37%)
+   Capital: $10927.61
+   DD: 0.26%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-03-07 16:15:00
+   Exit: $87851.00
+   PnL: $-327.83 (-1.44%)
+   Capital: $10599.79
+   DD: 3.26%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-03-23 11:00:00
+   Exit: $84780.30
+   PnL: $-317.99 (-0.64%)
+   Capital: $10281.79
+   DD: 6.16%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-03-25 23:00:00
+   Exit: $87150.65
+   PnL: $-308.45 (-0.80%)
+   Capital: $9973.34
+   DD: 8.97%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-04-02 20:30:00
+   Exit: $86167.41
+   PnL: $598.40 (+0.32%)
+   Capital: $10571.74
+   DD: 3.51%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-04-15 14:30:00
+   Exit: $85027.16
+   PnL: $634.30 (+0.08%)
+   Capital: $11206.04
+   DD: 0.00%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-04-15 15:30:00
+   Exit: $84924.24
+   PnL: $-336.18 (-0.36%)
+   Capital: $10869.86
+   DD: 3.00%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-04-16 15:15:00
+   Exit: $84894.39
+   PnL: $652.19 (+1.38%)
+   Capital: $11522.05
+   DD: 0.00%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-04-21 00:15:00
+   Exit: $85927.50
+   PnL: $-345.66 (-1.83%)
+   Capital: $11176.39
+   DD: 3.00%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-04-25 14:00:00
+   Exit: $95169.53
+   PnL: $-335.29 (-1.74%)
+   Capital: $10841.10
+   DD: 5.91%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-04-29 22:15:00
+   Exit: $94059.19
+   PnL: $-325.23 (-0.94%)
+   Capital: $10515.87
+   DD: 8.73%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-05-04 23:30:00
+   Exit: $94275.53
+   PnL: $630.95 (+1.26%)
+   Capital: $11146.82
+   DD: 3.26%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-05-26 17:45:00
+   Exit: $108947.27
+   PnL: $-334.40 (-0.35%)
+   Capital: $10812.41
+   DD: 6.16%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-06-13 16:00:00
+   Exit: $105826.50
+   PnL: $-324.37 (-0.82%)
+   Capital: $10488.04
+   DD: 8.97%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-06-13 16:30:00
+   Exit: $105793.05
+   PnL: $629.28 (+0.02%)
+   Capital: $11117.32
+   DD: 3.51%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-06-13 17:15:00
+   Exit: $105183.03
+   PnL: $667.04 (+0.41%)
+   Capital: $11784.36
+   DD: 0.00%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-06-23 16:15:00
+   Exit: $100288.20
+   PnL: $-353.53 (-1.93%)
+   Capital: $11430.83
+   DD: 3.00%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-06-23 16:45:00
+   Exit: $100288.20
+   PnL: $-342.92 (-0.28%)
+   Capital: $11087.91
+   DD: 5.91%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-06-23 17:00:00
+   Exit: $101499.91
+   PnL: $665.27 (+0.80%)
+   Capital: $11753.18
+   DD: 0.26%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-06-29 09:00:00
+   Exit: $107736.00
+   PnL: $-352.60 (-0.51%)
+   Capital: $11400.59
+   DD: 3.26%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-07-06 13:15:00
+   Exit: $108462.11
+   PnL: $-342.02 (-0.66%)
+   Capital: $11058.57
+   DD: 6.16%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-07-16 09:15:00
+   Exit: $119083.16
+   PnL: $-331.76 (-1.21%)
+   Capital: $10726.81
+   DD: 8.97%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-07-25 01:45:00
+   Exit: $117243.16
+   PnL: $-321.80 (-0.96%)
+   Capital: $10405.01
+   DD: 11.70%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-08-24 19:30:00
+   Exit: $112499.18
+   PnL: $624.30 (+1.71%)
+   Capital: $11029.31
+   DD: 6.41%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-09-05 14:15:00
+   Exit: $111479.80
+   PnL: $-330.88 (-1.39%)
+   Capital: $10698.43
+   DD: 9.22%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-09-11 22:15:00
+   Exit: $115072.50
+   PnL: $-320.95 (-1.19%)
+   Capital: $10377.48
+   DD: 11.94%
+
+❌ CLOSE SHORT POSITION (SL)
+   Time: 2025-09-16 05:00:00
+   Exit: $115771.84
+   PnL: $-311.32 (-0.66%)
+   Capital: $10066.15
+   DD: 14.58%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-09-19 11:15:00
+   Exit: $116392.71
+   PnL: $-301.98 (-0.66%)
+   Capital: $9764.17
+   DD: 17.14%
+
+✅ CLOSE SHORT POSITION (TP)
+   Time: 2025-09-24 04:00:00
+   Exit: $111133.70
+   PnL: $585.85 (+1.61%)
+   Capital: $10350.02
+   DD: 12.17%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-10-03 15:45:00
+   Exit: $121837.23
+   PnL: $621.00 (+1.29%)
+   Capital: $10971.02
+   DD: 6.90%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-10-24 06:30:00
+   Exit: $111472.37
+   PnL: $658.26 (+3.27%)
+   Capital: $11629.28
+   DD: 1.32%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-10-24 14:15:00
+   Exit: $110047.00
+   PnL: $-348.88 (-0.58%)
+   Capital: $11280.40
+   DD: 4.28%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-10-24 14:45:00
+   Exit: $110086.03
+   PnL: $676.82 (+0.02%)
+   Capital: $11957.23
+   DD: 0.00%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-10-24 15:00:00
+   Exit: $110563.51
+   PnL: $717.43 (+0.31%)
+   Capital: $12674.66
+   DD: 0.00%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-10-31 16:45:00
+   Exit: $108820.07
+   PnL: $-380.24 (-0.82%)
+   Capital: $12294.42
+   DD: 3.00%
+
+✅ CLOSE LONG POSITION (TP)
+   Time: 2025-10-31 17:00:00
+   Exit: $108896.06
+   PnL: $737.67 (+0.05%)
+   Capital: $13032.08
+   DD: 0.00%
+
+❌ CLOSE LONG POSITION (SL)
+   Time: 2025-11-02 16:15:00
+   Exit: $109794.42
+   PnL: $-390.96 (-0.56%)
+   Capital: $12641.12
+   DD: 3.00%
+
+Metric                    Backtest        Simulation      Diff
+----------------------------------------------------------------------
+Monthly Return %          2.91            1.21            -1.70
+Win Rate %                97.56           36.89           -60.67
+Trades/Month              1.8             4.7             +2.9
+Max DD %                  -2.51           28.00           +30.51
+
+================================================================================
+ANALYSIS
+================================================================================
+
+❌ WARNING: Large difference (-58.6%)
+   Check implementation vs backtest logic
+⚠️  Win Rate differs: 36.9% vs 97.6%
+
+================================================================================
+
