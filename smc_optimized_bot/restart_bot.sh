@@ -48,3 +48,4 @@ $COMPOSE_CMD logs --tail=20
 
 echo -e "\n${GREEN}Bot restarted!${NC}"
 
+

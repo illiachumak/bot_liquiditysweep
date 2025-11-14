@@ -1,0 +1,44 @@
+services:
+  paper-trading-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: paper-trading-bot
+    restart: unless-stopped
+
+    # Mount volumes to host
+    volumes:
+      - ./paper_trading_logs:/app/paper_trading_logs
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+    # Network mode
+    network_mode: bridge
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; exit(0 if os.path.exists('/app/paper_trading_logs') else 1)"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+# Volumes
+volumes:
+  paper_trading_logs:
+    driver: local

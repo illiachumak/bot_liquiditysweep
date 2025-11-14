@@ -68,3 +68,4 @@ echo -e "  ${YELLOW}docker compose logs -f${NC}     - View live logs"
 echo -e "  ${YELLOW}docker compose ps${NC}          - Check status"
 echo -e "  ${YELLOW}cat trades_history/trades.json${NC} - View trades"
 
+

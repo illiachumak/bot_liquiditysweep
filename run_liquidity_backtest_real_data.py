@@ -1,239 +1,221 @@
 """
-Script to run liquidity reversal backtest using real data from backtest/data
+Script to run liquidity reversal backtest on real data from backtest/data
 """
 
 import pandas as pd
 import sys
 import os
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+# Add parent directory to path to import liquidity_reversal_backtest
+sys.path.append(os.path.dirname(__file__))
 from liquidity_reversal_backtest import LiquidityReversalBacktest
 
-# Add parent directory to path to access backtest/data
-project_root = Path(__file__).parent.parent
-backtest_data_dir = project_root / 'backtest' / 'data'
 
-
-def load_csv_data(filename: str) -> pd.DataFrame:
+def load_data_from_backtest_data(timeframe: str = '4h', 
+                                 start_date: str = None,
+                                 end_date: str = None) -> pd.DataFrame:
     """
-    Load CSV data from backtest/data directory
+    Load BTC data from backtest/data directory
     
     Args:
-        filename: Name of CSV file (e.g., 'btc_4h_data_2018_to_2025.csv')
+        timeframe: '15m', '4h', '1h', '1d'
+        start_date: Start date filter (YYYY-MM-DD) or None
+        end_date: End date filter (YYYY-MM-DD) or None
     
     Returns:
-        DataFrame with OHLCV data
+        DataFrame with OHLCV data, lowercase column names, datetime index
     """
-    filepath = backtest_data_dir / filename
+    data_files = {
+        '15m': 'backtest/data/btc_15m_data_2018_to_2025.csv',
+        '1h': 'backtest/data/btc_1h_data_2018_to_2025.csv',
+        '4h': 'backtest/data/btc_4h_data_2018_to_2025.csv',
+        '1d': 'backtest/data/btc_1d_data_2018_to_2025.csv',
+    }
     
-    if not filepath.exists():
-        raise FileNotFoundError(f"File not found: {filepath}")
+    if timeframe not in data_files:
+        raise ValueError(f"Timeframe {timeframe} not supported. Use: 15m, 1h, 4h, 1d")
     
-    print(f"\n📂 Loading data from: {filepath}")
+    filepath = data_files[timeframe]
     
-    # Read CSV - handle different formats
-    df = pd.read_csv(filepath)
+    # Get absolute path
+    script_dir = Path(__file__).parent.parent
+    full_path = script_dir / filepath
     
-    # Check column names and normalize
-    # Files might have 'Open time' or 'timestamp' as first column
-    if 'Open time' in df.columns:
-        time_col = 'Open time'
-        # Rename columns to lowercase
-        df = df.rename(columns={
-            'Open time': 'timestamp',
-            'Open': 'open',
-            'High': 'high',
-            'Low': 'low',
-            'Close': 'close',
-            'Volume': 'volume'
-        })
-    elif 'timestamp' in df.columns:
-        time_col = 'timestamp'
-    else:
-        # Try first column as timestamp
-        time_col = df.columns[0]
-        df = df.rename(columns={time_col: 'timestamp'})
+    if not full_path.exists():
+        raise FileNotFoundError(f"Data file not found: {full_path}")
     
-    # Parse timestamp
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
-    df.set_index('timestamp', inplace=True)
+    print(f"\n📊 Loading {timeframe} data from {filepath}...")
     
-    # Ensure we have OHLCV columns (case insensitive)
-    required_cols = ['open', 'high', 'low', 'close', 'volume']
-    df.columns = df.columns.str.lower()
+    # Load CSV
+    data = pd.read_csv(full_path)
     
-    # Select only OHLCV columns
-    df = df[required_cols].copy()
+    # Filter out rows with missing Open time
+    data = data[data['Open time'].notna()]
+    
+    # Convert Open time to datetime
+    data['datetime'] = pd.to_datetime(data['Open time'], errors='coerce')
+    data = data[data['datetime'].notna()]
+    
+    # Set datetime as index
+    data.set_index('datetime', inplace=True)
+    
+    # Select and rename columns to lowercase
+    data = data[['Open', 'High', 'Low', 'Close', 'Volume']]
+    data.columns = ['open', 'high', 'low', 'close', 'volume']
     
     # Convert to float
-    for col in required_cols:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
+    for col in data.columns:
+        data[col] = pd.to_numeric(data[col], errors='coerce')
     
-    # Remove any rows with NaN
-    df = df.dropna()
+    # Remove NaN rows and sort
+    data = data.dropna().sort_index()
     
-    # Sort by timestamp
-    df = df.sort_index()
-    
-    print(f"   ✅ Loaded {len(df)} candles")
-    print(f"   📅 Period: {df.index[0]} to {df.index[-1]}")
-    print(f"   💰 Price range: ${df['low'].min():.2f} - ${df['high'].max():.2f}")
-    
-    return df
-
-
-def filter_data_by_date(df: pd.DataFrame, start_date: str = None, end_date: str = None) -> pd.DataFrame:
-    """
-    Filter DataFrame by date range
-    
-    Args:
-        df: DataFrame with datetime index
-        start_date: Start date in format 'YYYY-MM-DD' (optional)
-        end_date: End date in format 'YYYY-MM-DD' (optional)
-    
-    Returns:
-        Filtered DataFrame
-    """
+    # Filter by date if specified
     if start_date:
-        start_dt = pd.to_datetime(start_date)
-        df = df[df.index >= start_dt]
-        print(f"   📅 Filtered from: {start_dt}")
-    
+        data = data[data.index >= start_date]
     if end_date:
-        end_dt = pd.to_datetime(end_date)
-        df = df[df.index <= end_dt]
-        print(f"   📅 Filtered to: {end_dt}")
+        data = data[data.index <= end_date]
     
-    return df
+    print(f"   ✅ Loaded {len(data)} candles")
+    print(f"   Period: {data.index[0]} to {data.index[-1]}")
+    print(f"   Price range: ${data['low'].min():,.2f} - ${data['high'].max():,.2f}")
+    
+    return data
 
 
-def run_backtest_with_real_data(
-    start_date: str = '2023-01-01',
-    end_date: str = None,
-    initial_balance: float = 10000,
-    risk_per_trade: float = 0.02,
-    volume_threshold: float = 1.5,
-    sweep_lookback: int = 20
-):
+def run_backtest_real_data(start_date: str = '2023-01-01',
+                           end_date: str = '2024-12-31',
+                           initial_balance: float = 10000,
+                           risk_per_trade: float = 0.02,
+                           volume_threshold: float = 1.5,
+                           sweep_lookback: int = 20):
     """
-    Run liquidity reversal backtest with real data from backtest/data
+    Run liquidity reversal backtest on real data
     
     Args:
         start_date: Start date for backtest (YYYY-MM-DD)
-        end_date: End date for backtest (YYYY-MM-DD, optional)
+        end_date: End date for backtest (YYYY-MM-DD)
         initial_balance: Starting capital
         risk_per_trade: Risk per trade as fraction (0.02 = 2%)
-        volume_threshold: Volume threshold multiplier (1.5 = 1.5x average)
-        sweep_lookback: Lookback period for liquidity sweeps
+        volume_threshold: Minimum volume ratio for entry
+        sweep_lookback: Lookback period for liquidity sweep detection
     """
+    
+    import sys
+    sys.stdout.flush()
     
     print("\n" + "="*80)
     print("🚀 LIQUIDITY REVERSAL BACKTEST - REAL DATA")
     print("="*80)
+    sys.stdout.flush()
+    
+    print(f"\n⚙️  Configuration:")
+    print(f"   Period: {start_date} to {end_date}")
+    print(f"   Initial Balance: ${initial_balance:,.2f}")
+    print(f"   Risk per Trade: {risk_per_trade*100}%")
+    print(f"   Volume Threshold: {volume_threshold}x")
+    print(f"   Sweep Lookback: {sweep_lookback} candles")
+    sys.stdout.flush()
     
     # Load 4H data
-    print("\n📊 Loading 4H data...")
-    df_4h = load_csv_data('btc_4h_data_2018_to_2025.csv')
-    df_4h = filter_data_by_date(df_4h, start_date, end_date)
+    print("\n" + "-"*80)
+    sys.stdout.flush()
+    df_4h = load_data_from_backtest_data('4h', start_date, end_date)
+    sys.stdout.flush()
     
     # Load 15M data
-    print("\n📊 Loading 15M data...")
-    df_15m = load_csv_data('btc_15m_data_2018_to_2025.csv')
-    df_15m = filter_data_by_date(df_15m, start_date, end_date)
+    print("\n" + "-"*80)
+    sys.stdout.flush()
+    df_15m = load_data_from_backtest_data('15m', start_date, end_date)
+    sys.stdout.flush()
     
     # Verify data overlap
-    print("\n📊 Data Summary:")
-    print(f"   4H candles: {len(df_4h)} (from {df_4h.index[0]} to {df_4h.index[-1]})")
-    print(f"   15M candles: {len(df_15m)} (from {df_15m.index[0]} to {df_15m.index[-1]})")
-    
-    # Check if we have enough data
-    if len(df_4h) < 50:
-        print("⚠️  Warning: Not enough 4H data (need at least 50 candles)")
-        return None
-    
-    if len(df_15m) < 100:
-        print("⚠️  Warning: Not enough 15M data (need at least 100 candles)")
-        return None
+    if df_4h.index[0] > df_15m.index[-1] or df_4h.index[-1] < df_15m.index[0]:
+        raise ValueError("4H and 15M data periods don't overlap!")
     
     # Initialize backtest
-    print("\n⚙️  Initializing backtest...")
+    print("\n" + "-"*80)
+    print("🔧 Initializing backtest engine...")
     backtest = LiquidityReversalBacktest(
         initial_balance=initial_balance,
         risk_per_trade=risk_per_trade,
         volume_threshold=volume_threshold,
-        sweep_lookback=sweep_lookback
+        sweep_lookback=sweep_lookback,
+        market_commission=0.00045,  # 0.0450% for market orders
+        limit_commission=0.00018,  # 0.0180% for limit orders
+        use_limit_entry=True  # Use limit order at liquidity level (cheaper)
     )
     
     # Run backtest
-    print("\n🚀 Running backtest...")
-    try:
-        results = backtest.run_backtest(df_4h, df_15m, start_date, end_date)
-        
-        # Save results
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        results_dir = Path(__file__).parent / 'backtest_results'
-        results_dir.mkdir(exist_ok=True)
-        
-        results_file = results_dir / f'liquidity_reversal_real_{timestamp}.json'
-        trades_file = results_dir / f'liquidity_reversal_trades_real_{timestamp}.csv'
-        
-        backtest.save_results(results, str(results_file))
-        backtest.save_trades_csv(str(trades_file))
-        
-        print(f"\n💾 Results saved:")
-        print(f"   📄 {results_file}")
-        print(f"   📊 {trades_file}")
-        
-        return results
-        
-    except Exception as e:
-        print(f"\n❌ Error during backtest: {e}")
-        import traceback
-        traceback.print_exc()
-        return None
+    print("\n" + "="*80)
+    results = backtest.run_backtest(df_4h, df_15m, start_date, end_date)
+    
+    # Save results
+    print("\n" + "-"*80)
+    print("💾 Saving results...")
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    
+    # Create results directory
+    results_dir = Path(__file__).parent / 'backtest_results'
+    results_dir.mkdir(exist_ok=True)
+    
+    backtest.save_results(results, f'liquidity_reversal_real_{timestamp}.json')
+    backtest.save_trades_csv(f'liquidity_reversal_trades_real_{timestamp}.csv')
+    
+    print("\n" + "="*80)
+    print("✅ BACKTEST COMPLETED!")
+    print("="*80)
+    print(f"\n📁 Results saved to: {results_dir}")
+    print(f"   - JSON: liquidity_reversal_real_{timestamp}.json")
+    print(f"   - CSV: liquidity_reversal_trades_real_{timestamp}.csv")
+    
+    return results
 
 
 if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Run liquidity reversal backtest on real data')
+    parser.add_argument('--start-date', type=str, default='2023-01-01',
+                       help='Start date (YYYY-MM-DD)')
+    parser.add_argument('--end-date', type=str, default='2024-12-31',
+                       help='End date (YYYY-MM-DD)')
+    parser.add_argument('--balance', type=float, default=10000,
+                       help='Initial balance (default: 10000)')
+    parser.add_argument('--risk', type=float, default=0.02,
+                       help='Risk per trade as fraction (default: 0.02 = 2%%)')
+    parser.add_argument('--volume-threshold', type=float, default=1.5,
+                       help='Volume threshold multiplier (default: 1.5)')
+    parser.add_argument('--sweep-lookback', type=int, default=20,
+                       help='Sweep lookback period (default: 20)')
+    
+    args = parser.parse_args()
+    
     print("""
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║         LIQUIDITY SWEEP REVERSAL - BACKTEST WITH REAL DATA                   ║
+║          LIQUIDITY SWEEP REVERSAL BACKTEST - REAL DATA                        ║
 ║                                                                              ║
-║  This script uses data from backtest/data/ directory                        ║
-║  Files: btc_4h_data_2018_to_2025.csv, btc_15m_data_2018_to_2025.csv         ║
+║  Strategy: Reversal after 4H liquidity sweep with 15M volume + FVG entry     ║
+║  Data: Real BTC data from backtest/data/                                     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
     """)
     
-    # Parse command line arguments
-    start_date = sys.argv[1] if len(sys.argv) > 1 else '2023-01-01'
-    end_date = sys.argv[2] if len(sys.argv) > 2 else None
-    
-    print(f"\n⚙️  Configuration:")
-    print(f"   Start Date: {start_date}")
-    print(f"   End Date: {end_date or 'end of data'}")
-    print(f"   Initial Balance: $10,000")
-    print(f"   Risk per Trade: 2.0%")
-    print(f"   Volume Threshold: 1.5x")
-    
     try:
-        results = run_backtest_with_real_data(
-            start_date=start_date,
-            end_date=end_date,
-            initial_balance=10000,
-            risk_per_trade=0.02,
-            volume_threshold=1.5,
-            sweep_lookback=20
+        results = run_backtest_real_data(
+            start_date=args.start_date,
+            end_date=args.end_date,
+            initial_balance=args.balance,
+            risk_per_trade=args.risk,
+            volume_threshold=args.volume_threshold,
+            sweep_lookback=args.sweep_lookback
         )
         
-        if results:
-            print("\n✅ Backtest completed successfully!")
-            print("\n📁 Check backtest_results/ folder for detailed results")
-        else:
-            print("\n⚠️  Backtest completed with warnings or errors")
-            sys.exit(1)
-            
+        print("\n🎉 Success!")
+        
     except Exception as e:
-        print(f"\n❌ Error running backtest: {e}")
+        print(f"\n❌ Error: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
-

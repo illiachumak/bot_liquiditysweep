@@ -41,3 +41,4 @@ $COMPOSE_CMD ps
 echo -e "\n${GREEN}Bot stopped!${NC}"
 echo -e "${CYAN}To start again: ./start_bot.sh${NC}"
 
+
