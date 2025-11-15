@@ -1,0 +1,14 @@
+# Failed 4H FVG Bot Requirements
+
+# Binance API
+python-binance==1.0.17
+
+# Data processing
+numpy>=1.23.0,<2.0.0
+pandas>=2.0.0,<3.0.0
+
+# Environment variables
+python-dotenv==1.0.0
+
+# Timezone support
+pytz==2023.3

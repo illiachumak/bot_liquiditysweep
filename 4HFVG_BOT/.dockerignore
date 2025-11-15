@@ -1,0 +1,45 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/*.log
+*.log
+
+# State files (will be mounted as volume)
+state.json
+
+# Backtest results
+*.json
+!requirements.txt
+
+# Documentation
+*.md
+!README.md
+
+# Shell scripts
+*.sh
+
+# Environment
+.env
+.env.example
+
+# OS
+.DS_Store
+Thumbs.db
