@@ -1140,17 +1140,15 @@ def main():
 
     # Print warning
     if not DRY_RUN:
-        print("="*80)
-        print("⚠️  WARNING: LIVE TRADING MODE")
-        print("="*80)
-        print("This bot will trade with REAL MONEY on Binance.")
-        print("Please ensure you understand the risks.")
-        print()
-        confirmation = input("Type 'I UNDERSTAND THE RISKS' to continue: ")
-        if confirmation != 'I UNDERSTAND THE RISKS':
-            print("Aborted.")
-            sys.exit(0)
-        print()
+        logger.warning("="*80)
+        logger.warning("⚠️  WARNING: LIVE TRADING MODE - REAL MONEY")
+        logger.warning("="*80)
+        logger.warning("This bot will trade with REAL MONEY on Binance.")
+        logger.warning("Ensure you understand the risks before running.")
+        logger.warning("Set DRY_RUN=true in .env for testnet mode.")
+        logger.warning("="*80)
+    else:
+        logger.info("🧪 DRY RUN MODE - Using Binance Testnet")
 
     # Create and run bot
     bot = FailedFVGLiveBot()
