@@ -25,6 +25,11 @@ fi
 # Source .env to check DRY_RUN
 source .env
 
+# Create required directories and files
+echo "Setting up directories..."
+mkdir -p logs
+
+echo ""
 echo "Configuration:"
 echo "  DRY_RUN: $DRY_RUN"
 if [ "$DRY_RUN" = "false" ]; then

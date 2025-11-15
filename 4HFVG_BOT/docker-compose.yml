@@ -14,8 +14,6 @@ services:
 
     # Mount volumes for persistence
     volumes:
-      # State file to persist bot state
-      - ./state.json:/app/state.json
       # Logs directory
       - ./logs:/app/logs
 

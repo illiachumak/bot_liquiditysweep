@@ -25,10 +25,14 @@ DRY_RUN=true  # Keep true for testnet
 
 ### Step 2: Build and Run
 ```bash
-# Easy way - use the launcher script
+# Easy way - use the simple launcher
+./docker-run.sh
+
+# Or use interactive menu
 ./docker-start.sh
 
 # Or manually
+mkdir -p logs
 docker-compose up -d
 ```
 
