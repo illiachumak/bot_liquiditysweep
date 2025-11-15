@@ -135,3 +135,4 @@ logger.debug(f"Reversal check: bullish={curr_bullish}, strong_body={strong_body}
 3. Перевірити різницю в даних між реальним часом і API
 
 
+

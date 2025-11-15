@@ -1,0 +1,447 @@
+📊 Loading historical data...
+✅ Loaded 17193 4H candles
+✅ Loaded 274797 15M candles
+
+================================================================================
+TESTING PERIOD: 2021
+================================================================================
+
+
+================================================================================
+FAILED 4H FVG BACKTEST
+================================================================================
+Period: 2021-01-01 to 2021-12-31
+Initial Balance: $10,000.00
+Risk per Trade: 2.0%
+Min RR: 0.0
+Min SL: 0.0%
+================================================================================
+
+4H Candles: 2190
+15M Candles: 34975
+
+Running backtest...
+
+✅ Trade #1 | SHORT | Entry: $33380.01 | Exit: $32450.00 | PnL: $+364.48 (+2.79%) | Exit: TP
+✅ Trade #2 | SHORT | Entry: $33379.98 | Exit: $32267.00 | PnL: $+803.25 (+3.33%) | Exit: TP
+✅ Trade #3 | SHORT | Entry: $34606.06 | Exit: $32538.00 | PnL: $+315.11 (+5.98%) | Exit: TP
+✅ Trade #4 | LONG | Entry: $31930.50 | Exit: $36360.00 | PnL: $+647.39 (+13.87%) | Exit: TP
+❌ Trade #5 | LONG | Entry: $35919.12 | Exit: $33609.68 | PnL: $-242.60 (-6.43%) | Exit: SL
+✅ Trade #6 | LONG | Entry: $33499.99 | Exit: $33751.47 | PnL: $+237.75 (+0.75%) | Exit: SL
+✅ Trade #7 | LONG | Entry: $33028.66 | Exit: $33194.22 | PnL: $+242.51 (+0.50%) | Exit: SL
+✅ Trade #8 | SHORT | Entry: $39420.54 | Exit: $38259.25 | PnL: $+706.28 (+2.95%) | Exit: TP
+✅ Trade #9 | SHORT | Entry: $38454.47 | Exit: $37554.94 | PnL: $+493.80 (+2.34%) | Exit: TP
+✅ Trade #10 | SHORT | Entry: $37820.00 | Exit: $37200.00 | PnL: $+196.98 (+1.64%) | Exit: TP
+✅ Trade #11 | LONG | Entry: $35100.00 | Exit: $36744.05 | PnL: $+343.48 (+4.68%) | Exit: TP
+❌ Trade #12 | LONG | Entry: $36099.00 | Exit: $35443.96 | PnL: $-282.17 (-1.81%) | Exit: SL
+❌ Trade #13 | SHORT | Entry: $35543.34 | Exit: $36926.21 | PnL: $-276.52 (-3.89%) | Exit: SL
+❌ Trade #14 | LONG | Entry: $36537.00 | Exit: $35434.99 | PnL: $-270.99 (-3.02%) | Exit: SL
+✅ Trade #15 | LONG | Entry: $36019.48 | Exit: $37469.83 | PnL: $+298.80 (+4.03%) | Exit: TP
+✅ Trade #16 | LONG | Entry: $36777.77 | Exit: $37535.27 | PnL: $+142.00 (+2.06%) | Exit: TP
+✅ Trade #17 | SHORT | Entry: $36115.00 | Exit: $35610.17 | PnL: $+264.79 (+1.40%) | Exit: TP
+✅ Trade #18 | LONG | Entry: $31092.54 | Exit: $32374.64 | PnL: $+548.68 (+4.12%) | Exit: TP
+✅ Trade #21 | LONG | Entry: $32490.00 | Exit: $32931.59 | PnL: $+77.70 (+1.36%) | Exit: TP
+❌ Trade #22 | LONG | Entry: $33247.12 | Exit: $30974.93 | PnL: $-292.21 (-6.83%) | Exit: SL
+✅ Trade #23 | SHORT | Entry: $31650.02 | Exit: $30837.37 | PnL: $+105.04 (+2.57%) | Exit: TP
+✅ Trade #24 | SHORT | Entry: $31142.33 | Exit: $30755.00 | PnL: $+63.82 (+1.24%) | Exit: TP
+✅ Trade #25 | SHORT | Entry: $31126.86 | Exit: $30360.90 | PnL: $+125.66 (+2.46%) | Exit: TP
+❌ Trade #26 | SHORT | Entry: $30841.37 | Exit: $32377.08 | PnL: $-292.26 (-4.98%) | Exit: SL
+✅ Trade #27 | LONG | Entry: $32180.00 | Exit: $32490.00 | PnL: $+37.03 (+0.96%) | Exit: TP
+✅ Trade #28 | LONG | Entry: $32448.27 | Exit: $32670.00 | PnL: $+37.51 (+0.68%) | Exit: TP
+✅ Trade #29 | LONG | Entry: $32625.88 | Exit: $33000.00 | PnL: $+70.57 (+1.15%) | Exit: TP
+✅ Trade #87 | SHORT | Entry: $34925.08 | Exit: $32514.90 | PnL: $+289.32 (+6.90%) | Exit: SL
+✅ Trade #103 | SHORT | Entry: $34163.47 | Exit: $32514.90 | PnL: $+295.10 (+4.83%) | Exit: SL
+❌ Trade #104 | SHORT | Entry: $34137.89 | Exit: $34378.62 | PnL: $-301.01 (-0.71%) | Exit: SL
+✅ Trade #105 | SHORT | Entry: $33926.51 | Exit: $32825.00 | PnL: $+301.88 (+3.25%) | Exit: TP
+✅ Trade #106 | SHORT | Entry: $33110.10 | Exit: $32554.00 | PnL: $+121.00 (+1.68%) | Exit: TP
+❌ Trade #107 | SHORT | Entry: $33049.39 | Exit: $34869.60 | PnL: $-303.44 (-5.51%) | Exit: SL
+✅ Trade #108 | LONG | Entry: $34683.63 | Exit: $35668.10 | PnL: $+119.39 (+2.84%) | Exit: TP
+✅ Trade #109 | LONG | Entry: $35530.00 | Exit: $35984.33 | PnL: $+55.29 (+1.28%) | Exit: TP
+✅ Trade #110 | SHORT | Entry: $36105.00 | Exit: $34528.92 | PnL: $+300.87 (+4.37%) | Exit: SL
+❌ Trade #111 | SHORT | Entry: $36385.82 | Exit: $36918.69 | PnL: $-306.89 (-1.46%) | Exit: SL
+✅ Trade #112 | SHORT | Entry: $37612.37 | Exit: $36662.45 | PnL: $+1260.04 (+2.53%) | Exit: TP
+❌ Trade #113 | SHORT | Entry: $37404.34 | Exit: $37859.40 | PnL: $-325.95 (-1.22%) | Exit: SL
+✅ Trade #114 | SHORT | Entry: $40242.30 | Exit: $39156.16 | PnL: $+491.36 (+2.70%) | Exit: TP
+❌ Trade #117 | SHORT | Entry: $39237.21 | Exit: $39690.26 | PnL: $-329.26 (-1.15%) | Exit: SL
+✅ Trade #118 | SHORT | Entry: $39233.52 | Exit: $37923.00 | PnL: $+774.65 (+3.34%) | Exit: TP
+❌ Trade #119 | SHORT | Entry: $38433.10 | Exit: $39351.24 | PnL: $-338.16 (-2.39%) | Exit: SL
+✅ Trade #120 | LONG | Entry: $39119.18 | Exit: $39391.78 | PnL: $+49.02 (+0.70%) | Exit: TP
+✅ Trade #121 | LONG | Entry: $39318.78 | Exit: $39498.99 | PnL: $+42.71 (+0.46%) | Exit: TP
+❌ Trade #122 | SHORT | Entry: $39330.38 | Exit: $39351.24 | PnL: $-333.24 (-0.05%) | Exit: SL
+✅ Trade #126 | LONG | Entry: $43336.97 | Exit: $44918.00 | PnL: $+101.84 (+3.65%) | Exit: TP
+✅ Trade #132 | LONG | Entry: $46553.26 | Exit: $48399.00 | PnL: $+1036.18 (+3.96%) | Exit: TP
+✅ Trade #133 | SHORT | Entry: $48888.88 | Exit: $48101.38 | PnL: $+299.68 (+1.61%) | Exit: TP
+✅ Trade #134 | LONG | Entry: $47924.69 | Exit: $48219.23 | PnL: $+56.81 (+0.61%) | Exit: TP
+✅ Trade #138 | LONG | Entry: $48319.33 | Exit: $48801.00 | PnL: $+121.80 (+1.00%) | Exit: TP
+✅ Trade #139 | LONG | Entry: $49090.00 | Exit: $50000.00 | PnL: $+416.79 (+1.85%) | Exit: TP
+✅ Trade #140 | SHORT | Entry: $51686.20 | Exit: $51295.00 | PnL: $+244.79 (+0.76%) | Exit: TP
+✅ Trade #141 | SHORT | Entry: $51852.10 | Exit: $50901.90 | PnL: $+657.89 (+1.83%) | Exit: TP
+❌ Trade #142 | SHORT | Entry: $51428.78 | Exit: $52299.51 | PnL: $-385.29 (-1.69%) | Exit: SL
+✅ Trade #143 | SHORT | Entry: $52800.00 | Exit: $52047.88 | PnL: $+377.58 (+1.42%) | Exit: SL
+✅ Trade #144 | SHORT | Entry: $49450.00 | Exit: $48581.71 | PnL: $+165.31 (+1.76%) | Exit: TP
+✅ Trade #145 | SHORT | Entry: $50538.03 | Exit: $49850.81 | PnL: $+120.94 (+1.36%) | Exit: TP
+✅ Trade #146 | SHORT | Entry: $50319.20 | Exit: $49010.10 | PnL: $+950.11 (+2.60%) | Exit: TP
+✅ Trade #147 | SHORT | Entry: $49531.21 | Exit: $48524.86 | PnL: $+362.02 (+2.03%) | Exit: TP
+❌ Trade #199 | SHORT | Entry: $48318.37 | Exit: $50857.74 | PnL: $-417.10 (-5.26%) | Exit: SL
+✅ Trade #200 | LONG | Entry: $50613.42 | Exit: $51148.22 | PnL: $+57.19 (+1.06%) | Exit: TP
+✅ Trade #201 | SHORT | Entry: $50700.49 | Exit: $50133.99 | PnL: $+409.90 (+1.12%) | Exit: SL
+✅ Trade #202 | SHORT | Entry: $50700.49 | Exit: $50133.99 | PnL: $+418.10 (+1.12%) | Exit: SL
+✅ Trade #203 | LONG | Entry: $50606.00 | Exit: $51250.00 | PnL: $+129.33 (+1.27%) | Exit: TP
+✅ Trade #204 | LONG | Entry: $50722.20 | Exit: $51450.03 | PnL: $+115.55 (+1.43%) | Exit: TP
+✅ Trade #208 | LONG | Entry: $51478.98 | Exit: $51996.58 | PnL: $+56.02 (+1.01%) | Exit: TP
+✅ Trade #209 | LONG | Entry: $52126.82 | Exit: $52540.48 | PnL: $+49.57 (+0.79%) | Exit: TP
+✅ Trade #210 | SHORT | Entry: $54043.24 | Exit: $51045.89 | PnL: $+433.47 (+5.55%) | Exit: SL
+✅ Trade #211 | SHORT | Entry: $56062.93 | Exit: $55170.22 | PnL: $+1721.34 (+1.59%) | Exit: TP
+✅ Trade #216 | SHORT | Entry: $60571.76 | Exit: $60135.37 | PnL: $+148.98 (+0.72%) | Exit: TP
+✅ Trade #217 | SHORT | Entry: $60405.65 | Exit: $58966.78 | PnL: $+834.25 (+2.38%) | Exit: TP
+✅ Trade #284 | SHORT | Entry: $56046.40 | Exit: $54600.00 | PnL: $+155.20 (+2.58%) | Exit: TP
+❌ Trade #285 | SHORT | Entry: $55260.00 | Exit: $58210.00 | PnL: $-262.50 (-5.34%) | Exit: TIMEOUT
+✅ Trade #286 | SHORT | Entry: $58671.19 | Exit: $57601.92 | PnL: $+253.57 (+1.82%) | Exit: TP
+✅ Trade #287 | SHORT | Entry: $57803.73 | Exit: $57023.00 | PnL: $+587.82 (+1.35%) | Exit: TP
+❌ Trade #288 | SHORT | Entry: $57175.60 | Exit: $58777.32 | PnL: $-510.91 (-2.80%) | Exit: SL
+✅ Trade #289 | LONG | Entry: $58315.84 | Exit: $58888.00 | PnL: $+74.83 (+0.98%) | Exit: TP
+✅ Trade #290 | LONG | Entry: $58834.49 | Exit: $59249.50 | PnL: $+52.18 (+0.71%) | Exit: TP
+✅ Trade #291 | LONG | Entry: $58453.38 | Exit: $59468.00 | PnL: $+151.14 (+1.74%) | Exit: TP
+❌ Trade #292 | LONG | Entry: $59220.00 | Exit: $57193.11 | PnL: $-223.58 (-3.42%) | Exit: TIMEOUT
+✅ Trade #293 | SHORT | Entry: $57073.35 | Exit: $56521.01 | PnL: $+87.24 (+0.97%) | Exit: TP
+❌ Trade #294 | LONG | Entry: $56774.35 | Exit: $54490.80 | PnL: $-503.53 (-4.02%) | Exit: SL
+✅ Trade #319 | LONG | Entry: $54500.00 | Exit: $56636.50 | PnL: $+493.46 (+3.92%) | Exit: SL
+✅ Trade #320 | LONG | Entry: $54500.00 | Exit: $56176.42 | PnL: $+503.33 (+3.08%) | Exit: SL
+✅ Trade #321 | LONG | Entry: $54500.00 | Exit: $57200.59 | PnL: $+513.40 (+4.96%) | Exit: SL
+✅ Trade #322 | LONG | Entry: $54500.00 | Exit: $56910.08 | PnL: $+523.67 (+4.42%) | Exit: SL
+✅ Trade #323 | SHORT | Entry: $55034.72 | Exit: $53650.00 | PnL: $+206.88 (+2.52%) | Exit: TP
+✅ Trade #324 | SHORT | Entry: $54050.07 | Exit: $53111.66 | PnL: $+84.90 (+1.74%) | Exit: TP
+✅ Trade #325 | SHORT | Entry: $53120.00 | Exit: $51700.00 | PnL: $+107.54 (+2.67%) | Exit: TP
+❌ Trade #326 | SHORT | Entry: $52134.27 | Exit: $55792.14 | PnL: $-427.27 (-7.02%) | Exit: TIMEOUT
+❌ Trade #327 | SHORT | Entry: $55800.00 | Exit: $57314.40 | PnL: $-533.58 (-2.71%) | Exit: SL
+✅ Trade #340 | LONG | Entry: $57300.00 | Exit: $58225.00 | PnL: $+124.16 (+1.61%) | Exit: TP
+✅ Trade #341 | LONG | Entry: $57845.00 | Exit: $58405.82 | PnL: $+68.49 (+0.97%) | Exit: TP
+✅ Trade #347 | LONG | Entry: $58777.00 | Exit: $59220.00 | PnL: $+67.92 (+0.75%) | Exit: TP
+✅ Trade #348 | SHORT | Entry: $58988.35 | Exit: $56252.83 | PnL: $+528.12 (+4.64%) | Exit: SL
+✅ Trade #349 | SHORT | Entry: $58988.35 | Exit: $52513.46 | PnL: $+538.68 (+10.98%) | Exit: SL
+✅ Trade #350 | LONG | Entry: $58851.72 | Exit: $59368.00 | PnL: $+54.70 (+0.88%) | Exit: TP
+✅ Trade #351 | LONG | Entry: $58774.31 | Exit: $59700.36 | PnL: $+69.11 (+1.58%) | Exit: TP
+❌ Trade #352 | LONG | Entry: $59230.00 | Exit: $57655.00 | PnL: $-253.45 (-2.66%) | Exit: TIMEOUT
+✅ Trade #353 | SHORT | Entry: $57600.49 | Exit: $54852.87 | PnL: $+546.86 (+4.77%) | Exit: SL
+✅ Trade #384 | LONG | Entry: $57929.87 | Exit: $58155.00 | PnL: $+184.26 (+0.39%) | Exit: TP
+✅ Trade #385 | SHORT | Entry: $58173.84 | Exit: $57000.00 | PnL: $+377.54 (+2.02%) | Exit: TP
+✅ Trade #386 | SHORT | Entry: $57272.05 | Exit: $56972.86 | PnL: $+69.57 (+0.52%) | Exit: TP
+✅ Trade #466 | LONG | Entry: $57766.84 | Exit: $58387.35 | PnL: $+318.48 (+1.07%) | Exit: TP
+✅ Trade #475 | LONG | Entry: $58725.00 | Exit: $59175.01 | PnL: $+505.87 (+0.77%) | Exit: TP
+❌ Trade #476 | LONG | Entry: $58822.30 | Exit: $57998.77 | PnL: $-586.91 (-1.40%) | Exit: SL
+❌ Trade #495 | LONG | Entry: $58043.00 | Exit: $57819.58 | PnL: $-575.18 (-0.38%) | Exit: SL
+✅ Trade #496 | SHORT | Entry: $57999.99 | Exit: $57413.02 | PnL: $+247.38 (+1.01%) | Exit: TP
+✅ Trade #497 | SHORT | Entry: $57819.63 | Exit: $57161.86 | PnL: $+213.23 (+1.14%) | Exit: TP
+✅ Trade #498 | LONG | Entry: $56315.73 | Exit: $56886.00 | PnL: $+572.88 (+1.01%) | Exit: SL
+✅ Trade #499 | LONG | Entry: $56466.61 | Exit: $57568.92 | PnL: $+584.34 (+1.95%) | Exit: SL
+❌ Trade #500 | LONG | Entry: $56674.66 | Exit: $56664.21 | PnL: $-596.03 (-0.02%) | Exit: SL
+✅ Trade #501 | LONG | Entry: $56670.09 | Exit: $56766.24 | PnL: $+584.11 (+0.17%) | Exit: SL
+❌ Trade #502 | LONG | Entry: $56670.09 | Exit: $56664.21 | PnL: $-595.79 (-0.01%) | Exit: SL
+✅ Trade #503 | LONG | Entry: $56670.09 | Exit: $57333.85 | PnL: $+822.93 (+1.17%) | Exit: TP
+✅ Trade #512 | SHORT | Entry: $61640.06 | Exit: $61064.96 | PnL: $+167.59 (+0.93%) | Exit: TP
+✅ Trade #576 | SHORT | Entry: $55950.51 | Exit: $55779.97 | PnL: $+22.05 (+0.30%) | Exit: TIMEOUT
+✅ Trade #577 | LONG | Entry: $55246.63 | Exit: $56600.00 | PnL: $+726.95 (+2.45%) | Exit: TP
+❌ Trade #578 | LONG | Entry: $56172.44 | Exit: $53223.30 | PnL: $-618.67 (-5.25%) | Exit: SL
+✅ Trade #579 | SHORT | Entry: $54690.00 | Exit: $53200.00 | PnL: $+152.34 (+2.72%) | Exit: TP
+✅ Trade #580 | SHORT | Entry: $54099.45 | Exit: $52561.00 | PnL: $+122.53 (+2.84%) | Exit: TP
+✅ Trade #581 | LONG | Entry: $51767.25 | Exit: $54989.43 | PnL: $+611.79 (+6.22%) | Exit: SL
+✅ Trade #582 | LONG | Entry: $51767.25 | Exit: $54989.43 | PnL: $+624.02 (+6.22%) | Exit: SL
+✅ Trade #583 | LONG | Entry: $51767.25 | Exit: $55977.82 | PnL: $+636.51 (+8.13%) | Exit: SL
+✅ Trade #584 | LONG | Entry: $51767.25 | Exit: $54191.40 | PnL: $+649.24 (+4.68%) | Exit: SL
+✅ Trade #585 | LONG | Entry: $50113.99 | Exit: $54191.40 | PnL: $+662.22 (+8.14%) | Exit: SL
+✅ Trade #586 | SHORT | Entry: $50135.53 | Exit: $48555.00 | PnL: $+1985.50 (+3.15%) | Exit: TP
+❌ Trade #587 | LONG | Entry: $49889.33 | Exit: $49351.10 | PnL: $-715.17 (-1.08%) | Exit: SL
+✅ Trade #620 | LONG | Entry: $52087.99 | Exit: $52722.35 | PnL: $+122.48 (+1.22%) | Exit: TP
+✅ Trade #621 | LONG | Entry: $52579.91 | Exit: $52840.00 | PnL: $+46.62 (+0.49%) | Exit: TP
+✅ Trade #624 | LONG | Entry: $54620.00 | Exit: $54986.96 | PnL: $+171.78 (+0.67%) | Exit: TP
+❌ Trade #625 | SHORT | Entry: $53419.47 | Exit: $53923.82 | PnL: $-707.69 (-0.94%) | Exit: SL
+✅ Trade #626 | SHORT | Entry: $57764.99 | Exit: $57116.16 | PnL: $+1141.79 (+1.12%) | Exit: TP
+✅ Trade #627 | SHORT | Entry: $57271.78 | Exit: $56323.66 | PnL: $+899.54 (+1.66%) | Exit: TP
+✅ Trade #635 | LONG | Entry: $57719.99 | Exit: $58289.99 | PnL: $+258.32 (+0.99%) | Exit: TP
+✅ Trade #639 | SHORT | Entry: $56335.08 | Exit: $54580.00 | PnL: $+1325.34 (+3.12%) | Exit: TP
+✅ Trade #642 | SHORT | Entry: $54556.99 | Exit: $53526.00 | PnL: $+420.80 (+1.89%) | Exit: TP
+✅ Trade #647 | LONG | Entry: $55747.47 | Exit: $56111.00 | PnL: $+341.30 (+0.65%) | Exit: TP
+✅ Trade #648 | LONG | Entry: $56026.00 | Exit: $56325.42 | PnL: $+212.01 (+0.53%) | Exit: TP
+❌ Trade #649 | SHORT | Entry: $56571.42 | Exit: $57236.41 | PnL: $-785.52 (-1.18%) | Exit: SL
+✅ Trade #662 | SHORT | Entry: $56000.00 | Exit: $53400.00 | PnL: $+738.32 (+4.64%) | Exit: TP
+✅ Trade #677 | SHORT | Entry: $50500.00 | Exit: $50299.98 | PnL: $+20.61 (+0.40%) | Exit: TIMEOUT
+✅ Trade #684 | SHORT | Entry: $49792.07 | Exit: $49030.00 | PnL: $+82.84 (+1.53%) | Exit: TP
+✅ Trade #685 | LONG | Entry: $48341.98 | Exit: $56442.01 | PnL: $+786.64 (+16.76%) | Exit: SL
+✅ Trade #689 | SHORT | Entry: $48880.70 | Exit: $46924.62 | PnL: $+1546.65 (+4.00%) | Exit: TP
+✅ Trade #690 | SHORT | Entry: $40653.07 | Exit: $39222.00 | PnL: $+977.55 (+3.52%) | Exit: TP
+✅ Trade #699 | LONG | Entry: $37221.08 | Exit: $37922.18 | PnL: $+422.48 (+1.88%) | Exit: TP
+✅ Trade #700 | LONG | Entry: $37754.08 | Exit: $38637.70 | PnL: $+327.47 (+2.34%) | Exit: TP
+✅ Trade #701 | SHORT | Entry: $38343.05 | Exit: $37608.00 | PnL: $+754.78 (+1.92%) | Exit: TP
+✅ Trade #702 | SHORT | Entry: $39120.00 | Exit: $38440.00 | PnL: $+1944.96 (+1.74%) | Exit: TP
+❌ Trade #703 | SHORT | Entry: $39166.03 | Exit: $39321.59 | PnL: $-921.85 (-0.40%) | Exit: SL
+❌ Trade #704 | LONG | Entry: $38725.00 | Exit: $37750.43 | PnL: $-903.42 (-2.52%) | Exit: SL
+✅ Trade #705 | SHORT | Entry: $38182.98 | Exit: $37687.77 | PnL: $+567.47 (+1.30%) | Exit: TP
+✅ Trade #706 | LONG | Entry: $36048.15 | Exit: $39178.08 | PnL: $+896.70 (+8.68%) | Exit: SL
+✅ Trade #717 | LONG | Entry: $35555.00 | Exit: $35881.54 | PnL: $+163.87 (+0.92%) | Exit: TP
+❌ Trade #718 | LONG | Entry: $35890.00 | Exit: $35475.33 | PnL: $-917.91 (-1.16%) | Exit: SL
+❌ Trade #719 | LONG | Entry: $35554.63 | Exit: $35229.40 | PnL: $-899.55 (-0.91%) | Exit: SL
+❌ Trade #720 | SHORT | Entry: $35681.02 | Exit: $36560.98 | PnL: $-881.56 (-2.47%) | Exit: SL
+✅ Trade #730 | LONG | Entry: $36571.42 | Exit: $37278.03 | PnL: $+534.36 (+1.93%) | Exit: TP
+❌ Trade #731 | SHORT | Entry: $36478.36 | Exit: $36565.88 | PnL: $-874.61 (-0.24%) | Exit: SL
+✅ Trade #739 | SHORT | Entry: $36780.00 | Exit: $36072.82 | PnL: $+490.75 (+1.92%) | Exit: TP
+✅ Trade #740 | LONG | Entry: $37090.39 | Exit: $37338.42 | PnL: $+133.86 (+0.67%) | Exit: TP
+✅ Trade #747 | SHORT | Entry: $36354.51 | Exit: $35951.74 | PnL: $+212.75 (+1.11%) | Exit: TP
+✅ Trade #748 | LONG | Entry: $32460.42 | Exit: $32596.63 | PnL: $+873.87 (+0.42%) | Exit: SL
+✅ Trade #756 | LONG | Entry: $33968.70 | Exit: $34360.00 | PnL: $+232.94 (+1.15%) | Exit: TP
+✅ Trade #757 | LONG | Entry: $34742.22 | Exit: $35450.00 | PnL: $+420.31 (+2.04%) | Exit: TP
+✅ Trade #759 | LONG | Entry: $36021.08 | Exit: $36736.00 | PnL: $+173.12 (+1.98%) | Exit: TP
+✅ Trade #760 | LONG | Entry: $36313.50 | Exit: $37000.00 | PnL: $+2276.95 (+1.89%) | Exit: TP
+✅ Trade #797 | LONG | Entry: $39011.81 | Exit: $39800.00 | PnL: $+167.71 (+2.02%) | Exit: TP
+✅ Trade #798 | LONG | Entry: $39635.88 | Exit: $40659.42 | PnL: $+280.59 (+2.58%) | Exit: TP
+✅ Trade #809 | SHORT | Entry: $38205.00 | Exit: $37637.00 | PnL: $+326.43 (+1.49%) | Exit: TP
+✅ Trade #810 | SHORT | Entry: $37939.00 | Exit: $37365.00 | PnL: $+444.64 (+1.51%) | Exit: TP
+✅ Trade #811 | SHORT | Entry: $36603.13 | Exit: $36266.00 | PnL: $+1140.85 (+0.92%) | Exit: TP
+✅ Trade #815 | SHORT | Entry: $36122.04 | Exit: $35300.33 | PnL: $+246.41 (+2.27%) | Exit: TP
+❌ Trade #816 | LONG | Entry: $34332.37 | Exit: $33269.33 | PnL: $-1005.55 (-3.10%) | Exit: SL
+✅ Trade #831 | SHORT | Entry: $33180.03 | Exit: $32266.00 | PnL: $+297.27 (+2.75%) | Exit: TP
+✅ Trade #832 | SHORT | Entry: $33180.03 | Exit: $32083.22 | PnL: $+673.18 (+3.31%) | Exit: TP
+✅ Trade #851 | LONG | Entry: $33901.19 | Exit: $34444.00 | PnL: $+300.44 (+1.60%) | Exit: TP
+✅ Trade #852 | LONG | Entry: $33999.90 | Exit: $34500.00 | PnL: $+212.38 (+1.47%) | Exit: TP
+✅ Trade #854 | SHORT | Entry: $33563.44 | Exit: $32919.19 | PnL: $+471.40 (+1.92%) | Exit: TP
+❌ Trade #855 | SHORT | Entry: $33513.01 | Exit: $33947.75 | PnL: $-1024.53 (-1.30%) | Exit: SL
+✅ Trade #856 | SHORT | Entry: $34351.72 | Exit: $33347.11 | PnL: $+1004.04 (+2.92%) | Exit: SL
+✅ Trade #857 | SHORT | Entry: $33568.46 | Exit: $33150.00 | PnL: $+437.08 (+1.25%) | Exit: TP
+✅ Trade #858 | SHORT | Entry: $33318.71 | Exit: $32823.31 | PnL: $+1465.03 (+1.49%) | Exit: TP
+✅ Trade #859 | LONG | Entry: $32637.49 | Exit: $33499.00 | PnL: $+762.24 (+2.64%) | Exit: TP
+✅ Trade #871 | LONG | Entry: $34450.00 | Exit: $34972.28 | PnL: $+260.07 (+1.52%) | Exit: TP
+✅ Trade #872 | SHORT | Entry: $35975.03 | Exit: $35343.12 | PnL: $+3469.65 (+1.76%) | Exit: TP
+✅ Trade #873 | SHORT | Entry: $34431.62 | Exit: $34017.55 | PnL: $+588.22 (+1.20%) | Exit: TP
+✅ Trade #881 | LONG | Entry: $34570.00 | Exit: $34780.00 | PnL: $+130.84 (+0.61%) | Exit: TP
+✅ Trade #897 | SHORT | Entry: $34250.37 | Exit: $34000.00 | PnL: $+163.20 (+0.73%) | Exit: TP
+❌ Trade #898 | SHORT | Entry: $34253.24 | Exit: $34504.09 | PnL: $-264.06 (-0.73%) | Exit: TIMEOUT
+✅ Trade #919 | SHORT | Entry: $33302.00 | Exit: $33066.00 | PnL: $+162.88 (+0.71%) | Exit: TP
+❌ Trade #920 | LONG | Entry: $33237.00 | Exit: $33059.30 | PnL: $-1167.62 (-0.53%) | Exit: SL
+✅ Trade #921 | LONG | Entry: $32642.17 | Exit: $33840.27 | PnL: $+1144.27 (+3.67%) | Exit: SL
+✅ Trade #922 | LONG | Entry: $32717.50 | Exit: $33662.54 | PnL: $+1167.15 (+2.89%) | Exit: SL
+✅ Trade #923 | LONG | Entry: $32484.42 | Exit: $33732.41 | PnL: $+1190.50 (+3.84%) | Exit: SL
+✅ Trade #928 | LONG | Entry: $32724.89 | Exit: $33464.94 | PnL: $+1214.31 (+2.26%) | Exit: SL
+✅ Trade #937 | LONG | Entry: $33290.00 | Exit: $33561.55 | PnL: $+1238.59 (+0.82%) | Exit: SL
+✅ Trade #938 | LONG | Entry: $33526.92 | Exit: $34053.69 | PnL: $+669.44 (+1.57%) | Exit: TP
+✅ Trade #939 | LONG | Entry: $33889.78 | Exit: $34192.00 | PnL: $+225.36 (+0.89%) | Exit: TP
+✅ Trade #940 | SHORT | Entry: $34402.94 | Exit: $33710.94 | PnL: $+5745.92 (+2.01%) | Exit: TP
+✅ Trade #941 | SHORT | Entry: $33334.69 | Exit: $33128.00 | PnL: $+1666.22 (+0.62%) | Exit: TP
+✅ Trade #942 | SHORT | Entry: $32580.00 | Exit: $32202.25 | PnL: $+786.71 (+1.16%) | Exit: TP
+✅ Trade #948 | LONG | Entry: $32367.34 | Exit: $32807.41 | PnL: $+722.37 (+1.36%) | Exit: TP
+✅ Trade #950 | SHORT | Entry: $32112.00 | Exit: $31816.06 | PnL: $+473.08 (+0.92%) | Exit: TP
+✅ Trade #954 | SHORT | Entry: $31761.63 | Exit: $31455.00 | PnL: $+988.67 (+0.97%) | Exit: TP
+❌ Trade #959 | SHORT | Entry: $31871.37 | Exit: $32313.68 | PnL: $-1488.92 (-1.39%) | Exit: SL
+❌ Trade #960 | LONG | Entry: $32099.86 | Exit: $31278.48 | PnL: $-1459.14 (-2.56%) | Exit: SL
+✅ Trade #961 | SHORT | Entry: $31671.05 | Exit: $31108.97 | PnL: $+2304.45 (+1.77%) | Exit: TP
+✅ Trade #966 | SHORT | Entry: $30716.00 | Exit: $30560.00 | PnL: $+184.76 (+0.51%) | Exit: TP
+✅ Trade #967 | LONG | Entry: $29733.20 | Exit: $31400.07 | PnL: $+1479.74 (+5.61%) | Exit: SL
+✅ Trade #1008 | LONG | Entry: $31555.56 | Exit: $31792.40 | PnL: $+153.09 (+0.75%) | Exit: TP
+✅ Trade #1015 | LONG | Entry: $31780.00 | Exit: $32858.00 | PnL: $+1137.43 (+3.39%) | Exit: TP
+✅ Trade #1016 | LONG | Entry: $32599.97 | Exit: $32915.00 | PnL: $+153.14 (+0.97%) | Exit: TP
+✅ Trade #1039 | LONG | Entry: $33514.26 | Exit: $33777.00 | PnL: $+291.68 (+0.78%) | Exit: TP
+✅ Trade #1040 | LONG | Entry: $33609.05 | Exit: $33845.41 | PnL: $+246.53 (+0.70%) | Exit: TP
+✅ Trade #1041 | LONG | Entry: $34462.76 | Exit: $34632.78 | PnL: $+214.22 (+0.49%) | Exit: TP
+✅ Trade #1056 | LONG | Entry: $38682.15 | Exit: $39799.97 | PnL: $+479.22 (+2.89%) | Exit: TP
+✅ Trade #1062 | LONG | Entry: $38237.00 | Exit: $38771.91 | PnL: $+869.27 (+1.40%) | Exit: TP
+✅ Trade #1063 | LONG | Entry: $38925.53 | Exit: $40106.77 | PnL: $+3938.15 (+3.03%) | Exit: TP
+✅ Trade #1068 | SHORT | Entry: $40181.03 | Exit: $39422.01 | PnL: $+503.05 (+1.89%) | Exit: TP
+✅ Trade #1070 | SHORT | Entry: $39533.55 | Exit: $38473.96 | PnL: $+3427.02 (+2.68%) | Exit: TP
+❌ Trade #1071 | SHORT | Entry: $38765.92 | Exit: $39609.66 | PnL: $-1737.59 (-2.18%) | Exit: SL
+✅ Trade #1076 | LONG | Entry: $39990.00 | Exit: $40435.99 | PnL: $+570.95 (+1.12%) | Exit: TP
+✅ Trade #1077 | SHORT | Entry: $40421.69 | Exit: $39929.70 | PnL: $+1714.26 (+1.22%) | Exit: SL
+✅ Trade #1078 | LONG | Entry: $40187.02 | Exit: $41350.00 | PnL: $+1331.55 (+2.89%) | Exit: TP
+✅ Trade #1099 | LONG | Entry: $46400.00 | Exit: $46643.00 | PnL: $+158.73 (+0.52%) | Exit: TP
+✅ Trade #1104 | LONG | Entry: $47588.00 | Exit: $47886.00 | PnL: $+108.23 (+0.63%) | Exit: TP
+✅ Trade #1109 | SHORT | Entry: $46568.64 | Exit: $45971.03 | PnL: $+636.53 (+1.28%) | Exit: TP
+✅ Trade #1110 | SHORT | Entry: $46072.31 | Exit: $45519.00 | PnL: $+711.42 (+1.20%) | Exit: TP
+✅ Trade #1114 | LONG | Entry: $46500.00 | Exit: $46735.63 | PnL: $+390.37 (+0.51%) | Exit: TP
+❌ Trade #1116 | LONG | Entry: $47070.50 | Exit: $46647.96 | PnL: $-1815.28 (-0.90%) | Exit: SL
+✅ Trade #1125 | SHORT | Entry: $46229.48 | Exit: $45680.00 | PnL: $+509.00 (+1.19%) | Exit: TP
+❌ Trade #1126 | SHORT | Entry: $45717.24 | Exit: $46759.33 | PnL: $-1789.16 (-2.28%) | Exit: SL
+✅ Trade #1127 | LONG | Entry: $46588.00 | Exit: $46882.22 | PnL: $+358.49 (+0.63%) | Exit: TP
+✅ Trade #1142 | SHORT | Entry: $46123.00 | Exit: $45636.97 | PnL: $+1449.71 (+1.05%) | Exit: TP
+✅ Trade #1150 | SHORT | Entry: $45287.55 | Exit: $44601.95 | PnL: $+872.84 (+1.51%) | Exit: TP
+❌ Trade #1154 | LONG | Entry: $44719.67 | Exit: $44287.25 | PnL: $-1807.00 (-0.97%) | Exit: SL
+✅ Trade #1155 | SHORT | Entry: $44581.34 | Exit: $44126.38 | PnL: $+249.96 (+1.02%) | Exit: TP
+✅ Trade #1189 | LONG | Entry: $45465.70 | Exit: $45734.00 | PnL: $+526.48 (+0.59%) | Exit: TP
+✅ Trade #1204 | LONG | Entry: $46766.78 | Exit: $47390.00 | PnL: $+407.60 (+1.33%) | Exit: TP
+✅ Trade #1225 | LONG | Entry: $48550.00 | Exit: $48832.38 | PnL: $+110.32 (+0.58%) | Exit: TP
+✅ Trade #1226 | LONG | Entry: $48720.29 | Exit: $49096.34 | PnL: $+154.80 (+0.77%) | Exit: TP
+✅ Trade #1227 | LONG | Entry: $48558.36 | Exit: $49500.00 | PnL: $+3482.33 (+1.94%) | Exit: TP
+✅ Trade #1228 | SHORT | Entry: $49700.01 | Exit: $49309.07 | PnL: $+3670.08 (+0.79%) | Exit: TP
+✅ Trade #1229 | SHORT | Entry: $49405.57 | Exit: $49029.00 | PnL: $+1688.60 (+0.76%) | Exit: TP
+❌ Trade #1230 | SHORT | Entry: $49456.00 | Exit: $49786.86 | PnL: $-1976.66 (-0.67%) | Exit: SL
+❌ Trade #1231 | LONG | Entry: $49766.00 | Exit: $48678.71 | PnL: $-1937.13 (-2.18%) | Exit: SL
+✅ Trade #1250 | SHORT | Entry: $48210.98 | Exit: $47749.10 | PnL: $+505.46 (+0.96%) | Exit: TP
+✅ Trade #1251 | SHORT | Entry: $48018.00 | Exit: $47600.00 | PnL: $+413.84 (+0.87%) | Exit: TP
+✅ Trade #1270 | SHORT | Entry: $47356.57 | Exit: $46837.43 | PnL: $+474.98 (+1.10%) | Exit: TP
+✅ Trade #1279 | LONG | Entry: $48140.66 | Exit: $48451.51 | PnL: $+301.93 (+0.65%) | Exit: TP
+✅ Trade #1289 | LONG | Entry: $49032.43 | Exit: $49299.00 | PnL: $+200.77 (+0.54%) | Exit: TP
+✅ Trade #1297 | SHORT | Entry: $48431.56 | Exit: $48067.53 | PnL: $+542.23 (+0.75%) | Exit: TP
+✅ Trade #1300 | SHORT | Entry: $48018.00 | Exit: $47803.00 | PnL: $+616.37 (+0.45%) | Exit: TP
+✅ Trade #1301 | SHORT | Entry: $48018.00 | Exit: $47734.00 | PnL: $+762.18 (+0.59%) | Exit: TP
+✅ Trade #1302 | LONG | Entry: $47882.35 | Exit: $48200.00 | PnL: $+1709.33 (+0.66%) | Exit: TP
+❌ Trade #1303 | LONG | Entry: $47440.00 | Exit: $46606.60 | PnL: $-2008.93 (-1.76%) | Exit: SL
+✅ Trade #1307 | LONG | Entry: $48630.00 | Exit: $48899.92 | PnL: $+240.34 (+0.56%) | Exit: TP
+✅ Trade #1315 | SHORT | Entry: $51244.51 | Exit: $50402.00 | PnL: $+933.43 (+1.64%) | Exit: TP
+✅ Trade #1336 | SHORT | Entry: $47127.37 | Exit: $46222.97 | PnL: $+439.48 (+1.92%) | Exit: TIMEOUT
+✅ Trade #1337 | SHORT | Entry: $46538.02 | Exit: $45599.00 | PnL: $+400.71 (+2.02%) | Exit: TP
+✅ Trade #1338 | SHORT | Entry: $45957.51 | Exit: $44900.00 | PnL: $+5049.21 (+2.30%) | Exit: TP
+❌ Trade #1344 | SHORT | Entry: $45101.68 | Exit: $46973.76 | PnL: $-2110.01 (-4.15%) | Exit: SL
+✅ Trade #1345 | SHORT | Entry: $47205.77 | Exit: $45591.00 | PnL: $+2067.81 (+3.42%) | Exit: SL
+❌ Trade #1346 | SHORT | Entry: $48222.22 | Exit: $48526.73 | PnL: $-2109.17 (-0.63%) | Exit: SL
+✅ Trade #1347 | SHORT | Entry: $47858.97 | Exit: $47211.35 | PnL: $+3313.22 (+1.35%) | Exit: TP
+✅ Trade #1348 | SHORT | Entry: $48217.44 | Exit: $47800.51 | PnL: $+3527.53 (+0.86%) | Exit: TP
+✅ Trade #1351 | SHORT | Entry: $47600.09 | Exit: $47150.00 | PnL: $+739.79 (+0.95%) | Exit: TP
+✅ Trade #1394 | SHORT | Entry: $44901.04 | Exit: $44444.00 | PnL: $+287.36 (+1.02%) | Exit: TP
+✅ Trade #1401 | SHORT | Entry: $43450.00 | Exit: $42500.00 | PnL: $+529.35 (+2.19%) | Exit: TP
+❌ Trade #1402 | SHORT | Entry: $44034.49 | Exit: $44475.37 | PnL: $-2234.93 (-1.00%) | Exit: SL
+✅ Trade #1403 | LONG | Entry: $44404.11 | Exit: $44899.00 | PnL: $+544.93 (+1.11%) | Exit: TP
+✅ Trade #1419 | SHORT | Entry: $42753.35 | Exit: $42180.55 | PnL: $+522.77 (+1.34%) | Exit: TP
+✅ Trade #1420 | SHORT | Entry: $42348.00 | Exit: $40843.82 | PnL: $+1180.85 (+3.55%) | Exit: TP
+❌ Trade #1421 | SHORT | Entry: $41766.93 | Exit: $41920.24 | PnL: $-100.84 (-0.37%) | Exit: TIMEOUT
+✅ Trade #1422 | LONG | Entry: $41879.42 | Exit: $43234.16 | PnL: $+2498.42 (+3.23%) | Exit: TP
+✅ Trade #1423 | LONG | Entry: $43147.03 | Exit: $43495.00 | PnL: $+436.60 (+0.81%) | Exit: TP
+✅ Trade #1424 | LONG | Entry: $43419.59 | Exit: $43830.00 | PnL: $+384.03 (+0.95%) | Exit: TP
+✅ Trade #1425 | LONG | Entry: $43442.05 | Exit: $44044.23 | PnL: $+527.76 (+1.39%) | Exit: TP
+❌ Trade #1426 | SHORT | Entry: $43840.30 | Exit: $44438.70 | PnL: $-2310.12 (-1.36%) | Exit: SL
+✅ Trade #1435 | LONG | Entry: $46950.00 | Exit: $47786.70 | PnL: $+729.98 (+1.78%) | Exit: TP
+✅ Trade #1443 | LONG | Entry: $50931.30 | Exit: $51473.99 | PnL: $+195.63 (+1.07%) | Exit: TP
+✅ Trade #1472 | LONG | Entry: $54720.00 | Exit: $55555.00 | PnL: $+159.32 (+1.53%) | Exit: TP
+✅ Trade #1473 | LONG | Entry: $55034.99 | Exit: $55750.00 | PnL: $+133.11 (+1.30%) | Exit: TP
+❌ Trade #1481 | SHORT | Entry: $54608.02 | Exit: $55201.50 | PnL: $-846.57 (-1.09%) | Exit: TIMEOUT
+✅ Trade #1482 | LONG | Entry: $55218.39 | Exit: $56074.43 | PnL: $+2062.14 (+1.55%) | Exit: TP
+❌ Trade #1483 | LONG | Entry: $55516.60 | Exit: $54381.57 | PnL: $-2312.59 (-2.04%) | Exit: SL
+✅ Trade #1506 | LONG | Entry: $56000.00 | Exit: $56561.31 | PnL: $+712.41 (+1.00%) | Exit: TP
+✅ Trade #1507 | LONG | Entry: $56264.75 | Exit: $57049.00 | PnL: $+780.03 (+1.39%) | Exit: TP
+✅ Trade #1508 | SHORT | Entry: $57526.07 | Exit: $54883.90 | PnL: $+2296.19 (+4.59%) | Exit: SL
+❌ Trade #1509 | SHORT | Entry: $57469.75 | Exit: $57586.29 | PnL: $-2342.11 (-0.20%) | Exit: SL
+✅ Trade #1510 | SHORT | Entry: $57100.03 | Exit: $56400.00 | PnL: $+3456.36 (+1.23%) | Exit: TP
+✅ Trade #1511 | LONG | Entry: $54865.89 | Exit: $56599.99 | PnL: $+5080.45 (+3.16%) | Exit: TP
+✅ Trade #1513 | LONG | Entry: $56865.00 | Exit: $57242.00 | PnL: $+300.50 (+0.66%) | Exit: TP
+✅ Trade #1514 | LONG | Entry: $57077.99 | Exit: $57500.00 | PnL: $+1786.53 (+0.74%) | Exit: TP
+✅ Trade #1515 | SHORT | Entry: $60986.62 | Exit: $60150.00 | PnL: $+3869.96 (+1.37%) | Exit: TP
+✅ Trade #1520 | LONG | Entry: $60694.44 | Exit: $61465.90 | PnL: $+1078.39 (+1.27%) | Exit: TP
+❌ Trade #1521 | SHORT | Entry: $61717.70 | Exit: $62704.07 | PnL: $-2606.71 (-1.60%) | Exit: SL
+❌ Trade #1522 | SHORT | Entry: $62577.02 | Exit: $62821.17 | PnL: $-2554.58 (-0.39%) | Exit: SL
+❌ Trade #1523 | SHORT | Entry: $62310.00 | Exit: $62502.49 | PnL: $-2503.49 (-0.31%) | Exit: SL
+✅ Trade #1524 | SHORT | Entry: $65319.99 | Exit: $64062.82 | PnL: $+7501.06 (+1.92%) | Exit: TP
+✅ Trade #1529 | SHORT | Entry: $63235.56 | Exit: $62000.00 | PnL: $+1288.94 (+1.95%) | Exit: TP
+✅ Trade #1537 | SHORT | Entry: $61401.00 | Exit: $60478.10 | PnL: $+996.13 (+1.50%) | Exit: TP
+✅ Trade #1538 | SHORT | Entry: $62240.00 | Exit: $61800.00 | PnL: $+1852.11 (+0.71%) | Exit: TP
+✅ Trade #1540 | SHORT | Entry: $61000.00 | Exit: $60000.00 | PnL: $+1325.99 (+1.64%) | Exit: TP
+❌ Trade #1541 | LONG | Entry: $58977.70 | Exit: $57884.00 | PnL: $-2712.70 (-1.85%) | Exit: SL
+✅ Trade #1542 | LONG | Entry: $60376.51 | Exit: $62499.00 | PnL: $+2538.19 (+3.52%) | Exit: TP
+✅ Trade #1543 | LONG | Entry: $62119.00 | Exit: $62553.96 | PnL: $+266.93 (+0.70%) | Exit: TP
+❌ Trade #1544 | LONG | Entry: $62212.74 | Exit: $61300.48 | PnL: $-549.28 (-1.47%) | Exit: TIMEOUT
+✅ Trade #1545 | LONG | Entry: $61175.54 | Exit: $61620.06 | PnL: $+890.17 (+0.73%) | Exit: TP
+✅ Trade #1546 | LONG | Entry: $60339.99 | Exit: $61735.30 | PnL: $+3603.29 (+2.31%) | Exit: TP
+✅ Trade #1547 | LONG | Entry: $60845.84 | Exit: $62298.00 | PnL: $+2600.91 (+2.39%) | Exit: TP
+❌ Trade #1560 | LONG | Entry: $62750.00 | Exit: $60873.95 | PnL: $-1541.14 (-2.99%) | Exit: TIMEOUT
+❌ Trade #1561 | LONG | Entry: $61293.85 | Exit: $60202.02 | PnL: $-2814.63 (-1.78%) | Exit: SL
+✅ Trade #1562 | SHORT | Entry: $60609.54 | Exit: $60081.21 | PnL: $+690.22 (+0.87%) | Exit: TP
+❌ Trade #1563 | SHORT | Entry: $60609.54 | Exit: $62052.23 | PnL: $-2772.14 (-2.38%) | Exit: SL
+✅ Trade #1564 | LONG | Entry: $61920.20 | Exit: $62328.06 | PnL: $+1614.12 (+0.66%) | Exit: TP
+✅ Trade #1565 | SHORT | Entry: $62108.67 | Exit: $61683.61 | PnL: $+2748.98 (+0.68%) | Exit: SL
+✅ Trade #1566 | SHORT | Entry: $67188.55 | Exit: $66222.40 | PnL: $+3625.01 (+1.44%) | Exit: TP
+❌ Trade #1567 | LONG | Entry: $66523.80 | Exit: $65756.22 | PnL: $-2876.46 (-1.15%) | Exit: SL
+✅ Trade #1577 | SHORT | Entry: $64838.52 | Exit: $62822.90 | PnL: $+2778.31 (+3.11%) | Exit: TP
+✅ Trade #1579 | LONG | Entry: $64220.03 | Exit: $64843.00 | PnL: $+1948.50 (+0.97%) | Exit: TP
+❌ Trade #1580 | LONG | Entry: $64672.35 | Exit: $63791.05 | PnL: $-2913.47 (-1.36%) | Exit: SL
+✅ Trade #1581 | SHORT | Entry: $65839.34 | Exit: $64662.12 | PnL: $+4834.28 (+1.79%) | Exit: TP
+✅ Trade #1587 | SHORT | Entry: $64216.36 | Exit: $63900.00 | PnL: $+2614.83 (+0.49%) | Exit: TP
+✅ Trade #1627 | SHORT | Entry: $61358.59 | Exit: $60440.00 | PnL: $+1156.61 (+1.50%) | Exit: TP
+✅ Trade #1628 | SHORT | Entry: $60810.01 | Exit: $60293.06 | PnL: $+533.29 (+0.85%) | Exit: TP
+✅ Trade #1629 | SHORT | Entry: $60425.87 | Exit: $58574.07 | PnL: $+1695.17 (+3.06%) | Exit: TP
+✅ Trade #1631 | SHORT | Entry: $57116.57 | Exit: $56474.26 | PnL: $+1327.35 (+1.12%) | Exit: TP
+❌ Trade #1632 | SHORT | Entry: $58327.69 | Exit: $58967.33 | PnL: $-3098.43 (-1.10%) | Exit: SL
+❌ Trade #1641 | SHORT | Entry: $59220.00 | Exit: $59964.69 | PnL: $-3036.46 (-1.26%) | Exit: SL
+❌ Trade #1642 | LONG | Entry: $59297.59 | Exit: $58539.91 | PnL: $-2975.73 (-1.28%) | Exit: SL
+✅ Trade #1663 | SHORT | Entry: $58500.00 | Exit: $57600.00 | PnL: $+2552.04 (+1.54%) | Exit: TP
+✅ Trade #1726 | SHORT | Entry: $57124.37 | Exit: $56404.66 | PnL: $+705.87 (+1.26%) | Exit: TP
+✅ Trade #1727 | SHORT | Entry: $56773.99 | Exit: $55610.00 | PnL: $+1652.00 (+2.05%) | Exit: TP
+❌ Trade #1728 | SHORT | Entry: $57150.34 | Exit: $58874.65 | PnL: $-3014.41 (-3.02%) | Exit: SL
+✅ Trade #1737 | SHORT | Entry: $58617.16 | Exit: $57000.00 | PnL: $+5051.45 (+2.76%) | Exit: TP
+✅ Trade #1773 | LONG | Entry: $54609.19 | Exit: $56994.52 | PnL: $+3055.15 (+4.37%) | Exit: SL
+✅ Trade #1774 | LONG | Entry: $54609.19 | Exit: $56886.00 | PnL: $+3116.26 (+4.17%) | Exit: SL
+✅ Trade #1775 | LONG | Entry: $54609.19 | Exit: $57215.09 | PnL: $+3178.58 (+4.77%) | Exit: SL
+✅ Trade #1776 | LONG | Entry: $54609.19 | Exit: $55206.37 | PnL: $+3242.15 (+1.09%) | Exit: SL
+✅ Trade #1777 | SHORT | Entry: $54326.62 | Exit: $53500.00 | PnL: $+526.60 (+1.52%) | Exit: TP
+❌ Trade #1778 | SHORT | Entry: $54050.00 | Exit: $57400.41 | PnL: $-2130.02 (-6.20%) | Exit: TIMEOUT
+❌ Trade #1779 | SHORT | Entry: $57392.55 | Exit: $58366.50 | PnL: $-3274.93 (-1.70%) | Exit: SL
+✅ Trade #1780 | LONG | Entry: $58000.00 | Exit: $58547.74 | PnL: $+362.47 (+0.94%) | Exit: TP
+✅ Trade #1785 | SHORT | Entry: $57958.02 | Exit: $56666.66 | PnL: $+7433.86 (+2.23%) | Exit: TP
+✅ Trade #1798 | LONG | Entry: $56806.13 | Exit: $56886.00 | PnL: $+3365.36 (+0.14%) | Exit: SL
+✅ Trade #1799 | SHORT | Entry: $57068.12 | Exit: $56458.01 | PnL: $+940.32 (+1.07%) | Exit: TP
+✅ Trade #1800 | SHORT | Entry: $56926.76 | Exit: $55777.77 | PnL: $+4067.84 (+2.02%) | Exit: TP
+✅ Trade #1829 | SHORT | Entry: $54211.01 | Exit: $53750.00 | PnL: $+453.61 (+0.85%) | Exit: TP
+✅ Trade #1830 | SHORT | Entry: $53750.00 | Exit: $51680.00 | PnL: $+1322.14 (+3.85%) | Exit: TP
+✅ Trade #1855 | SHORT | Entry: $49188.00 | Exit: $48906.90 | PnL: $+284.62 (+0.57%) | Exit: TIMEOUT
+❌ Trade #1856 | SHORT | Entry: $49035.19 | Exit: $50441.67 | PnL: $-1367.09 (-2.87%) | Exit: TIMEOUT
+✅ Trade #1857 | SHORT | Entry: $50669.97 | Exit: $48600.00 | PnL: $+1145.28 (+4.09%) | Exit: TP
+✅ Trade #1864 | SHORT | Entry: $48540.00 | Exit: $48048.00 | PnL: $+586.81 (+1.01%) | Exit: TP
+✅ Trade #1865 | SHORT | Entry: $50183.79 | Exit: $48951.62 | PnL: $+6351.53 (+2.46%) | Exit: TP
+✅ Trade #1880 | LONG | Entry: $48016.00 | Exit: $48761.00 | PnL: $+1134.78 (+1.55%) | Exit: TP
+❌ Trade #1881 | LONG | Entry: $48385.00 | Exit: $47740.33 | PnL: $-3731.06 (-1.33%) | Exit: SL
+✅ Trade #1882 | SHORT | Entry: $48168.27 | Exit: $47517.65 | PnL: $+3446.50 (+1.35%) | Exit: TP
+✅ Trade #1883 | SHORT | Entry: $48590.00 | Exit: $48243.58 | PnL: $+5739.19 (+0.71%) | Exit: TP
+✅ Trade #1884 | SHORT | Entry: $48165.07 | Exit: $47666.00 | PnL: $+6003.24 (+1.04%) | Exit: TP
+✅ Trade #1891 | SHORT | Entry: $47411.00 | Exit: $46850.00 | PnL: $+1582.55 (+1.18%) | Exit: TP
+✅ Trade #1894 | LONG | Entry: $46945.00 | Exit: $47500.00 | PnL: $+3511.61 (+1.18%) | Exit: TP
+✅ Trade #1895 | SHORT | Entry: $47030.00 | Exit: $46807.27 | PnL: $+1601.33 (+0.47%) | Exit: TP
+✅ Trade #1896 | SHORT | Entry: $46908.36 | Exit: $46482.90 | PnL: $+2364.32 (+0.91%) | Exit: TP
+✅ Trade #1897 | SHORT | Entry: $46600.00 | Exit: $46220.00 | PnL: $+2266.33 (+0.82%) | Exit: TP
+✅ Trade #1898 | LONG | Entry: $48717.34 | Exit: $48996.98 | PnL: $+4073.92 (+0.57%) | Exit: TP
+✅ Trade #1899 | LONG | Entry: $49950.00 | Exit: $50281.08 | PnL: $+2219.01 (+0.66%) | Exit: TP
+✅ Trade #1901 | LONG | Entry: $50450.00 | Exit: $51040.00 | PnL: $+4006.35 (+1.17%) | Exit: TP
+✅ Trade #1912 | SHORT | Entry: $50622.00 | Exit: $50128.44 | PnL: $+1380.78 (+0.97%) | Exit: TP
+✅ Trade #1913 | LONG | Entry: $46793.72 | Exit: $47709.20 | PnL: $+17755.98 (+1.96%) | Exit: TP
+✅ Trade #1914 | LONG | Entry: $47132.35 | Exit: $47900.00 | PnL: $+7378.87 (+1.63%) | Exit: TP
+❌ Trade #1915 | LONG | Entry: $47199.43 | Exit: $46731.73 | PnL: $-4923.04 (-0.99%) | Exit: SL
+✅ Trade #1922 | SHORT | Entry: $46343.53 | Exit: $46216.93 | PnL: $+326.42 (+0.27%) | Exit: TIMEOUT
+
+================================================================================
+DEBUG STATISTICS
+================================================================================
+Total 4H FVGs detected:        1209
+Total rejections:              378
+Total 15M FVGs found:          3770
+
+FAILURE REASONS:
+  FVG type mismatch:           1848
+  No SL available:             0
+  No TP available:             0
+  Failed RR check (< 2.0):     0
+  Failed SL check (< 0.3%):    0
+================================================================================
+
+
+================================================================================
+BACKTEST RESULTS
+================================================================================
+
+📊 TRADE STATISTICS
+   Total Trades:      376
+   Wins:              300
+   Losses:            76
+   Win Rate:          79.79%
+
+💰 PROFIT & LOSS
+   Total PnL:         $+231,555.35 (+2315.55%)
+   Final Balance:     $241,555.35
+   Avg Win:           $1,115.97
+   Avg Loss:          $-1,358.36
+   Profit Factor:     3.24
+
+📈 RISK METRICS
+   Avg R:R:           1.77
+   Max Drawdown:      7.02%
+   Monthly Return:    191.90%
+
+================================================================================
+
+
+💾 Results saved to backtest_failed_fvg_2021.json
+Traceback (most recent call last):
+  File "/Users/illiachumak/trading/implement/smc_optimized_bot/backtest_failed_fvg.py", line 800, in <module>
+    all_results[year] = results['summary']
+KeyError: 'summary'
