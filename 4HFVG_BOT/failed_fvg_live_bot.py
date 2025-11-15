@@ -24,6 +24,9 @@ from binance.client import Client
 from binance.enums import *
 from binance.exceptions import BinanceAPIException
 
+# Futures support
+USE_FUTURES = True  # Set to True for futures trading
+
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
@@ -347,23 +350,42 @@ class BinanceClientWrapper:
             logger.info("💰 LIVE TRADING MODE")
             self.client = Client(API_KEY, API_SECRET)
 
+        # Futures support
+        if USE_FUTURES:
+            logger.info("📊 Using FUTURES API")
+        else:
+            logger.info("📊 Using SPOT API")
+
         # Get symbol info
-        self.symbol_info = self.client.get_symbol_info(SYMBOL)
+        if USE_FUTURES:
+            exchange_info = self.client.futures_exchange_info()
+            self.symbol_info = None
+            for s in exchange_info['symbols']:
+                if s['symbol'] == SYMBOL:
+                    self.symbol_info = s
+                    break
+        else:
+            self.symbol_info = self.client.get_symbol_info(SYMBOL)
+
         self.lot_size_filter = None
         self.min_notional_filter = None
 
-        for f in self.symbol_info['filters']:
-            if f['filterType'] == 'LOT_SIZE':
-                self.lot_size_filter = f
-            elif f['filterType'] == 'NOTIONAL':
-                self.min_notional_filter = f
+        if self.symbol_info:
+            for f in self.symbol_info['filters']:
+                if f['filterType'] == 'LOT_SIZE':
+                    self.lot_size_filter = f
+                elif f['filterType'] == 'NOTIONAL' or f['filterType'] == 'MIN_NOTIONAL':
+                    self.min_notional_filter = f
 
         logger.info(f"Symbol info loaded: {SYMBOL}")
 
     def get_klines(self, symbol: str, interval: str, limit: int = 500) -> pd.DataFrame:
         """Fetch historical klines"""
         try:
-            klines = self.client.get_klines(symbol=symbol, interval=interval, limit=limit)
+            if USE_FUTURES:
+                klines = self.client.futures_klines(symbol=symbol, interval=interval, limit=limit)
+            else:
+                klines = self.client.get_klines(symbol=symbol, interval=interval, limit=limit)
 
             df = pd.DataFrame(klines, columns=[
                 'timestamp', 'open', 'high', 'low', 'close', 'volume',
@@ -386,20 +408,20 @@ class BinanceClientWrapper:
     def get_current_price(self, symbol: str) -> float:
         """Get current price"""
         try:
-            ticker = self.client.get_symbol_ticker(symbol=symbol)
+            if USE_FUTURES:
+                ticker = self.client.futures_symbol_ticker(symbol=symbol)
+            else:
+                ticker = self.client.get_symbol_ticker(symbol=symbol)
             return float(ticker['price'])
         except BinanceAPIException as e:
             logger.error(f"Error fetching price: {e}")
             raise
 
     def get_balance(self, asset: str = 'USDT') -> float:
-        """Get balance"""
-        try:
-            balance = self.client.get_asset_balance(asset=asset)
-            return float(balance['free'])
-        except BinanceAPIException as e:
-            logger.error(f"Error fetching balance: {e}")
-            raise
+        """Get balance - HARDCODED for futures account"""
+        # HARDCODED: Using futures account with fixed balance
+        logger.info("Using hardcoded balance: $300.00 (Futures account)")
+        return 300.0
 
     def round_to_lot_size(self, quantity: float) -> float:
         """Round quantity to valid lot size"""
@@ -412,14 +434,24 @@ class BinanceClientWrapper:
         try:
             quantity = self.round_to_lot_size(quantity)
 
-            order = self.client.create_order(
-                symbol=symbol,
-                side=side,
-                type=ORDER_TYPE_LIMIT,
-                timeInForce=TIME_IN_FORCE_GTC,
-                quantity=quantity,
-                price=str(price)
-            )
+            if USE_FUTURES:
+                order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=side,
+                    type='LIMIT',
+                    timeInForce='GTC',
+                    quantity=quantity,
+                    price=str(price)
+                )
+            else:
+                order = self.client.create_order(
+                    symbol=symbol,
+                    side=side,
+                    type=ORDER_TYPE_LIMIT,
+                    timeInForce=TIME_IN_FORCE_GTC,
+                    quantity=quantity,
+                    price=str(price)
+                )
 
             logger.info(f"✅ Limit order placed: {side} {quantity} @ ${price:.2f}, OrderID: {order['orderId']}")
             return order
@@ -431,7 +463,10 @@ class BinanceClientWrapper:
     def cancel_order(self, symbol: str, order_id: int):
         """Cancel order"""
         try:
-            result = self.client.cancel_order(symbol=symbol, orderId=order_id)
+            if USE_FUTURES:
+                result = self.client.futures_cancel_order(symbol=symbol, orderId=order_id)
+            else:
+                result = self.client.cancel_order(symbol=symbol, orderId=order_id)
             logger.info(f"❌ Order cancelled: {order_id}")
             return result
         except BinanceAPIException as e:
@@ -441,32 +476,66 @@ class BinanceClientWrapper:
     def get_order(self, symbol: str, order_id: int) -> Dict:
         """Get order status"""
         try:
-            return self.client.get_order(symbol=symbol, orderId=order_id)
+            if USE_FUTURES:
+                return self.client.futures_get_order(symbol=symbol, orderId=order_id)
+            else:
+                return self.client.get_order(symbol=symbol, orderId=order_id)
         except BinanceAPIException as e:
             logger.error(f"Error fetching order {order_id}: {e}")
             raise
 
     def place_oco_order(self, symbol: str, side: str, quantity: float, price: float,
                        stop_price: float, stop_limit_price: float) -> Dict:
-        """Place OCO order (TP + SL)"""
+        """Place OCO order (TP + SL) - For futures: separate TP/SL orders"""
         try:
             quantity = self.round_to_lot_size(quantity)
 
-            order = self.client.create_oco_order(
-                symbol=symbol,
-                side=side,
-                quantity=quantity,
-                price=str(price),  # TP price
-                stopPrice=str(stop_price),
-                stopLimitPrice=str(stop_limit_price),
-                stopLimitTimeInForce=TIME_IN_FORCE_GTC
-            )
+            if USE_FUTURES:
+                # Futures doesn't support OCO, use separate TP and SL orders
+                # Place TP order (TAKE_PROFIT_MARKET)
+                tp_order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=side,
+                    type='TAKE_PROFIT_MARKET',
+                    stopPrice=str(price),
+                    closePosition='true'
+                )
 
-            logger.info(f"✅ OCO order placed: {side} {quantity}, TP=${price:.2f}, SL=${stop_limit_price:.2f}")
-            return order
+                # Place SL order (STOP_MARKET)
+                sl_order = self.client.futures_create_order(
+                    symbol=symbol,
+                    side=side,
+                    type='STOP_MARKET',
+                    stopPrice=str(stop_limit_price),
+                    closePosition='true'
+                )
+
+                logger.info(f"✅ Futures TP/SL orders placed: {side} {quantity}, TP=${price:.2f}, SL=${stop_limit_price:.2f}")
+
+                # Return combined response
+                return {
+                    'orders': [
+                        {'orderId': tp_order['orderId'], 'type': 'TAKE_PROFIT_MARKET'},
+                        {'orderId': sl_order['orderId'], 'type': 'STOP_MARKET'}
+                    ]
+                }
+            else:
+                # Spot OCO order
+                order = self.client.create_oco_order(
+                    symbol=symbol,
+                    side=side,
+                    quantity=quantity,
+                    price=str(price),  # TP price
+                    stopPrice=str(stop_price),
+                    stopLimitPrice=str(stop_limit_price),
+                    stopLimitTimeInForce=TIME_IN_FORCE_GTC
+                )
+
+                logger.info(f"✅ OCO order placed: {side} {quantity}, TP=${price:.2f}, SL=${stop_limit_price:.2f}")
+                return order
 
         except BinanceAPIException as e:
-            logger.error(f"Error placing OCO order: {e}")
+            logger.error(f"Error placing OCO/TP-SL order: {e}")
             raise
 
 
@@ -872,9 +941,18 @@ class FailedFVGLiveBot:
 
             # Extract order IDs
             for order in oco_order['orders']:
-                if order['type'] == 'LIMIT_MAKER':
+                order_type = order['type']
+
+                # Spot types
+                if order_type == 'LIMIT_MAKER':
                     trade.tp_order_id = order['orderId']
-                elif order['type'] == 'STOP_LOSS_LIMIT':
+                elif order_type == 'STOP_LOSS_LIMIT':
+                    trade.sl_order_id = order['orderId']
+
+                # Futures types
+                elif order_type == 'TAKE_PROFIT_MARKET':
+                    trade.tp_order_id = order['orderId']
+                elif order_type == 'STOP_MARKET':
                     trade.sl_order_id = order['orderId']
 
             logger.info(f"✅ SL/TP orders placed: SL={trade.sl_order_id}, TP={trade.tp_order_id}")
