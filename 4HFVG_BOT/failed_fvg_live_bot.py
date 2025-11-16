@@ -569,6 +569,10 @@ class FailedFVGLiveBot:
         self.df_4h: Optional[pd.DataFrame] = None
         self.df_15m: Optional[pd.DataFrame] = None
 
+        # Candle timestamps tracking
+        self.last_4h_candle_time: Optional[pd.Timestamp] = None
+        self.last_15m_candle_time: Optional[pd.Timestamp] = None
+
         # Stats
         self.balance = 0.0
         self.initial_balance = 0.0
@@ -593,6 +597,12 @@ class FailedFVGLiveBot:
         self.df_4h = self.client.get_klines(SYMBOL, TIMEFRAME_4H, limit=200)
         self.df_15m = self.client.get_klines(SYMBOL, TIMEFRAME_15M, limit=1000)
         logger.info(f"Loaded {len(self.df_4h)} 4H candles, {len(self.df_15m)} 15M candles")
+
+        # Store last candle timestamps
+        self.last_4h_candle_time = self.df_4h.index[-1]
+        self.last_15m_candle_time = self.df_15m.index[-1]
+        logger.info(f"Last 4H candle: {self.last_4h_candle_time}")
+        logger.info(f"Last 15M candle: {self.last_15m_candle_time}")
 
         # Detect initial FVGs
         logger.info("Detecting initial FVGs...")
@@ -681,9 +691,19 @@ class FailedFVGLiveBot:
                 if state.get('active_trade'):
                     self.active_trade = ActiveTrade.from_dict(state['active_trade'])
 
+                # Restore candle timestamps
+                if 'last_4h_candle_time' in state and state['last_4h_candle_time']:
+                    self.last_4h_candle_time = pd.Timestamp(state['last_4h_candle_time'])
+                if 'last_15m_candle_time' in state and state['last_15m_candle_time']:
+                    self.last_15m_candle_time = pd.Timestamp(state['last_15m_candle_time'])
+
                 logger.info(f"Restored: {len(self.active_4h_fvgs)} active FVGs, "
                           f"{len(self.rejected_4h_fvgs)} rejected FVGs, "
                           f"{len(self.pending_setups)} pending setups")
+                if self.last_4h_candle_time:
+                    logger.info(f"Last 4H candle: {self.last_4h_candle_time}")
+                if self.last_15m_candle_time:
+                    logger.info(f"Last 15M candle: {self.last_15m_candle_time}")
 
         except FileNotFoundError:
             logger.info("No state file found, starting fresh")
@@ -699,6 +719,8 @@ class FailedFVGLiveBot:
                 'pending_setups': [setup.to_dict() for setup in self.pending_setups],
                 'active_trade': self.active_trade.to_dict() if self.active_trade else None,
                 'balance': self.balance,
+                'last_4h_candle_time': self.last_4h_candle_time.isoformat() if self.last_4h_candle_time else None,
+                'last_15m_candle_time': self.last_15m_candle_time.isoformat() if self.last_15m_candle_time else None,
                 'last_updated': datetime.now().isoformat()
             }
 
@@ -1072,9 +1094,7 @@ class FailedFVGLiveBot:
                 fvg.invalidated = True
                 self.active_4h_fvgs.remove(fvg)
 
-        # Detect new FVGs
-        # Re-fetch last few candles and detect
-        self.df_4h = self.client.get_klines(SYMBOL, TIMEFRAME_4H, limit=50)
+        # Detect new FVGs from already updated df_4h (no re-fetch needed)
         new_fvgs = self.detector.detect_fvgs(self.df_4h.tail(10), '4h')
 
         for fvg in new_fvgs:
@@ -1090,9 +1110,7 @@ class FailedFVGLiveBot:
         if not self.rejected_4h_fvgs:
             return
 
-        # Fetch recent 15M candles
-        self.df_15m = self.client.get_klines(SYMBOL, TIMEFRAME_15M, limit=50)
-
+        # Use already updated 15M data (no re-fetch needed)
         for rejected_fvg in self.rejected_4h_fvgs[:]:
             if not self.can_create_setup(rejected_fvg):
                 continue
@@ -1133,6 +1151,73 @@ class FailedFVGLiveBot:
 
         return False
 
+    def check_new_4h_candle(self) -> bool:
+        """Check if new 4H candle appeared (by timestamp)"""
+        try:
+            # Fetch latest 4H data
+            df_new = self.client.get_klines(SYMBOL, TIMEFRAME_4H, limit=50)
+
+            if df_new.empty:
+                return False
+
+            latest_candle_time = df_new.index[-1]
+
+            # Check if new candle appeared
+            if self.last_4h_candle_time is None or latest_candle_time > self.last_4h_candle_time:
+                logger.info(f"🕯️  New 4H candle detected!")
+                logger.info(f"   Previous: {self.last_4h_candle_time}")
+                logger.info(f"   Current:  {latest_candle_time}")
+
+                # Update data
+                self.df_4h = df_new
+                last_candle = self.df_4h.iloc[-1].to_dict()
+
+                # Add close_time to candle dict for check_rejection
+                last_candle['close_time'] = int(latest_candle_time.timestamp() * 1000)
+
+                # Update FVGs with the NEW candle
+                self.update_4h_fvgs(last_candle)
+
+                # Update timestamp
+                self.last_4h_candle_time = latest_candle_time
+
+                return True
+
+            return False
+
+        except Exception as e:
+            logger.error(f"Error checking new 4H candle: {e}")
+            return False
+
+    def check_new_15m_candle(self) -> bool:
+        """Check if new 15M candle appeared (by timestamp)"""
+        try:
+            # Fetch latest 15M data
+            df_new = self.client.get_klines(SYMBOL, TIMEFRAME_15M, limit=50)
+
+            if df_new.empty:
+                return False
+
+            latest_candle_time = df_new.index[-1]
+
+            # Check if new candle appeared
+            if self.last_15m_candle_time is None or latest_candle_time > self.last_15m_candle_time:
+                logger.info(f"🕯️  New 15M candle detected: {latest_candle_time}")
+
+                # Update data
+                self.df_15m = df_new
+
+                # Update timestamp
+                self.last_15m_candle_time = latest_candle_time
+
+                return True
+
+            return False
+
+        except Exception as e:
+            logger.error(f"Error checking new 15M candle: {e}")
+            return False
+
     def run(self):
         """Main loop"""
         self.running = True
@@ -1140,8 +1225,6 @@ class FailedFVGLiveBot:
         logger.info("🚀 Bot started! Entering main loop...")
         logger.info("Press Ctrl+C to stop")
 
-        last_4h_check = datetime.now()
-        last_15m_check = datetime.now()
         last_state_save = datetime.now()
 
         try:
@@ -1153,16 +1236,15 @@ class FailedFVGLiveBot:
                     logger.critical("Emergency stop triggered!")
                     break
 
-                # Every 4H: Update 4H FVGs
-                if (now - last_4h_check).total_seconds() >= 14400:  # 4H
-                    logger.info("Checking 4H candles...")
-                    last_candle = self.df_4h.iloc[-1].to_dict()
-                    self.update_4h_fvgs(last_candle)
-                    last_4h_check = now
+                # Check for new 4H candle (by timestamp comparison)
+                new_4h = self.check_new_4h_candle()
+                if new_4h:
+                    logger.info("✅ 4H candle processed")
 
-                # Every 15M: Main logic
-                if (now - last_15m_check).total_seconds() >= 900:  # 15M
-                    logger.info("Checking 15M candles...")
+                # Check for new 15M candle (by timestamp comparison)
+                new_15m = self.check_new_15m_candle()
+                if new_15m:
+                    logger.info("Checking 15M logic...")
 
                     # Check pending setups
                     self.check_pending_setups()
@@ -1174,15 +1256,13 @@ class FailedFVGLiveBot:
                     # Monitor active trade
                     self.monitor_active_trade()
 
-                    last_15m_check = now
-
                 # Save state every 5 minutes
                 if (now - last_state_save).total_seconds() >= 300:
                     self.save_state()
                     last_state_save = now
 
-                # Sleep
-                time.sleep(10)  # Check every 10 seconds
+                # Sleep - check every 30 seconds for new candles
+                time.sleep(30)
 
         except KeyboardInterrupt:
             logger.info("\n⚠️  Keyboard interrupt received")
