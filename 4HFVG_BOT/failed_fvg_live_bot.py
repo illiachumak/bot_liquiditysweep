@@ -435,13 +435,17 @@ class BinanceClientWrapper:
             quantity = self.round_to_lot_size(quantity)
 
             if USE_FUTURES:
+                # Determine position side based on order direction (for Hedge Mode)
+                position_side = "SHORT" if side == "SELL" else "LONG"
+
                 order = self.client.futures_create_order(
                     symbol=symbol,
                     side=side,
                     type='LIMIT',
                     timeInForce='GTC',
                     quantity=quantity,
-                    price=str(price)
+                    price=str(price),
+                    positionSide=position_side
                 )
             else:
                 order = self.client.create_order(
@@ -492,13 +496,17 @@ class BinanceClientWrapper:
 
             if USE_FUTURES:
                 # Futures doesn't support OCO, use separate TP and SL orders
+                # Determine position side: SELL closes LONG, BUY closes SHORT
+                position_side = "LONG" if side == "SELL" else "SHORT"
+
                 # Place TP order (TAKE_PROFIT_MARKET)
                 tp_order = self.client.futures_create_order(
                     symbol=symbol,
                     side=side,
                     type='TAKE_PROFIT_MARKET',
                     stopPrice=str(price),
-                    closePosition='true'
+                    closePosition='true',
+                    positionSide=position_side
                 )
 
                 # Place SL order (STOP_MARKET)
@@ -507,7 +515,8 @@ class BinanceClientWrapper:
                     side=side,
                     type='STOP_MARKET',
                     stopPrice=str(stop_limit_price),
-                    closePosition='true'
+                    closePosition='true',
+                    positionSide=position_side
                 )
 
                 logger.info(f"✅ Futures TP/SL orders placed: {side} {quantity}, TP=${price:.2f}, SL=${stop_limit_price:.2f}")
