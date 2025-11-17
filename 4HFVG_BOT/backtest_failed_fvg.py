@@ -198,8 +198,8 @@ class FailedFVGBacktest:
         self.limit_order_expiry_candles = limit_order_expiry_candles
 
         # Fee structure
-        self.maker_fee = 0.0018  # 0.18% for entry and TP (limit orders)
-        self.taker_fee = 0.0045  # 0.45% for SL (market order)
+        self.maker_fee = 0.00018  # 0.18% for entry and TP (limit orders)
+        self.taker_fee = 0.00045  # 0.45% for SL (market order)
 
         self.active_4h_fvgs: List[BacktestFVG] = []
         self.rejected_4h_fvgs: List[BacktestFVG] = []

@@ -49,8 +49,8 @@ LIMIT_EXPIRY_CANDLES = 16      # 4H
 COOLDOWN_CANDLES = 16          # 4H
 
 # Fees
-MAKER_FEE = 0.0018             # 0.18%
-TAKER_FEE = 0.0045             # 0.45%
+MAKER_FEE = 0.00018             # 0.18%
+TAKER_FEE = 0.00045             # 0.45%
 
 # Risk limits
 MAX_DRAWDOWN_PCT = 15.0
