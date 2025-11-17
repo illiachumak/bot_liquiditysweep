@@ -23,8 +23,8 @@ MIN_RR = 2.0  # Minimum RR for validation (same as live bot)
 FIXED_RR = 3.0  # Fixed RR for TP calculation (same as live bot)
 LIMIT_EXPIRY_CANDLES = 16  # 4H in 15M candles
 COOLDOWN_CANDLES = 16
-MAKER_FEE = 0.00018  # 0.18% (corrected from 0.0018)
-TAKER_FEE = 0.00045  # 0.45% (corrected from 0.0045)
+MAKER_FEE = 0.00018  # 0.0180% (0.0180 / 100 = 0.00018)
+TAKER_FEE = 0.00045  # 0.0450% (0.0450 / 100 = 0.00045)
 
 
 class LiveBotSimulator:
