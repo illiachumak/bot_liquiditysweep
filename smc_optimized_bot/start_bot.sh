@@ -70,3 +70,4 @@ echo -e "  ${YELLOW}cat trades_history/trades.json${NC} - View trades"
 
 
 
+

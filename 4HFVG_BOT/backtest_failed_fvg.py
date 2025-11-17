@@ -574,6 +574,13 @@ class FailedFVGBacktest:
                         if rejected_fvg.has_filled_trade:
                             continue
 
+                        # Check if 4H FVG is invalidated on current 15M candle
+                        current_candle_15m = df_15m.iloc[current_15m_idx]
+                        if rejected_fvg.is_fully_passed(current_candle_15m['High'], current_candle_15m['Low']):
+                            rejected_fvg.invalidated = True
+                            self.rejected_4h_fvgs.remove(rejected_fvg)
+                            continue
+
                         # Skip if there's a pending setup that hasn't expired yet
                         if rejected_fvg.pending_setup_expiry_time is not None:
                             if current_time < rejected_fvg.pending_setup_expiry_time:

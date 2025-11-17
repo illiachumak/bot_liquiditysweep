@@ -1093,6 +1093,7 @@ class FailedFVGLiveBot:
             if fvg.is_fully_passed(high, low):
                 fvg.invalidated = True
                 self.active_4h_fvgs.remove(fvg)
+                # DON'T remove from rejected_4h_fvgs yet - will be checked on 15M data
 
         # Detect new FVGs from already updated df_4h (no re-fetch needed)
         new_fvgs = self.detector.detect_fvgs(self.df_4h.tail(10), '4h')
@@ -1111,7 +1112,16 @@ class FailedFVGLiveBot:
             return
 
         # Use already updated 15M data (no re-fetch needed)
+        current_candle_15m = self.df_15m.iloc[-1]
+
         for rejected_fvg in self.rejected_4h_fvgs[:]:
+            # Check if 4H FVG is invalidated on current 15M candle
+            if rejected_fvg.is_fully_passed(float(current_candle_15m['high']), float(current_candle_15m['low'])):
+                logger.info(f"4H FVG {rejected_fvg.id} invalidated, removing from rejected list")
+                rejected_fvg.invalidated = True
+                self.rejected_4h_fvgs.remove(rejected_fvg)
+                continue
+
             if not self.can_create_setup(rejected_fvg):
                 continue
 
