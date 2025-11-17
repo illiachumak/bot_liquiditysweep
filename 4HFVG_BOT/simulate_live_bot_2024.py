@@ -19,11 +19,12 @@ from failed_fvg_live_bot import LiveFVG, PendingSetup, ActiveTrade, FVGDetector
 # Strategy parameters (same as live bot)
 RISK_PER_TRADE = 0.02
 MIN_SL_PCT = 0.3
-FIXED_RR = 1.5
+MIN_RR = 2.0  # Minimum RR for validation (same as live bot)
+FIXED_RR = 3.0  # Fixed RR for TP calculation (same as live bot)
 LIMIT_EXPIRY_CANDLES = 16  # 4H in 15M candles
 COOLDOWN_CANDLES = 16
-MAKER_FEE = 0.0018
-TAKER_FEE = 0.0045
+MAKER_FEE = 0.00018  # 0.18% (corrected from 0.0018)
+TAKER_FEE = 0.00045  # 0.45% (corrected from 0.0045)
 
 
 class LiveBotSimulator:
@@ -74,13 +75,19 @@ class LiveBotSimulator:
 
         return df_4h, df_15m
 
-    def can_create_setup(self, rejected_fvg: LiveFVG) -> bool:
+    def can_create_setup(self, rejected_fvg: LiveFVG, current_time: pd.Timestamp) -> bool:
         """Check if we can create setup (same as live bot)"""
         if rejected_fvg.has_filled_trade:
             return False
 
         if rejected_fvg.pending_expiry_time:
-            if datetime.now() < rejected_fvg.pending_expiry_time:
+            # Convert to pd.Timestamp if needed
+            if isinstance(rejected_fvg.pending_expiry_time, datetime):
+                expiry_ts = pd.Timestamp(rejected_fvg.pending_expiry_time)
+            else:
+                expiry_ts = rejected_fvg.pending_expiry_time
+            
+            if current_time < expiry_ts:
                 return False
 
         if rejected_fvg.pending_setup_id:
@@ -110,7 +117,7 @@ class LiveBotSimulator:
         risk = abs(entry - sl)
         reward = abs(tp - entry)
         rr = reward / risk
-        if rr < FIXED_RR * 0.99:  # Small tolerance
+        if rr < MIN_RR:  # Use MIN_RR for validation, not FIXED_RR
             return False
 
         return True
@@ -311,7 +318,7 @@ class LiveBotSimulator:
                 self.rejected_4h_fvgs.remove(rejected_fvg)
                 continue
 
-            if not self.can_create_setup(rejected_fvg):
+            if not self.can_create_setup(rejected_fvg, self.df_15m.index[current_15m_idx]):
                 continue
 
             # Look for 15M FVG
@@ -392,6 +399,19 @@ class LiveBotSimulator:
                         )
 
                         if filled:
+                            # Set active trade BEFORE simulating (prevents multiple trades)
+                            # Create temporary active trade object
+                            self.active_trade = ActiveTrade(
+                                trade_id=setup.setup_id,
+                                setup_id=setup.setup_id,
+                                direction=setup.direction,
+                                entry_price=setup.entry_price,
+                                entry_time=datetime.fromtimestamp(self.df_15m.index[fill_idx].timestamp()),
+                                sl=setup.sl,
+                                tp=setup.tp,
+                                size=setup.size
+                            )
+                            
                             # Simulate trade
                             trade = self.simulate_trade(setup, self.df_15m, fill_idx)
 
@@ -405,16 +425,17 @@ class LiveBotSimulator:
                                     self.rejected_4h_fvgs.remove(fvg)
                                     break
 
+                            # Clear active trade after close
+                            self.active_trade = None
+
                             emoji = "✅" if trade['result'] == 'WIN' else "❌"
                             print(f"{emoji} Trade #{len(self.trades_history)} | {trade['direction']} | "
                                   f"Entry: ${trade['entry_price']:.2f} | Exit: ${trade['exit_price']:.2f} | "
                                   f"PnL: ${trade['pnl']:+.2f} ({trade['pnl_pct']:+.2f}%) | "
                                   f"Exit: {trade['exit_reason']}")
 
-                            # Jump to after trade exit
-                            exit_time = trade['exit_time']
-                            while current_15m_idx < len(self.df_15m) and self.df_15m.index[current_15m_idx] <= exit_time:
-                                current_15m_idx += 1
+                            # Continue from next candle (don't jump forward)
+                            current_15m_idx = fill_idx + 1
                             continue
                         else:
                             # Setup expired

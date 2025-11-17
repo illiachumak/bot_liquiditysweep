@@ -413,6 +413,18 @@ class FailedFVGBacktest:
         # Calculate size
         risk_amount = self.balance * self.risk_per_trade
         size = risk_amount / risk
+        
+        # Round size to reasonable precision (simulate lot size rounding)
+        # For BTC, typical lot size is 0.001 BTC
+        size = round(size, 3)
+        
+        # Check minimum notional (simulate Binance minimum)
+        min_notional = 10.0  # $10 minimum
+        notional = size * limit_price
+        if notional < min_notional:
+            # Increase size to meet minimum
+            size = min_notional / limit_price
+            size = round(size, 3)
 
         # Create trade
         self.trade_counter += 1
@@ -654,6 +666,9 @@ class FailedFVGBacktest:
 
                                 if filled:
                                     total_fills += 1
+                                    # Set active trade BEFORE simulating (prevents multiple trades)
+                                    self.active_trade = potential_trade
+                                    
                                     # Simulate trade
                                     trade = self.simulate_trade(potential_trade, df_15m, fill_idx)
 
@@ -673,18 +688,12 @@ class FailedFVGBacktest:
                                     if rejected_fvg in self.rejected_4h_fvgs:
                                         self.rejected_4h_fvgs.remove(rejected_fvg)
 
-                                    # Jump to end of trade
-                                    # IMPORTANT: When a trade closes (especially by SL), we jump forward in time.
-                                    # This creates more opportunities for new trades because:
-                                    # 1. More time passes = more 15M FVGs can form
-                                    # 2. More rejected 4H FVGs can be processed
-                                    # 3. When RR increases, more trades close by SL (see analysis),
-                                    #    which means more time jumps = more trade opportunities
-                                    if fill_idx:
-                                        # Find the idx after trade exit
-                                        exit_time = trade.exit_time
-                                        exit_idx = df_15m.index.get_loc(exit_time)
-                                        current_15m_idx = exit_idx
+                                    # Clear active trade after close
+                                    self.active_trade = None
+
+                                    # Continue processing from next candle (don't jump forward)
+                                    # This ensures we don't miss opportunities between entry and exit
+                                    current_15m_idx = fill_idx + 1
 
                                     # Break from rejected_fvg loop (only 1 trade at a time)
                                     break
@@ -878,18 +887,18 @@ if __name__ == "__main__":
     # Test configurations - Testing different expiry windows
     test_configs = [
         {
-            'name': 'Test 1: Fixed RR 1.5, 4H Expiry (16 candles)',
+            'name': 'Test 1: Fixed RR 3.0, Min RR 2.0, 4H Expiry (16 candles)',
             'params': {
                 'initial_balance': 10000.0,
                 'risk_per_trade': 0.02,
-                'min_rr': 0.0,
+                'min_rr': 2.0,  # Same as live bot MIN_RR
                 'min_sl_pct': 0.3,
                 'use_fixed_rr': True,
-                'fixed_rr': 3,
+                'fixed_rr': 3.0,  # Same as live bot FIXED_RR
                 'enable_fees': True,
                 'limit_order_expiry_candles': 16  # 4H
             },
-            'suffix': '4h_expiry'
+            'suffix': '4h_expiry_fixed_rr_3'
         },
         {
             'name': 'Test 2: Fixed RR 1.5, 8H Expiry (32 candles)',

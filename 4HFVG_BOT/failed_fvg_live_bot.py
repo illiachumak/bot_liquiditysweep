@@ -44,7 +44,8 @@ TIMEFRAME_15M = '15m'
 # Strategy parameters
 RISK_PER_TRADE = 0.02          # 2%
 MIN_SL_PCT = 0.3               # 0.3%
-FIXED_RR = 3.0                 # 3.0 RR (optimized from backtest: 82% win rate, 1621% return, 9.43 profit factor)
+MIN_RR = 2.0                   # Minimum RR for validation (same as backtest)
+FIXED_RR = 3.0                 # 3.0 RR for TP calculation (optimized from backtest: 82% win rate, 1621% return, 9.43 profit factor)
 LIMIT_EXPIRY_CANDLES = 16      # 4H (optimized from backtest)
 COOLDOWN_CANDLES = 16          # 4H
 
@@ -782,8 +783,8 @@ class FailedFVGLiveBot:
         risk = abs(entry - sl)
         reward = abs(tp - entry)
         rr = reward / risk
-        if rr < FIXED_RR:
-            logger.warning(f"RR too low: {rr:.2f} < {FIXED_RR}")
+        if rr < MIN_RR:
+            logger.warning(f"RR too low: {rr:.2f} < {MIN_RR}")
             return False
 
         # Price sanity
@@ -831,6 +832,15 @@ class FailedFVGLiveBot:
         # Calculate size
         size = self.calculate_position_size(entry_price, sl)
 
+        # Calculate expiry time based on 15M candles (16 candles = 4H)
+        # Use last 15M candle time + 16 * 15 minutes for accuracy
+        if self.df_15m is not None and len(self.df_15m) > 0:
+            last_candle_time = self.df_15m.index[-1]
+            expiry_time = last_candle_time + timedelta(minutes=15 * LIMIT_EXPIRY_CANDLES)
+        else:
+            # Fallback to current time + 4 hours if no data
+            expiry_time = datetime.now() + timedelta(hours=4)
+        
         # Create setup
         setup = PendingSetup(
             setup_id=f"setup_{int(datetime.now().timestamp())}",
@@ -842,7 +852,7 @@ class FailedFVGLiveBot:
             tp=tp,
             size=size,
             created_time=datetime.now(),
-            expiry_time=datetime.now() + timedelta(hours=4)
+            expiry_time=expiry_time
         )
 
         logger.info(f"📋 Setup created: {direction} @ ${entry_price:.2f}, SL=${sl:.2f}, TP=${tp:.2f}, Size={size}")
@@ -928,10 +938,18 @@ class FailedFVGLiveBot:
         setup.status = 'EXPIRED'
         self.pending_setups.remove(setup)
 
-        # Set cooldown on parent FVG
+        # Set cooldown on parent FVG (16 candles = 4H)
+        # Use last 15M candle time for accuracy
+        if self.df_15m is not None and len(self.df_15m) > 0:
+            last_candle_time = self.df_15m.index[-1]
+            cooldown_time = last_candle_time + timedelta(minutes=15 * COOLDOWN_CANDLES)
+        else:
+            # Fallback to current time + 4 hours if no data
+            cooldown_time = datetime.now() + timedelta(hours=4)
+        
         for fvg in self.rejected_4h_fvgs:
             if fvg.id == setup.parent_4h_fvg_id:
-                fvg.pending_expiry_time = datetime.now() + timedelta(hours=4)
+                fvg.pending_expiry_time = cooldown_time
                 logger.info(f"Cooldown set until {fvg.pending_expiry_time}")
                 break
 
