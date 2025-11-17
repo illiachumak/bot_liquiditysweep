@@ -254,11 +254,29 @@ class FailedFVGBacktest:
 
     def update_4h_fvgs(self, df_4h: pd.DataFrame, current_4h_idx: int):
         """Update 4H FVGs and check rejection on 4H candles"""
-        # Detect new FVGs in recent candles
+        # CRITICAL: Detect FVG only from CLOSED candles
+        # When we process current_4h_idx, that candle is already closed
+        # detect_fvg uses range(start_idx + 2, end_idx) where end_idx is exclusive
+        # So end_idx = current_4h_idx + 1 means we check up to current_4h_idx (inclusive)
+        # This is correct - we detect FVG from closed candle at current_4h_idx
         lookback = min(10, current_4h_idx)
         start_idx = max(0, current_4h_idx - lookback)
 
+        # Detect FVGs up to current_4h_idx (closed candle)
+        # detect_fvg range is (start_idx + 2, current_4h_idx + 1), so it checks candles
+        # from start_idx+2 to current_4h_idx (inclusive), which are all closed
         new_fvgs = self.detect_fvg(df_4h, start_idx, current_4h_idx + 1, timeframe='4h')
+        
+        # Additional safety: filter to ensure we only get FVGs from closed candles
+        # FVG is formed at candle i, so we need i <= current_4h_idx
+        filtered_fvgs = []
+        for fvg in new_fvgs:
+            # fvg.index is the index of the candle where FVG was formed (candle i)
+            # We only want FVGs formed at closed candles (<= current_4h_idx)
+            if fvg.index <= current_4h_idx:
+                filtered_fvgs.append(fvg)
+        
+        new_fvgs = filtered_fvgs
 
         # Add unique FVGs
         newly_added = 0

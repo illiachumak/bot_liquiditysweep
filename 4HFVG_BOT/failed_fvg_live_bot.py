@@ -600,15 +600,19 @@ class FailedFVGLiveBot:
         logger.info(f"Loaded {len(self.df_4h)} 4H candles, {len(self.df_15m)} 15M candles")
 
         # Store last candle timestamps
+        # IMPORTANT: Last candle is still OPEN, so we store it but won't detect FVG from it
+        # When a new candle appears, the previous one (which was last) will be closed
         self.last_4h_candle_time = self.df_4h.index[-1]
         self.last_15m_candle_time = self.df_15m.index[-1]
-        logger.info(f"Last 4H candle: {self.last_4h_candle_time}")
+        logger.info(f"Last 4H candle: {self.last_4h_candle_time} (still OPEN - will detect FVG when it closes)")
         logger.info(f"Last 15M candle: {self.last_15m_candle_time}")
 
         # Detect initial FVGs
+        # IMPORTANT: Exclude last candle (still open) from initial detection
         logger.info("Detecting initial FVGs...")
-        self.active_4h_fvgs = self.detector.detect_fvgs(self.df_4h, '4h')
-        logger.info(f"Found {len(self.active_4h_fvgs)} 4H FVGs")
+        df_4h_closed = self.df_4h.iloc[:-1] if len(self.df_4h) > 0 else self.df_4h
+        self.active_4h_fvgs = self.detector.detect_fvgs(df_4h_closed, '4h')
+        logger.info(f"Found {len(self.active_4h_fvgs)} 4H FVGs (from closed candles only)")
 
         # Get balance
         self.balance = self.client.get_balance('USDT')
@@ -1095,7 +1099,10 @@ class FailedFVGLiveBot:
         self.save_state()
 
     def update_4h_fvgs(self, candle: Dict):
-        """Update 4H FVGs with new candle"""
+        """Update 4H FVGs with new candle - NOTE: FVG detection moved to check_new_4h_candle()"""
+        # This method is now only used for checking rejections and invalidations
+        # FVG detection happens in check_new_4h_candle() when a candle closes
+        
         # Check rejections
         for fvg in self.active_4h_fvgs[:]:
             if not fvg.rejected:
@@ -1112,14 +1119,6 @@ class FailedFVGLiveBot:
                 fvg.invalidated = True
                 self.active_4h_fvgs.remove(fvg)
                 # DON'T remove from rejected_4h_fvgs yet - will be checked on 15M data
-
-        # Detect new FVGs from already updated df_4h (no re-fetch needed)
-        new_fvgs = self.detector.detect_fvgs(self.df_4h.tail(10), '4h')
-
-        for fvg in new_fvgs:
-            if not any(existing.id == fvg.id for existing in self.active_4h_fvgs):
-                self.active_4h_fvgs.append(fvg)
-                logger.info(f"New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
 
     def look_for_setups(self):
         """Look for setup opportunities"""
@@ -1190,7 +1189,7 @@ class FailedFVGLiveBot:
 
             latest_candle_time = df_new.index[-1]
 
-            # Check if new candle appeared
+            # Check if new candle appeared (new candle means previous one closed)
             if self.last_4h_candle_time is None or latest_candle_time > self.last_4h_candle_time:
                 logger.info(f"🕯️  New 4H candle detected!")
                 logger.info(f"   Previous: {self.last_4h_candle_time}")
@@ -1198,13 +1197,87 @@ class FailedFVGLiveBot:
 
                 # Update data
                 self.df_4h = df_new
+                
+                # CRITICAL: When new candle appears, the PREVIOUS candle is now closed
+                # We need to detect FVG from the CLOSED candle, not the new one that just started
+                if self.last_4h_candle_time is not None and len(self.df_4h) >= 3:
+                    # The closed candle is the one that just finished (second to last in new df)
+                    # When new candle appears at index -1, the closed one is at index -2
+                    closed_candle_idx = len(self.df_4h) - 2
+                    
+                    # Verify it matches last_4h_candle_time
+                    if closed_candle_idx >= 0:
+                        actual_closed_time = self.df_4h.index[closed_candle_idx]
+                        if actual_closed_time != self.last_4h_candle_time:
+                            logger.warning(f"⚠️  Closed candle time mismatch! Expected {self.last_4h_candle_time}, got {actual_closed_time}")
+                            # Try to find by timestamp
+                            try:
+                                closed_candle_idx = self.df_4h.index.get_loc(self.last_4h_candle_time)
+                            except (KeyError, TypeError):
+                                # If still not found, use -2 as fallback
+                                closed_candle_idx = len(self.df_4h) - 2
+                                logger.warning(f"   Using index {closed_candle_idx} as fallback")
+                    
+                    # Make sure we have enough candles for FVG detection (need i-2)
+                    if closed_candle_idx >= 2:
+                        # Detect FVG using the closed candle and previous candles
+                        closed_candle = self.df_4h.iloc[closed_candle_idx]
+                        prev_candle_2 = self.df_4h.iloc[closed_candle_idx - 2]
+                        
+                        # Check for FVG formation
+                        new_fvgs = []
+                        
+                        # Bullish FVG: low[i] > high[i-2]
+                        if closed_candle['low'] > prev_candle_2['high']:
+                            fvg = LiveFVG(
+                                id=f"4h_BULLISH_{closed_candle['low']:.2f}_{prev_candle_2['high']:.2f}_{int(closed_candle.name.timestamp())}",
+                                type='BULLISH',
+                                top=closed_candle['low'],
+                                bottom=prev_candle_2['high'],
+                                formed_time=closed_candle.name,
+                                timeframe='4h'
+                            )
+                            new_fvgs.append(fvg)
+                            logger.info(f"🔍 Checking for FVG: closed candle {closed_candle.name}, prev-2: {prev_candle_2.name}")
+                        
+                        # Bearish FVG: high[i] < low[i-2]
+                        elif closed_candle['high'] < prev_candle_2['low']:
+                            fvg = LiveFVG(
+                                id=f"4h_BEARISH_{prev_candle_2['low']:.2f}_{closed_candle['high']:.2f}_{int(closed_candle.name.timestamp())}",
+                                type='BEARISH',
+                                top=prev_candle_2['low'],
+                                bottom=closed_candle['high'],
+                                formed_time=closed_candle.name,
+                                timeframe='4h'
+                            )
+                            new_fvgs.append(fvg)
+                            logger.info(f"🔍 Checking for FVG: closed candle {closed_candle.name}, prev-2: {prev_candle_2.name}")
+                        
+                        # Add new FVGs
+                        for fvg in new_fvgs:
+                            if not any(existing.id == fvg.id for existing in self.active_4h_fvgs):
+                                self.active_4h_fvgs.append(fvg)
+                                logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f} (from closed candle at {closed_candle.name})")
+                    else:
+                        logger.debug(f"Skipping FVG detection: closed_candle_idx={closed_candle_idx} < 2")
+                
+                # Now update FVGs with the NEW (current) candle for rejection checking
                 last_candle = self.df_4h.iloc[-1].to_dict()
-
-                # Add close_time to candle dict for check_rejection
                 last_candle['close_time'] = int(latest_candle_time.timestamp() * 1000)
-
-                # Update FVGs with the NEW candle
-                self.update_4h_fvgs(last_candle)
+                
+                # Check rejections on the new candle (but don't detect new FVGs from it yet)
+                for fvg in self.active_4h_fvgs[:]:
+                    if not fvg.rejected:
+                        fvg.check_rejection(last_candle)
+                        if fvg.rejected:
+                            self.rejected_4h_fvgs.append(fvg)
+                    
+                    # Check invalidation
+                    high = float(last_candle['high'])
+                    low = float(last_candle['low'])
+                    if fvg.is_fully_passed(high, low):
+                        fvg.invalidated = True
+                        self.active_4h_fvgs.remove(fvg)
 
                 # Update timestamp
                 self.last_4h_candle_time = latest_candle_time

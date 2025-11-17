@@ -343,11 +343,12 @@ class LiveBotSimulator:
 
         return None
 
-    def run_simulation(self, start_date: str = '2024-01-01', end_date: str = '2024-12-31'):
+    def run_simulation(self, start_date: str = '2024-01-01', end_date: str = '2024-12-31', log_trades: bool = True):
         """Run simulation"""
 
+        period_name = f"{start_date} to {end_date}"
         print(f"\n{'='*80}")
-        print(f"LIVE BOT SIMULATION - 2024")
+        print(f"LIVE BOT SIMULATION - {period_name}")
         print(f"{'='*80}\n")
 
         # Load data
@@ -364,16 +365,22 @@ class LiveBotSimulator:
 
         print("Running simulation...\n")
 
-        # Initialize with first 50 candles
-        initial_4h = self.detector.detect_fvgs(self.df_4h.head(50), '4h')
+        # Start from index 2 (minimum for FVG detection: need at least 3 candles)
+        # This matches backtest logic
+        start_idx = 2
+        
+        # Initialize with FVGs from first candles (need at least 3 for detection)
+        # Use enough candles to detect initial FVGs (similar to backtest lookback)
+        init_lookback = min(50, len(self.df_4h))
+        initial_4h = self.detector.detect_fvgs(self.df_4h.head(init_lookback), '4h')
         self.active_4h_fvgs = initial_4h
-        self.current_4h_idx = 50
+        self.current_4h_idx = start_idx
 
         # Map 15M index to 4H index
         current_15m_idx = 0
 
         # Main loop - iterate through 4H candles
-        for i in range(50, len(self.df_4h)):
+        for i in range(start_idx, len(self.df_4h)):
             self.current_4h_idx = i
             current_4h_time = self.df_4h.index[i]
             current_4h_candle = self.df_4h.iloc[i]
@@ -429,10 +436,28 @@ class LiveBotSimulator:
                             self.active_trade = None
 
                             emoji = "✅" if trade['result'] == 'WIN' else "❌"
-                            print(f"{emoji} Trade #{len(self.trades_history)} | {trade['direction']} | "
-                                  f"Entry: ${trade['entry_price']:.2f} | Exit: ${trade['exit_price']:.2f} | "
-                                  f"PnL: ${trade['pnl']:+.2f} ({trade['pnl_pct']:+.2f}%) | "
-                                  f"Exit: {trade['exit_reason']}")
+                            
+                            # Detailed logging for manual verification
+                            print(f"\n{'='*80}")
+                            print(f"{emoji} TRADE #{len(self.trades_history)} - {trade['direction']}")
+                            print(f"{'='*80}")
+                            print(f"Entry Time:    {trade['entry_time']}")
+                            print(f"Entry Price:   ${trade['entry_price']:.2f}")
+                            print(f"Exit Time:     {trade['exit_time']}")
+                            print(f"Exit Price:    ${trade['exit_price']:.2f}")
+                            print(f"Exit Reason:   {trade['exit_reason']}")
+                            print(f"Size:          {trade['size']:.6f} BTC")
+                            print(f"SL:            ${trade['sl']:.2f}")
+                            print(f"TP:            ${trade['tp']:.2f}")
+                            print(f"Risk:          ${abs(trade['entry_price'] - trade['sl']):.2f}")
+                            print(f"Reward:        ${abs(trade['tp'] - trade['entry_price']):.2f}")
+                            print(f"R:R Ratio:     {abs(trade['tp'] - trade['entry_price']) / abs(trade['entry_price'] - trade['sl']):.2f}")
+                            print(f"PnL:           ${trade['pnl']:+.2f}")
+                            print(f"PnL %:         {trade['pnl_pct']:+.2f}%")
+                            print(f"Result:        {trade['result']}")
+                            print(f"Parent 4H FVG: {setup.parent_4h_fvg_id}")
+                            print(f"15M FVG:       {setup.fvg_15m_id}")
+                            print(f"{'='*80}\n")
 
                             # Continue from next candle (don't jump forward)
                             current_15m_idx = fill_idx + 1
@@ -451,7 +476,7 @@ class LiveBotSimulator:
         self.print_results()
 
         # Save results
-        self.save_results()
+        self.save_results(start_date)
 
     def print_results(self):
         """Print simulation results"""
@@ -491,7 +516,7 @@ class LiveBotSimulator:
 
         print()
 
-    def save_results(self):
+    def save_results(self, start_date: str = '2024-01-01'):
         """Save results to JSON"""
 
         wins = [t for t in self.trades_history if t['result'] == 'WIN']
@@ -541,7 +566,12 @@ class LiveBotSimulator:
             }
             results['trades'].append(trade_dict)
 
-        filename = 'simulation_2024_results.json'
+        # Generate filename based on date range
+        if '2024-11' in start_date or '2024-12' in start_date:
+            filename = 'simulation_last_2months_results.json'
+        else:
+            filename = 'simulation_2024_results.json'
+            
         with open(filename, 'w') as f:
             json.dump(results, f, indent=2)
 
