@@ -184,7 +184,7 @@ class FailedFVGBacktest:
 
     def __init__(self, initial_balance: float = 10000.0, risk_per_trade: float = 0.02,
                  min_rr: float = 2.0, min_sl_pct: float = 0.3,
-                 use_fixed_rr: bool = False, fixed_rr: float = 1.5,
+                 use_fixed_rr: bool = False, fixed_rr: float = 2.0,
                  enable_fees: bool = False,
                  limit_order_expiry_candles: int = 16):  # 4H on 15M timeframe
         self.initial_balance = initial_balance
@@ -564,6 +564,10 @@ class FailedFVGBacktest:
             while current_15m_idx < len(df_15m) and df_15m.index[current_15m_idx] < next_4h_time:
 
                 # Check for setups (only if no active trade)
+                # NOTE: self.active_trade is never set, so this check always passes.
+                # This means new trades can be created even while a trade is being simulated.
+                # When RR increases, more trades close by SL, and the code jumps forward
+                # in time (line 677), creating more opportunities for new trades.
                 if not self.active_trade:
 
                     current_time = df_15m.index[current_15m_idx]
@@ -670,6 +674,12 @@ class FailedFVGBacktest:
                                         self.rejected_4h_fvgs.remove(rejected_fvg)
 
                                     # Jump to end of trade
+                                    # IMPORTANT: When a trade closes (especially by SL), we jump forward in time.
+                                    # This creates more opportunities for new trades because:
+                                    # 1. More time passes = more 15M FVGs can form
+                                    # 2. More rejected 4H FVGs can be processed
+                                    # 3. When RR increases, more trades close by SL (see analysis),
+                                    #    which means more time jumps = more trade opportunities
                                     if fill_idx:
                                         # Find the idx after trade exit
                                         exit_time = trade.exit_time
@@ -875,7 +885,7 @@ if __name__ == "__main__":
                 'min_rr': 0.0,
                 'min_sl_pct': 0.3,
                 'use_fixed_rr': True,
-                'fixed_rr': 1.5,
+                'fixed_rr': 3,
                 'enable_fees': True,
                 'limit_order_expiry_candles': 16  # 4H
             },
@@ -889,7 +899,7 @@ if __name__ == "__main__":
                 'min_rr': 0.0,
                 'min_sl_pct': 0.3,
                 'use_fixed_rr': True,
-                'fixed_rr': 1.5,
+                'fixed_rr': 3,
                 'enable_fees': True,
                 'limit_order_expiry_candles': 32  # 8H
             },
@@ -903,7 +913,7 @@ if __name__ == "__main__":
                 'min_rr': 0.0,
                 'min_sl_pct': 0.3,
                 'use_fixed_rr': True,
-                'fixed_rr': 1.5,
+                'fixed_rr': 3,
                 'enable_fees': True,
                 'limit_order_expiry_candles': 48  # 12H
             },

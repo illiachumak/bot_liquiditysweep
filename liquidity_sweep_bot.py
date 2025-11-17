@@ -262,15 +262,11 @@ class BinanceManager:
     def place_market_order(self, symbol: str, side: str, quantity: float) -> Optional[Dict]:
         """Place market order"""
         try:
-            # Determine position side based on order direction (for Hedge Mode)
-            position_side = "SHORT" if side == SIDE_SELL else "LONG"
-
             order = self.client.futures_create_order(
                 symbol=symbol,
                 side=side,
                 type=ORDER_TYPE_MARKET,
-                quantity=quantity,
-                positionSide=position_side
+                quantity=quantity
             )
             logger.info(f"Market order placed: {side} {quantity} {symbol}")
             return order
@@ -284,16 +280,12 @@ class BinanceManager:
     def place_stop_loss(self, symbol: str, side: str, quantity: float, stop_price: float) -> Optional[Dict]:
         """Place stop loss order"""
         try:
-            # Determine position side: SELL closes LONG, BUY closes SHORT
-            position_side = "LONG" if side == SIDE_SELL else "SHORT"
-
             order = self.client.futures_create_order(
                 symbol=symbol,
                 side=side,
                 type=FUTURE_ORDER_TYPE_STOP_MARKET,
                 quantity=quantity,
-                stopPrice=stop_price,
-                positionSide=position_side
+                stopPrice=stop_price
             )
             logger.info(f"Stop loss placed: {stop_price}")
             return order
@@ -304,16 +296,12 @@ class BinanceManager:
     def place_take_profit(self, symbol: str, side: str, quantity: float, price: float) -> Optional[Dict]:
         """Place take profit order"""
         try:
-            # Determine position side: SELL closes LONG, BUY closes SHORT
-            position_side = "LONG" if side == SIDE_SELL else "SHORT"
-
             order = self.client.futures_create_order(
                 symbol=symbol,
                 side=side,
                 type=FUTURE_ORDER_TYPE_TAKE_PROFIT_MARKET,
                 quantity=quantity,
-                stopPrice=price,
-                positionSide=position_side
+                stopPrice=price
             )
             logger.info(f"Take profit placed: {price}")
             return order
