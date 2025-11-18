@@ -823,18 +823,20 @@ class FailedFVGLiveBot:
         if rejected_fvg.type == 'BULLISH':
             direction = 'SHORT'
             if fvg_15m.type != 'BEARISH':
+                logger.warning(f"    ❌ FVG type mismatch: need BEARISH for SHORT, got {fvg_15m.type}")
                 return None
             entry_price = fvg_15m.top
         else:
             direction = 'LONG'
             if fvg_15m.type != 'BULLISH':
+                logger.warning(f"    ❌ FVG type mismatch: need BULLISH for LONG, got {fvg_15m.type}")
                 return None
             entry_price = fvg_15m.bottom
 
         # Get SL
         sl = rejected_fvg.get_stop_loss()
         if not sl:
-            logger.warning("No SL available")
+            logger.warning("    ❌ No SL available (no highs/lows inside FVG)")
             return None
 
         # Calculate TP
@@ -843,6 +845,8 @@ class FailedFVGLiveBot:
             tp = entry_price - (FIXED_RR * risk)
         else:
             tp = entry_price + (FIXED_RR * risk)
+
+        logger.info(f"    Validating {direction} setup: Entry=${entry_price:.2f}, SL=${sl:.2f}, TP=${tp:.2f}")
 
         # Validate
         if not self.validate_setup(entry_price, sl, tp):
@@ -903,6 +907,11 @@ class FailedFVGLiveBot:
 
     def check_pending_setups(self):
         """Check status of pending setups"""
+        if not self.pending_setups:
+            return
+
+        logger.info(f"Checking {len(self.pending_setups)} pending setup(s)...")
+
         for setup in self.pending_setups[:]:
             try:
                 # Check if expired
@@ -1061,6 +1070,10 @@ class FailedFVGLiveBot:
             else:
                 self.active_trade.current_pnl = (self.active_trade.entry_price - current_price) * self.active_trade.size
 
+            # Log monitoring info (every 15M)
+            pnl_pct = (self.active_trade.current_pnl / (self.active_trade.entry_price * self.active_trade.size)) * 100
+            logger.debug(f"Monitoring trade #{self.active_trade.trade_id}: Current PnL ${self.active_trade.current_pnl:+.2f} ({pnl_pct:+.2f}%)")
+
         except Exception as e:
             logger.error(f"Error monitoring trade: {e}")
 
@@ -1103,7 +1116,15 @@ class FailedFVGLiveBot:
 
         pnl_pct = (pnl / (self.active_trade.entry_price * self.active_trade.size)) * 100
 
+        # Calculate duration
+        duration = (self.active_trade.exit_time - self.active_trade.entry_time).total_seconds()
+        duration_hours = duration / 3600
+        duration_str = f"{duration_hours:.1f}h" if duration_hours >= 1 else f"{duration/60:.0f}m"
+
         logger.info(f"{emoji} Trade closed: {reason} | PnL: ${pnl:+.2f} ({pnl_pct:+.2f}%) | Balance: ${self.balance:.2f}")
+        logger.info(f"   Entry: ${self.active_trade.entry_price:.2f} @ {self.active_trade.entry_time}")
+        logger.info(f"   Exit:  ${exit_price:.2f} @ {self.active_trade.exit_time}")
+        logger.info(f"   Duration: {duration_str} | Direction: {self.active_trade.direction}")
 
         # Save to history
         self.trades_history.append(self.active_trade.to_dict())
@@ -1117,23 +1138,32 @@ class FailedFVGLiveBot:
         """Update 4H FVGs with new candle - NOTE: FVG detection moved to check_new_4h_candle()"""
         # This method is now only used for checking rejections and invalidations
         # FVG detection happens in check_new_4h_candle() when a candle closes
-        
+
+        rejections_count = 0
+        invalidations_count = 0
+
         # Check rejections
         for fvg in self.active_4h_fvgs[:]:
             if not fvg.rejected:
-                fvg.check_rejection(candle)
+                was_rejected = fvg.check_rejection(candle)
 
                 # If rejected, add to rejected list
-                if fvg.rejected:
+                if was_rejected and fvg.rejected:
                     self.rejected_4h_fvgs.append(fvg)
+                    rejections_count += 1
 
             # Check invalidation
             high = float(candle['high'])
             low = float(candle['low'])
             if fvg.is_fully_passed(high, low):
+                logger.info(f"❌ 4H FVG {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f} invalidated (price fully passed)")
                 fvg.invalidated = True
                 self.active_4h_fvgs.remove(fvg)
+                invalidations_count += 1
                 # DON'T remove from rejected_4h_fvgs yet - will be checked on 15M data
+
+        if rejections_count > 0 or invalidations_count > 0:
+            logger.info(f"4H FVG update: {rejections_count} new rejections, {invalidations_count} invalidations")
 
     def look_for_setups(self):
         """Look for setup opportunities"""
@@ -1218,6 +1248,47 @@ class FailedFVGLiveBot:
             return True
 
         return False
+
+    def log_statistics(self):
+        """Log current bot statistics"""
+        logger.info("=" * 80)
+        logger.info("📊 BOT STATISTICS")
+        logger.info("=" * 80)
+
+        # Balance info
+        pnl = self.balance - self.initial_balance
+        pnl_pct = (pnl / self.initial_balance * 100) if self.initial_balance > 0 else 0
+        logger.info(f"💰 Balance: ${self.balance:.2f} (Start: ${self.initial_balance:.2f}, {pnl_pct:+.2f}%)")
+
+        # FVG info
+        logger.info(f"📋 Active 4H FVGs: {len(self.active_4h_fvgs)}")
+        logger.info(f"🚫 Rejected 4H FVGs: {len(self.rejected_4h_fvgs)}")
+
+        # Setup/Trade info
+        logger.info(f"📦 Pending setups: {len(self.pending_setups)}")
+        logger.info(f"🔄 Active trades: {1 if self.active_trade else 0}")
+
+        # Trade history
+        if self.trades_history:
+            wins = sum(1 for t in self.trades_history if t.get('pnl', 0) > 0)
+            win_rate = wins / len(self.trades_history) * 100
+            logger.info(f"📈 Total trades: {len(self.trades_history)} (Win rate: {win_rate:.1f}%)")
+        else:
+            logger.info(f"📈 Total trades: 0")
+
+        # Recent rejected FVGs details
+        if self.rejected_4h_fvgs:
+            logger.info(f"Recent rejected FVGs:")
+            for fvg in self.rejected_4h_fvgs[-3:]:  # Last 3
+                cooldown_info = ""
+                if fvg.pending_expiry_time:
+                    time_left = (fvg.pending_expiry_time - datetime.now()).total_seconds() / 60
+                    if time_left > 0:
+                        cooldown_info = f" (cooldown {time_left:.0f}m)"
+                trade_info = " [FILLED]" if fvg.has_filled_trade else ""
+                logger.info(f"  - {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}{cooldown_info}{trade_info}")
+
+        logger.info("=" * 80)
 
     def check_new_4h_candle(self) -> bool:
         """Check if new 4H candle appeared (by timestamp)"""
@@ -1310,9 +1381,9 @@ class FailedFVGLiveBot:
                                 self.active_4h_fvgs.append(fvg)
                                 logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f} (from closed candle at {closed_candle.name})")
 
-                        # Log if no FVG found
+                        # Log if no FVG found (less verbose - only on 4H close)
                         if not new_fvgs:
-                            logger.debug(f"No FVG detected for closed candle at {closed_candle.name} (low={closed_candle['low']:.2f}, high={closed_candle['high']:.2f})")
+                            logger.debug(f"No FVG detected for closed candle at {closed_candle.name}")
 
                         # Check rejections and invalidations on the CLOSED candle
                         closed_candle_dict = closed_candle.to_dict()
@@ -1388,6 +1459,7 @@ class FailedFVGLiveBot:
         logger.info("Press Ctrl+C to stop")
 
         last_state_save = datetime.now()
+        last_stats_log = datetime.now()
 
         try:
             while self.running:
@@ -1402,6 +1474,9 @@ class FailedFVGLiveBot:
                 new_4h = self.check_new_4h_candle()
                 if new_4h:
                     logger.info("✅ 4H candle processed")
+                    # Log statistics after 4H candle
+                    self.log_statistics()
+                    last_stats_log = now
 
                 # Check for new 15M candle (by timestamp comparison)
                 new_15m = self.check_new_15m_candle()
@@ -1417,6 +1492,11 @@ class FailedFVGLiveBot:
 
                     # Monitor active trade
                     self.monitor_active_trade()
+
+                # Log statistics every 4 hours
+                if (now - last_stats_log).total_seconds() >= 14400:  # 4 hours
+                    self.log_statistics()
+                    last_stats_log = now
 
                 # Save state every 5 minutes
                 if (now - last_state_save).total_seconds() >= 300:
