@@ -1,0 +1,40 @@
+{
+  "period": "2025-11-12 00:00:00 to 2025-11-18 20:00:00",
+  "trades": [
+    {
+      "trade_id": 1,
+      "direction": "LONG",
+      "entry_time": "2025-11-13 04:15:00",
+      "entry_price": 102094.07,
+      "exit_time": "2025-11-13 16:45:00",
+      "exit_price": 100611.96282,
+      "sl": 100611.96282,
+      "tp": 106540.39154000003,
+      "size": 0.004,
+      "pnl": -6.18,
+      "pnl_pct": -1.51,
+      "exit_reason": "SL"
+    },
+    {
+      "trade_id": 2,
+      "direction": "SHORT",
+      "entry_time": "2025-11-17 14:30:00",
+      "entry_price": 95620.02,
+      "exit_time": "2025-11-17 16:00:00",
+      "exit_price": 93774.82200000003,
+      "sl": 96235.086,
+      "tp": 93774.82200000003,
+      "size": 0.01,
+      "pnl": 18.11,
+      "pnl_pct": 1.89,
+      "exit_reason": "TP"
+    }
+  ],
+  "summary": {
+    "total_trades": 2,
+    "wins": 1,
+    "losses": 1,
+    "total_pnl": 11.93,
+    "final_balance": 311.93
+  }
+}

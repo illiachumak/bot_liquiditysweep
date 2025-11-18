@@ -137,3 +137,4 @@ logger.debug(f"Reversal check: bullish={curr_bullish}, strong_body={strong_body}
 
 
 
+

@@ -10,6 +10,8 @@ import numpy as np
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Tuple
 import json
+import requests
+import time
 
 
 class BacktestFVG:
@@ -841,24 +843,86 @@ class FailedFVGBacktest:
         print(f"\n💾 Results saved to {filename}")
 
 
-def load_data(data_dir: str = '/Users/illiachumak/trading/backtest/data'):
-    """Load historical data"""
+def fetch_binance_klines(symbol: str, interval: str, start_time: int, end_time: int) -> List[List]:
+    """Fetch klines from Binance API"""
 
-    print("📊 Loading historical data...")
+    # Real Binance API endpoint (NOT testnet)
+    base_url = "https://api.binance.com"
+    endpoint = "/api/v3/klines"
 
-    # Load 4H data
-    df_4h = pd.read_csv(f"{data_dir}/btc_4h_data_2018_to_2025.csv")
-    df_4h['Open time'] = pd.to_datetime(df_4h['Open time'])
+    all_klines = []
+    current_start = start_time
+
+    while current_start < end_time:
+        params = {
+            'symbol': symbol,
+            'interval': interval,
+            'startTime': current_start,
+            'endTime': end_time,
+            'limit': 1000  # Max limit per request
+        }
+
+        try:
+            response = requests.get(base_url + endpoint, params=params)
+            response.raise_for_status()
+            klines = response.json()
+
+            if not klines:
+                break
+
+            all_klines.extend(klines)
+
+            # Update start time to last candle's close time + 1ms
+            current_start = klines[-1][6] + 1
+
+            # Rate limiting
+            time.sleep(0.1)
+
+            print(f"  Fetched {len(klines)} candles (Total: {len(all_klines)})")
+
+        except Exception as e:
+            print(f"❌ Error fetching data: {e}")
+            break
+
+    return all_klines
+
+
+def load_data_from_binance(days: int = 7):
+    """Load historical data from Binance API for last N days"""
+
+    print(f"📊 Loading data from Binance for last {days} days...")
+
+    # Calculate time range
+    end_time = int(datetime.utcnow().timestamp() * 1000)
+    start_time = int((datetime.utcnow() - timedelta(days=days)).timestamp() * 1000)
+
+    print(f"Start: {datetime.fromtimestamp(start_time/1000)}")
+    print(f"End: {datetime.fromtimestamp(end_time/1000)}\n")
+
+    # Fetch 4H data
+    print("Fetching 4H data...")
+    klines_4h = fetch_binance_klines('BTCUSDT', '4h', start_time, end_time)
+
+    # Fetch 15M data
+    print("\nFetching 15M data...")
+    klines_15m = fetch_binance_klines('BTCUSDT', '15m', start_time, end_time)
+
+    # Convert to DataFrame
+    columns = ['Open time', 'Open', 'High', 'Low', 'Close', 'Volume',
+               'Close time', 'Quote volume', 'Trades', 'Taker buy base',
+               'Taker buy quote', 'Ignore']
+
+    df_4h = pd.DataFrame(klines_4h, columns=columns)
+    df_4h['Open time'] = pd.to_datetime(df_4h['Open time'], unit='ms')
     df_4h.set_index('Open time', inplace=True)
-    df_4h = df_4h[['Open', 'High', 'Low', 'Close', 'Volume']]
+    df_4h = df_4h[['Open', 'High', 'Low', 'Close', 'Volume']].astype(float)
 
-    # Load 15M data
-    df_15m = pd.read_csv(f"{data_dir}/btc_15m_data_2018_to_2025.csv")
-    df_15m['Open time'] = pd.to_datetime(df_15m['Open time'])
+    df_15m = pd.DataFrame(klines_15m, columns=columns)
+    df_15m['Open time'] = pd.to_datetime(df_15m['Open time'], unit='ms')
     df_15m.set_index('Open time', inplace=True)
-    df_15m = df_15m[['Open', 'High', 'Low', 'Close', 'Volume']]
+    df_15m = df_15m[['Open', 'High', 'Low', 'Close', 'Volume']].astype(float)
 
-    print(f"✅ Loaded {len(df_4h)} 4H candles")
+    print(f"\n✅ Loaded {len(df_4h)} 4H candles")
     print(f"✅ Loaded {len(df_15m)} 15M candles")
 
     return df_4h, df_15m

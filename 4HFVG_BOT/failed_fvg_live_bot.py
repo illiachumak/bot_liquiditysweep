@@ -118,7 +118,7 @@ class LiveFVG:
 
         if not self.entered:
             self.entered = True
-            logger.info(f"FVG entered: {self.timeframe} {self.type} ${self.bottom:.2f}-${self.top:.2f}")
+            logger.info(f"✅ FVG entered: {self.timeframe} {self.type} ${self.bottom:.2f}-${self.top:.2f}")
 
         # Track highs/lows inside
         if high >= self.bottom:
@@ -133,7 +133,11 @@ class LiveFVG:
                     self.rejected = True
                     self.rejection_time = datetime.fromtimestamp(candle['close_time'] / 1000)
                     self.rejection_price = close
-                    logger.info(f"🚫 REJECTION! Bullish FVG ${self.bottom:.2f}-${self.top:.2f} → SHORT setup")
+                    expected_direction = "SHORT"
+                    expected_15m = "BEARISH"
+                    logger.info(f"🚫 REJECTION! Bullish FVG ${self.bottom:.2f}-${self.top:.2f} → {expected_direction} setup")
+                    logger.info(f"   Rejected @ ${close:.2f} (closed below bottom ${self.bottom:.2f})")
+                    logger.info(f"   Expected: {expected_direction} trade with 15M {expected_15m} FVG")
                     return True
         else:  # BEARISH
             if self.entered and close > self.top:
@@ -141,7 +145,11 @@ class LiveFVG:
                     self.rejected = True
                     self.rejection_time = datetime.fromtimestamp(candle['close_time'] / 1000)
                     self.rejection_price = close
-                    logger.info(f"🚫 REJECTION! Bearish FVG ${self.bottom:.2f}-${self.top:.2f} → LONG setup")
+                    expected_direction = "LONG"
+                    expected_15m = "BULLISH"
+                    logger.info(f"🚫 REJECTION! Bearish FVG ${self.bottom:.2f}-${self.top:.2f} → {expected_direction} setup")
+                    logger.info(f"   Rejected @ ${close:.2f} (closed above top ${self.top:.2f})")
+                    logger.info(f"   Expected: {expected_direction} trade with 15M {expected_15m} FVG")
                     return True
 
         return False
@@ -346,16 +354,22 @@ class BinanceClientWrapper:
     def __init__(self):
         if DRY_RUN:
             logger.info("🧪 DRY RUN MODE - Using Binance Testnet")
-            self.client = Client(API_KEY, API_SECRET, testnet=True)
+            if USE_FUTURES:
+                # Futures testnet requires different configuration
+                logger.info("📊 Using FUTURES TESTNET")
+                self.client = Client(API_KEY, API_SECRET, testnet=False)
+                self.client.FUTURES_URL = 'https://testnet.binancefuture.com'
+            else:
+                # Spot testnet
+                logger.info("📊 Using SPOT TESTNET")
+                self.client = Client(API_KEY, API_SECRET, testnet=True)
         else:
             logger.info("💰 LIVE TRADING MODE")
             self.client = Client(API_KEY, API_SECRET)
-
-        # Futures support
-        if USE_FUTURES:
-            logger.info("📊 Using FUTURES API")
-        else:
-            logger.info("📊 Using SPOT API")
+            if USE_FUTURES:
+                logger.info("📊 Using FUTURES API (REAL MONEY)")
+            else:
+                logger.info("📊 Using SPOT API (REAL MONEY)")
 
         # Get symbol info
         if USE_FUTURES:
@@ -780,7 +794,7 @@ class FailedFVGLiveBot:
         # SL distance
         sl_distance_pct = abs(entry - sl) / entry * 100
         if sl_distance_pct < MIN_SL_PCT:
-            logger.warning(f"SL too tight: {sl_distance_pct:.3f}% < {MIN_SL_PCT}%")
+            logger.warning(f"    ❌ Setup validation failed: SL too tight {sl_distance_pct:.3f}% < {MIN_SL_PCT}%")
             return False
 
         # RR ratio
@@ -788,7 +802,7 @@ class FailedFVGLiveBot:
         reward = abs(tp - entry)
         rr = reward / risk
         if rr < MIN_RR:
-            logger.warning(f"RR too low: {rr:.2f} < {MIN_RR}")
+            logger.warning(f"    ❌ Setup validation failed: RR too low {rr:.2f} < {MIN_RR}")
             return False
 
         # Price sanity
@@ -796,9 +810,10 @@ class FailedFVGLiveBot:
         max_distance_pct = 5.0
         distance_pct = abs(entry - current_price) / current_price * 100
         if distance_pct > max_distance_pct:
-            logger.warning(f"Entry too far from current: {distance_pct:.2f}% > {max_distance_pct}%")
+            logger.warning(f"    ❌ Setup validation failed: Entry too far from current {distance_pct:.2f}% > {max_distance_pct}%")
             return False
 
+        logger.info(f"    ✅ Setup validation passed: Entry=${entry:.2f}, SL=${sl:.2f}, TP=${tp:.2f}, RR={rr:.2f}")
         return True
 
     def create_setup_from_rejection(self, rejected_fvg: LiveFVG, fvg_15m: LiveFVG) -> Optional[PendingSetup]:
@@ -1123,35 +1138,54 @@ class FailedFVGLiveBot:
     def look_for_setups(self):
         """Look for setup opportunities"""
         if self.active_trade:
+            logger.debug(f"Active trade exists, skipping setup search")
             return
 
         if not self.rejected_4h_fvgs:
+            logger.debug(f"No rejected 4H FVGs to check")
             return
+
+        logger.info(f"Looking for setups from {len(self.rejected_4h_fvgs)} rejected FVG(s)...")
 
         # Use already updated 15M data (no re-fetch needed)
         current_candle_15m = self.df_15m.iloc[-1]
 
+        setups_checked = 0
+        setups_created = 0
+
         for rejected_fvg in self.rejected_4h_fvgs[:]:
+            setups_checked += 1
+
             # Check if 4H FVG is invalidated on current 15M candle
             if rejected_fvg.is_fully_passed(float(current_candle_15m['high']), float(current_candle_15m['low'])):
-                logger.info(f"4H FVG {rejected_fvg.id} invalidated, removing from rejected list")
+                logger.info(f"❌ 4H FVG {rejected_fvg.type} ${rejected_fvg.bottom:.2f}-${rejected_fvg.top:.2f} invalidated")
                 rejected_fvg.invalidated = True
                 self.rejected_4h_fvgs.remove(rejected_fvg)
                 continue
 
             if not self.can_create_setup(rejected_fvg):
+                # Log why we can't create setup
+                if rejected_fvg.has_filled_trade:
+                    logger.debug(f"  Rejected FVG {rejected_fvg.type} already has filled trade")
+                elif rejected_fvg.pending_expiry_time:
+                    time_left = (rejected_fvg.pending_expiry_time - datetime.now()).total_seconds() / 60
+                    logger.debug(f"  Rejected FVG {rejected_fvg.type} in cooldown ({time_left:.0f}m left)")
                 continue
+
+            logger.info(f"  Checking rejected {rejected_fvg.type} FVG ${rejected_fvg.bottom:.2f}-${rejected_fvg.top:.2f}")
 
             # Look for 15M FVG
             fvgs_15m = self.detector.detect_fvgs(self.df_15m.tail(10), '15m')
 
             if fvgs_15m:
                 fvg_15m = fvgs_15m[-1]  # Most recent
+                logger.info(f"    Found 15M {fvg_15m.type} FVG ${fvg_15m.bottom:.2f}-${fvg_15m.top:.2f}")
 
                 # Try to create setup
                 setup = self.create_setup_from_rejection(rejected_fvg, fvg_15m)
 
                 if setup:
+                    setups_created += 1
                     # Place order
                     self.place_setup_order(setup)
 
@@ -1160,6 +1194,13 @@ class FailedFVGLiveBot:
 
                     # Only one setup at a time
                     break
+                else:
+                    logger.debug(f"    Setup validation failed")
+            else:
+                logger.debug(f"    No 15M FVG found in last 10 candles")
+
+        if setups_checked > 0:
+            logger.info(f"Setup search complete: checked {setups_checked}, created {setups_created}")
 
     def check_emergency_stop(self) -> bool:
         """Check if we should stop trading"""
