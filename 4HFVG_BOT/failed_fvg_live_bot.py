@@ -1346,6 +1346,7 @@ class FailedFVGLiveBot:
                             logger.warning(f"⚠️  Could not find close match for {self.last_4h_candle_time}, using last closed candle: {actual_closed_time} (diff: {min_diff:.0f}s)")
                     
                     # Make sure we have enough candles for FVG detection (need i-2)
+                    logger.info(f"closed_candle_idx = {closed_candle_idx}, checking if >= 2")
                     if closed_candle_idx >= 2:
                         # Detect FVG using the closed candle and previous candles
                         closed_candle = df_closed.iloc[closed_candle_idx]
@@ -1394,10 +1395,16 @@ class FailedFVGLiveBot:
                         closed_candle_dict = closed_candle.to_dict()
                         closed_candle_dict['close_time'] = int(closed_candle.name.timestamp() * 1000)
 
+                        logger.info(f"Checking {len(self.active_4h_fvgs)} active FVGs for rejection/invalidation on closed candle {closed_candle.name}")
+                        logger.info(f"Closed candle: H={closed_candle_dict['high']:.2f}, L={closed_candle_dict['low']:.2f}, C={closed_candle_dict['close']:.2f}")
+
                         for fvg in self.active_4h_fvgs[:]:
+                            logger.info(f"  Checking FVG: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}, entered={fvg.entered}, rejected={fvg.rejected}")
+
                             # Check rejection on closed candle
                             if not fvg.rejected:
-                                fvg.check_rejection(closed_candle_dict)
+                                rejection_result = fvg.check_rejection(closed_candle_dict)
+                                logger.info(f"    Rejection check result: {rejection_result}, fvg.rejected={fvg.rejected}")
                                 if fvg.rejected:
                                     self.rejected_4h_fvgs.append(fvg)
                                     logger.info(f"Rejection detected on closed candle {closed_candle.name}")
@@ -1409,8 +1416,10 @@ class FailedFVGLiveBot:
                                 fvg.invalidated = True
                                 self.active_4h_fvgs.remove(fvg)
                                 logger.info(f"FVG {fvg.id} invalidated on closed candle {closed_candle.name}")
+                            else:
+                                logger.info(f"    FVG not fully passed: type={fvg.type}, low={low:.2f}, bottom={fvg.bottom:.2f}, high={high:.2f}, top={fvg.top:.2f}")
                     else:
-                        logger.debug(f"Skipping FVG detection: closed_candle_idx={closed_candle_idx} < 2")
+                        logger.info(f"⚠️  Skipping FVG detection: closed_candle_idx={closed_candle_idx} < 2")
                 elif self.last_4h_candle_time is None:
                     # First run - detect FVGs from all closed candles (excluding last open one)
                     logger.info("First run: Detecting FVGs from all closed candles...")
