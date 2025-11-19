@@ -59,11 +59,16 @@ MAX_DAILY_LOSS = 500.0
 MAX_CONSECUTIVE_LOSSES = 5
 
 # Logging
+import os
+
+# Create logs directory if it doesn't exist
+os.makedirs('logs', exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s | %(levelname)s | %(message)s',
     handlers=[
-        logging.FileHandler('live_bot.log'),
+        logging.FileHandler('logs/live_bot.log'),
         logging.StreamHandler()
     ]
 )
