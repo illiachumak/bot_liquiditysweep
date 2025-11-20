@@ -1,0 +1,49 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#1a1a1a"/>
+  <line x1="100" y1="50" x2="100" y2="550" stroke="#333" stroke-width="2"/>
+  <line x1="100" y1="550" x2="750" y2="550" stroke="#333" stroke-width="2"/>
+  <text x="40" y="100" fill="#888" font-size="14" font-family="monospace">$93,000</text>
+  <text x="40" y="200" fill="#888" font-size="14" font-family="monospace">$92,500</text>
+  <text x="40" y="300" fill="#888" font-size="14" font-family="monospace">$92,000</text>
+  <text x="40" y="400" fill="#888" font-size="14" font-family="monospace">$91,500</text>
+  <text x="40" y="500" fill="#888" font-size="14" font-family="monospace">$91,000</text>
+  <text x="40" y="550" fill="#888" font-size="14" font-family="monospace">$90,500</text>
+  <rect x="100" y="200" width="650" height="200" fill="#2196F3" opacity="0.2"/>
+  <line x1="100" y1="200" x2="750" y2="200" stroke="#2196F3" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="100" y1="400" x2="750" y2="400" stroke="#2196F3" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="350" y="190" fill="#2196F3" font-size="16" font-weight="bold" font-family="Arial">TOP = $92,500</text>
+  <text x="330" y="420" fill="#2196F3" font-size="16" font-weight="bold" font-family="Arial">BOTTOM = $91,500</text>
+  <text x="320" y="300" fill="#2196F3" font-size="20" font-weight="bold" font-family="Arial">BULLISH FVG</text>
+  <rect x="180" y="380" width="40" height="80" fill="#ef5350"/>
+  <line x1="200" y1="360" x2="200" y2="380" stroke="#ef5350" stroke-width="2"/>
+  <line x1="200" y1="460" x2="200" y2="480" stroke="#ef5350" stroke-width="2"/>
+  <text x="180" y="495" fill="#fff" font-size="12" font-family="Arial">[i-2]</text>
+  <rect x="280" y="120" width="40" height="60" fill="#66bb6a"/>
+  <line x1="300" y1="100" x2="300" y2="120" stroke="#66bb6a" stroke-width="2"/>
+  <line x1="300" y1="180" x2="300" y2="200" stroke="#66bb6a" stroke-width="2"/>
+  <text x="285" y="95" fill="#fff" font-size="12" font-family="Arial">[i]</text>
+  <rect x="380" y="250" width="40" height="100" fill="#66bb6a"/>
+  <line x1="400" y1="220" x2="400" y2="250" stroke="#66bb6a" stroke-width="2"/>
+  <line x1="400" y1="350" x2="400" y2="370" stroke="#66bb6a" stroke-width="2"/>
+  <text x="375" y="385" fill="#fff" font-size="12" font-family="Arial">[i+1]</text>
+  <circle cx="400" cy="220" r="5" fill="#ffeb3b"/>
+  <text x="410" y="225" fill="#ffeb3b" font-size="12" font-family="Arial">high=$92,100</text>
+  <rect x="480" y="230" width="40" height="120" fill="#66bb6a"/>
+  <line x1="500" y1="205" x2="500" y2="230" stroke="#66bb6a" stroke-width="2"/>
+  <line x1="500" y1="350" x2="500" y2="375" stroke="#66bb6a" stroke-width="2"/>
+  <text x="475" y="390" fill="#fff" font-size="12" font-family="Arial">[i+2]</text>
+  <circle cx="500" cy="205" r="5" fill="#ffeb3b"/>
+  <text x="510" y="210" fill="#ffeb3b" font-size="12" font-family="Arial">high=$92,300</text>
+  <rect x="580" y="410" width="40" height="90" fill="#ef5350"/>
+  <line x1="600" y1="380" x2="600" y2="410" stroke="#ef5350" stroke-width="2"/>
+  <line x1="600" y1="500" x2="600" y2="520" stroke="#ef5350" stroke-width="2"/>
+  <text x="575" y="535" fill="#fff" font-size="12" font-family="Arial">[i+3]</text>
+  <text x="615" y="455" fill="#ff0000" font-size="14" font-weight="bold" font-family="Arial">REJECTED!</text>
+  <text x="615" y="475" fill="#ff0000" font-size="12" font-family="Arial">close=$91,400</text>
+  <rect x="100" y="80" width="180" height="100" fill="#333" stroke="#ffeb3b" stroke-width="2" rx="5"/>
+  <text x="110" y="100" fill="#ffeb3b" font-size="14" font-weight="bold" font-family="Arial">SL Calculation:</text>
+  <text x="110" y="120" fill="#fff" font-size="12" font-family="monospace">max(92100, 92300)</text>
+  <text x="110" y="140" fill="#fff" font-size="12" font-family="monospace">= 92300 * 1.002</text>
+  <text x="110" y="160" fill="#0f0" font-size="14" font-weight="bold" font-family="monospace">= $92,446</text>
+  <text x="200" y="30" fill="#fff" font-size="20" font-weight="bold" font-family="Arial">Приклад 2: BULLISH FVG - З HIGHS INSIDE</text>
+</svg>

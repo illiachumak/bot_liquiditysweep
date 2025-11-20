@@ -353,6 +353,73 @@ class FVGDetector:
 # BINANCE CLIENT WRAPPER
 # ============================================================================
 
+class MockBinanceClient:
+    """Mock client for simulation mode"""
+
+    def __init__(self, df_4h: pd.DataFrame, df_15m: pd.DataFrame):
+        self.df_4h = df_4h
+        self.df_15m = df_15m
+        self.current_4h_idx = 0
+        self.current_15m_idx = 0
+        self.symbol_info = {'filters': []}
+
+    def get_klines(self, symbol: str, interval: str, limit: int = 100) -> pd.DataFrame:
+        """Return historical data up to current simulation point"""
+        if interval == TIMEFRAME_4H:
+            end_idx = min(self.current_4h_idx + 1, len(self.df_4h))
+            start_idx = max(0, end_idx - limit)
+            return self.df_4h.iloc[start_idx:end_idx].copy()
+        else:  # 15M
+            end_idx = min(self.current_15m_idx + 1, len(self.df_15m))
+            start_idx = max(0, end_idx - limit)
+            return self.df_15m.iloc[start_idx:end_idx].copy()
+
+    def get_current_price(self, symbol: str) -> float:
+        """Return current price in simulation"""
+        if self.current_15m_idx < len(self.df_15m):
+            return float(self.df_15m.iloc[self.current_15m_idx]['close'])
+        return float(self.df_15m.iloc[-1]['close'])
+
+    def round_to_lot_size(self, size: float) -> float:
+        """Simple rounding for simulation"""
+        return round(size, 8)
+
+    def get_balance(self, asset: str) -> float:
+        """Mock balance - not used in simulation"""
+        return 10000.0
+
+    def create_order(self, **kwargs):
+        """Mock order creation"""
+        return {'orderId': 1, 'status': 'NEW'}
+
+    def cancel_order(self, symbol: str, orderId: int):
+        """Mock order cancellation"""
+        return {'orderId': orderId, 'status': 'CANCELED'}
+
+    def get_order(self, symbol: str, orderId: int):
+        """Mock get order"""
+        return {'orderId': orderId, 'status': 'NEW', 'price': 0}
+
+    def place_oco_order(self, **kwargs):
+        """Mock OCO order"""
+        return {'orders': [
+            {'orderId': 1, 'type': 'LIMIT_MAKER'},
+            {'orderId': 2, 'type': 'STOP_LOSS_LIMIT'}
+        ]}
+
+    def futures_create_order(self, **kwargs):
+        """Mock futures order"""
+        return {'orderId': 1, 'status': 'NEW'}
+
+    def futures_cancel_order(self, **kwargs):
+        """Mock futures cancel"""
+        return {'orderId': 1, 'status': 'CANCELED'}
+
+    def futures_get_order(self, **kwargs):
+        """Mock futures get order"""
+        return {'orderId': 1, 'status': 'NEW', 'price': 0}
+
+
 class BinanceClientWrapper:
     """Wrapper for Binance client with error handling"""
 
@@ -575,8 +642,12 @@ class BinanceClientWrapper:
 class FailedFVGLiveBot:
     """Main live trading bot"""
 
-    def __init__(self):
-        self.client = BinanceClientWrapper()
+    def __init__(self, client=None, simulation_mode=False):
+        self.simulation_mode = simulation_mode
+        if client is not None:
+            self.client = client
+        else:
+            self.client = BinanceClientWrapper()
         self.detector = FVGDetector()
 
         # State
@@ -780,18 +851,8 @@ class FailedFVGLiveBot:
         risk_per_unit = abs(entry - sl)
         size = risk_amount / risk_per_unit
 
-        # Round to lot size
-        size = self.client.round_to_lot_size(size)
-
-        # Check minimum notional
-        notional = size * entry
-        min_notional = 10.0  # Binance minimum
-        if notional < min_notional:
-            logger.warning(f"Notional ${notional:.2f} < ${min_notional:.2f}, increasing size")
-            size = min_notional / entry
-            size = self.client.round_to_lot_size(size)
-
-        return size
+        # Simple rounding to match simulation (no lot size or notional checks)
+        return round(size, 8)
 
     def validate_setup(self, entry: float, sl: float, tp: float) -> bool:
         """Validate setup parameters"""
@@ -810,13 +871,8 @@ class FailedFVGLiveBot:
             logger.warning(f"    ❌ Setup validation failed: RR too low {rr:.2f} < {MIN_RR}")
             return False
 
-        # Price sanity
-        current_price = self.client.get_current_price(SYMBOL)
-        max_distance_pct = 5.0
-        distance_pct = abs(entry - current_price) / current_price * 100
-        if distance_pct > max_distance_pct:
-            logger.warning(f"    ❌ Setup validation failed: Entry too far from current {distance_pct:.2f}% > {max_distance_pct}%")
-            return False
+        # REMOVED: Price sanity check (not in simulation)
+        # This check was rejecting valid setups that simulation would accept
 
         logger.info(f"    ✅ Setup validation passed: Entry=${entry:.2f}, SL=${sl:.2f}, TP=${tp:.2f}, RR={rr:.2f}")
         return True
@@ -860,15 +916,15 @@ class FailedFVGLiveBot:
         # Calculate size
         size = self.calculate_position_size(entry_price, sl)
 
-        # Calculate expiry time based on 15M candles (16 candles = 4H)
-        # Use last 15M candle time + 16 * 15 minutes for accuracy
+        # Calculate created_time and expiry_time (matches simulation)
+        # Use last 15M candle time as current_time
         if self.df_15m is not None and len(self.df_15m) > 0:
-            last_candle_time = self.df_15m.index[-1]
-            expiry_time = last_candle_time + timedelta(minutes=15 * LIMIT_EXPIRY_CANDLES)
+            current_time = self.df_15m.index[-1]
         else:
-            # Fallback to current time + 4 hours if no data
-            expiry_time = datetime.now() + timedelta(hours=4)
-        
+            current_time = datetime.now()
+
+        expiry_time = current_time + timedelta(hours=4)
+
         # Create setup
         setup = PendingSetup(
             setup_id=f"setup_{int(datetime.now().timestamp())}",
@@ -879,7 +935,7 @@ class FailedFVGLiveBot:
             sl=sl,
             tp=tp,
             size=size,
-            created_time=datetime.now(),
+            created_time=current_time,
             expiry_time=expiry_time
         )
 
@@ -971,15 +1027,9 @@ class FailedFVGLiveBot:
         setup.status = 'EXPIRED'
         self.pending_setups.remove(setup)
 
-        # Set cooldown on parent FVG (16 candles = 4H)
-        # Use last 15M candle time for accuracy
-        if self.df_15m is not None and len(self.df_15m) > 0:
-            last_candle_time = self.df_15m.index[-1]
-            cooldown_time = last_candle_time + timedelta(minutes=15 * COOLDOWN_CANDLES)
-        else:
-            # Fallback to current time + 4 hours if no data
-            cooldown_time = datetime.now() + timedelta(hours=4)
-        
+        # Set cooldown on parent FVG (matches simulation)
+        cooldown_time = setup.expiry_time + timedelta(hours=4)
+
         for fvg in self.rejected_4h_fvgs:
             if fvg.id == setup.parent_4h_fvg_id:
                 fvg.pending_expiry_time = cooldown_time
@@ -1224,8 +1274,9 @@ class FailedFVGLiveBot:
                     # Place order
                     self.place_setup_order(setup)
 
-                    # Mark FVG as having pending setup
+                    # Mark FVG as having pending setup (matches simulation)
                     rejected_fvg.pending_setup_id = setup.setup_id
+                    rejected_fvg.pending_expiry_time = setup.expiry_time
 
                     # Only one setup at a time
                     break
@@ -1345,85 +1396,71 @@ class FailedFVGLiveBot:
                             actual_closed_time = df_closed.index[closed_candle_idx]
                             logger.warning(f"⚠️  Could not find close match for {self.last_4h_candle_time}, using last closed candle: {actual_closed_time} (diff: {min_diff:.0f}s)")
                     
-                    # FVG DETECTION - needs i-2, so only when closed_candle_idx >= 2
-                    logger.info(f"closed_candle_idx = {closed_candle_idx}, checking if >= 2 for FVG detection")
-                    if closed_candle_idx >= 2:
-                        # Detect FVG using the closed candle and previous candles
-                        closed_candle = df_closed.iloc[closed_candle_idx]
-                        prev_candle_2 = df_closed.iloc[closed_candle_idx - 2]
+                    # FVG DETECTION - Use 10-candle lookback window (matches simulation)
+                    if len(df_closed) >= 3:  # Need at least 3 candles for FVG detection
+                        lookback_start = max(0, len(df_closed) - 10)
+                        df_window = df_closed.iloc[lookback_start:]
 
-                        # Check for FVG formation
-                        new_fvgs = []
-
-                        # Bullish FVG: low[i] > high[i-2]
-                        if closed_candle['low'] > prev_candle_2['high']:
-                            fvg = LiveFVG(
-                                id=f"4h_BULLISH_{closed_candle['low']:.2f}_{prev_candle_2['high']:.2f}_{int(closed_candle.name.timestamp())}",
-                                type='BULLISH',
-                                top=closed_candle['low'],
-                                bottom=prev_candle_2['high'],
-                                formed_time=closed_candle.name,
-                                timeframe='4h'
-                            )
-                            new_fvgs.append(fvg)
-                            logger.info(f"🔍 Checking for FVG: closed candle {closed_candle.name}, prev-2: {prev_candle_2.name}")
-
-                        # Bearish FVG: high[i] < low[i-2]
-                        elif closed_candle['high'] < prev_candle_2['low']:
-                            fvg = LiveFVG(
-                                id=f"4h_BEARISH_{prev_candle_2['low']:.2f}_{closed_candle['high']:.2f}_{int(closed_candle.name.timestamp())}",
-                                type='BEARISH',
-                                top=prev_candle_2['low'],
-                                bottom=closed_candle['high'],
-                                formed_time=closed_candle.name,
-                                timeframe='4h'
-                            )
-                            new_fvgs.append(fvg)
-                            logger.info(f"🔍 Checking for FVG: closed candle {closed_candle.name}, prev-2: {prev_candle_2.name}")
+                        logger.info(f"🔍 Detecting FVGs in window: {len(df_window)} candles (from index {lookback_start} to {len(df_closed)-1})")
+                        new_fvgs = self.detector.detect_fvgs(df_window, '4h')
 
                         # Add new FVGs
                         for fvg in new_fvgs:
                             if not any(existing.id == fvg.id for existing in self.active_4h_fvgs):
                                 self.active_4h_fvgs.append(fvg)
-                                logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f} (from closed candle at {closed_candle.name})")
+                                logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
 
-                        # Log if no FVG found (less verbose - only on 4H close)
+                        # Log if no FVG found
                         if not new_fvgs:
-                            logger.debug(f"No FVG detected for closed candle at {closed_candle.name}")
+                            logger.debug(f"No FVG detected in lookback window")
                     else:
-                        logger.info(f"⚠️  Skipping FVG detection: closed_candle_idx={closed_candle_idx} < 2")
+                        logger.info(f"⚠️  Skipping FVG detection: only {len(df_closed)} closed candles (need >= 3)")
 
-                    # REJECTION/INVALIDATION CHECK - ALWAYS runs, same as simulation
-                    # Get the PREVIOUS candle (which just closed when new 4H appeared)
-                    # last_4h_candle_time is the candle that JUST CLOSED
+                    # REJECTION/INVALIDATION CHECK - Check ALL candles between last check and now
+                    # This ensures we don't miss rejections if bot missed a candle detection
                     try:
-                        closed_candle_for_check = df_closed[df_closed.index == self.last_4h_candle_time].iloc[0]
-                        closed_candle_dict = closed_candle_for_check.to_dict()
-                        closed_candle_dict['close_time'] = int(closed_candle_for_check.name.timestamp() * 1000)
+                        # Get all closed candles starting from last_4h_candle_time (inclusive)
+                        # When new candle appears, last_4h_candle_time is the candle that JUST CLOSED
+                        # If bot missed some candles, we check all missed ones too
+                        candles_to_check = df_closed[df_closed.index >= self.last_4h_candle_time]
 
-                        logger.info(f"Checking {len(self.active_4h_fvgs)} active FVGs for rejection/invalidation on closed candle {closed_candle_for_check.name}")
-                        logger.info(f"Closed candle: H={closed_candle_dict['high']:.2f}, L={closed_candle_dict['low']:.2f}, C={closed_candle_dict['close']:.2f}")
+                        if len(candles_to_check) == 0:
+                            logger.warning("⚠️  No candles to check for rejection/invalidation")
+                        else:
+                            logger.info(f"Checking {len(self.active_4h_fvgs)} active FVGs on {len(candles_to_check)} closed candle(s)")
+                            logger.info(f"   Time range: {self.last_4h_candle_time} → {latest_candle_time}")
 
-                        for fvg in self.active_4h_fvgs[:]:
-                            logger.info(f"  Checking FVG: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}, entered={fvg.entered}, rejected={fvg.rejected}")
+                        for candle_row in candles_to_check.itertuples():
+                            candle_open_time = candle_row.Index
+                            candle_close_time = candle_open_time + timedelta(hours=4)
 
-                            # Check rejection on closed candle
-                            if not fvg.rejected:
-                                rejection_result = fvg.check_rejection(closed_candle_dict)
-                                logger.info(f"    Rejection check result: {rejection_result}, fvg.rejected={fvg.rejected}")
-                                if fvg.rejected:
-                                    self.rejected_4h_fvgs.append(fvg)
-                                    logger.info(f"Rejection detected on closed candle {closed_candle_for_check.name}")
+                            closed_candle_dict = {
+                                'open': candle_row.open,
+                                'high': candle_row.high,
+                                'low': candle_row.low,
+                                'close': candle_row.close,
+                                'close_time': int(candle_close_time.timestamp() * 1000)
+                            }
 
-                            # Check invalidation
-                            high = float(closed_candle_dict['high'])
-                            low = float(closed_candle_dict['low'])
-                            if fvg.is_fully_passed(high, low):
-                                fvg.invalidated = True
-                                self.active_4h_fvgs.remove(fvg)
-                                logger.info(f"FVG {fvg.id} invalidated on closed candle {closed_candle_for_check.name}")
-                            else:
-                                logger.info(f"    FVG not fully passed: type={fvg.type}, low={low:.2f}, bottom={fvg.bottom:.2f}, high={high:.2f}, top={fvg.top:.2f}")
+                            logger.info(f"📊 Checking candle {candle_open_time} → {candle_close_time}")
+                            logger.info(f"   OHLC: O={candle_row.open:.2f} H={candle_row.high:.2f} L={candle_row.low:.2f} C={candle_row.close:.2f}")
+
+                            for fvg in self.active_4h_fvgs[:]:
+                                # Check rejection on closed candle
+                                if not fvg.rejected:
+                                    rejection_result = fvg.check_rejection(closed_candle_dict)
+                                    if fvg.rejected:
+                                        self.rejected_4h_fvgs.append(fvg)
+                                        logger.info(f"   ✅ Rejection detected: {fvg.type} FVG ${fvg.bottom:.2f}-${fvg.top:.2f}")
+
+                                # Check invalidation
+                                high = float(closed_candle_dict['high'])
+                                low = float(closed_candle_dict['low'])
+                                if fvg.is_fully_passed(high, low):
+                                    fvg.invalidated = True
+                                    self.active_4h_fvgs.remove(fvg)
+                                    logger.info(f"   ❌ FVG {fvg.id} invalidated")
+
                     except Exception as e:
                         logger.error(f"Error checking rejection/invalidation: {e}")
                 elif self.last_4h_candle_time is None:
@@ -1583,6 +1620,349 @@ def main():
     bot = FailedFVGLiveBot()
     bot.initialize()
     bot.run()
+
+
+def run_simulation(start_date: str = '2024-01-01', end_date: str = '2024-12-31'):
+    """Run simulation using live bot logic with historical data"""
+
+    print("="*80)
+    print("LIVE BOT SIMULATION MODE")
+    print("="*80)
+    print(f"Testing period: {start_date} to {end_date}")
+    print("="*80)
+
+    # Load historical data
+    data_dir = '/Users/illiachumak/trading/backtest/data'
+
+    print("\n📊 Loading historical data...")
+
+    # Load 4H data
+    df_4h = pd.read_csv(f"{data_dir}/btc_4h_data_2018_to_2025.csv")
+    df_4h['Open time'] = pd.to_datetime(df_4h['Open time'])
+    df_4h.set_index('Open time', inplace=True)
+    df_4h = df_4h[['Open', 'High', 'Low', 'Close', 'Volume']]
+    df_4h.columns = ['open', 'high', 'low', 'close', 'volume']
+
+    # Load 15M data
+    df_15m = pd.read_csv(f"{data_dir}/btc_15m_data_2018_to_2025.csv")
+    df_15m['Open time'] = pd.to_datetime(df_15m['Open time'])
+    df_15m.set_index('Open time', inplace=True)
+    df_15m = df_15m[['Open', 'High', 'Low', 'Close', 'Volume']]
+    df_15m.columns = ['open', 'high', 'low', 'close', 'volume']
+
+    # Filter by date range
+    df_4h = df_4h[(df_4h.index >= start_date) & (df_4h.index <= end_date)]
+    df_15m = df_15m[(df_15m.index >= start_date) & (df_15m.index <= end_date)]
+
+    print(f"✅ Loaded {len(df_4h)} 4H candles, {len(df_15m)} 15M candles")
+    print(f"Period: {df_4h.index[0]} to {df_4h.index[-1]}")
+
+    # Create mock client
+    mock_client = MockBinanceClient(df_4h, df_15m)
+
+    # Create bot with mock client
+    bot = FailedFVGLiveBot(client=mock_client, simulation_mode=True)
+    bot.balance = 10000.0
+    bot.initial_balance = 10000.0
+
+    # Simulation state
+    trade_counter = 0
+    trades_history = []
+
+    print("\n🔄 Running simulation...\n")
+
+    # Start from index 2 (minimum for FVG detection)
+    start_idx = 2
+
+    # Initialize with FVGs from first candles
+    init_lookback = min(50, len(df_4h))
+    df_4h_init = df_4h.head(init_lookback)
+    bot.active_4h_fvgs = bot.detector.detect_fvgs(df_4h_init, '4h')
+
+    # Map 15M index to current position
+    current_15m_idx = 0
+
+    # Main simulation loop - iterate through 4H candles
+    for i in range(start_idx, len(df_4h)):
+        mock_client.current_4h_idx = i
+        current_4h_time = df_4h.index[i]
+        current_4h_candle = df_4h.iloc[i]
+
+        # Convert to dict for compatibility
+        candle_dict = {
+            'open': current_4h_candle['open'],
+            'high': current_4h_candle['high'],
+            'low': current_4h_candle['low'],
+            'close': current_4h_candle['close'],
+            'volume': current_4h_candle['volume'],
+            'close_time': int(current_4h_time.timestamp() * 1000)  # milliseconds
+        }
+
+        # Update 4H FVGs (rejection & invalidation checks)
+        bot.update_4h_fvgs(candle_dict)
+
+        # Detect new 4H FVGs from lookback window (matches fixed live bot)
+        if len(df_4h) >= 3:
+            lookback_start = max(0, i - 10)
+            df_window = df_4h.iloc[lookback_start:i+1]
+            new_fvgs = bot.detector.detect_fvgs(df_window, '4h')
+
+            for fvg in new_fvgs:
+                if not any(existing.id == fvg.id for existing in bot.active_4h_fvgs):
+                    bot.active_4h_fvgs.append(fvg)
+
+        # Find next 4H time
+        next_4h_time = df_4h.index[i+1] if i+1 < len(df_4h) else df_15m.index[-1]
+
+        # Process 15M candles in this 4H period
+        while current_15m_idx < len(df_15m) and df_15m.index[current_15m_idx] < next_4h_time:
+            mock_client.current_15m_idx = current_15m_idx
+
+            # Update 15M data (for look_for_setups)
+            bot.df_15m = mock_client.get_klines(SYMBOL, TIMEFRAME_15M, limit=1000)
+            bot.df_4h = mock_client.get_klines(SYMBOL, TIMEFRAME_4H, limit=200)
+
+            # Look for setups (only if no active trade and no pending setups)
+            if not bot.active_trade and not bot.pending_setups:
+                # Check all rejected FVGs for setup opportunities
+                for rejected_fvg in bot.rejected_4h_fvgs[:]:
+                    # Check if invalidated
+                    current_candle_15m = df_15m.iloc[current_15m_idx]
+                    if rejected_fvg.is_fully_passed(current_candle_15m['high'], current_candle_15m['low']):
+                        rejected_fvg.invalidated = True
+                        bot.rejected_4h_fvgs.remove(rejected_fvg)
+                        continue
+
+                    # Check if can create setup
+                    current_time = df_15m.index[current_15m_idx]
+                    if rejected_fvg.has_filled_trade:
+                        continue
+                    if rejected_fvg.pending_expiry_time:
+                        if isinstance(rejected_fvg.pending_expiry_time, datetime):
+                            expiry_ts = pd.Timestamp(rejected_fvg.pending_expiry_time)
+                        else:
+                            expiry_ts = rejected_fvg.pending_expiry_time
+                        if current_time < expiry_ts:
+                            continue
+
+                    # Look for 15M FVG
+                    lookback_start = max(0, current_15m_idx - 10)
+                    df_window_15m = df_15m.iloc[lookback_start:current_15m_idx + 1]
+                    fvgs_15m = bot.detector.detect_fvgs(df_window_15m, '15m')
+
+                    if fvgs_15m:
+                        fvg_15m = fvgs_15m[-1]
+
+                        # Check type match
+                        if rejected_fvg.type == 'BULLISH' and fvg_15m.type != 'BEARISH':
+                            continue
+                        if rejected_fvg.type == 'BEARISH' and fvg_15m.type != 'BULLISH':
+                            continue
+
+                        # Create setup (using bot's method)
+                        setup = bot.create_setup_from_rejection(rejected_fvg, fvg_15m)
+
+                        if setup:
+                            # Mark FVG
+                            rejected_fvg.pending_setup_id = setup.setup_id
+                            rejected_fvg.pending_expiry_time = setup.expiry_time
+
+                            # Check if gets filled in expiry window
+                            expiry_idx = min(current_15m_idx + LIMIT_EXPIRY_CANDLES, len(df_15m))
+                            filled = False
+                            fill_idx = None
+
+                            for j in range(current_15m_idx + 1, expiry_idx):
+                                candle = df_15m.iloc[j]
+                                if setup.direction == 'LONG':
+                                    if candle['low'] <= setup.entry_price:
+                                        filled = True
+                                        fill_idx = j
+                                        break
+                                else:  # SHORT
+                                    if candle['high'] >= setup.entry_price:
+                                        filled = True
+                                        fill_idx = j
+                                        break
+
+                            if filled:
+                                # Set active trade
+                                bot.active_trade = ActiveTrade(
+                                    trade_id=f"trade_{trade_counter}",
+                                    setup_id=setup.setup_id,
+                                    direction=setup.direction,
+                                    entry_price=setup.entry_price,
+                                    entry_time=df_15m.index[fill_idx],
+                                    sl=setup.sl,
+                                    tp=setup.tp,
+                                    size=setup.size
+                                )
+
+                                # Simulate trade execution
+                                entry_idx = fill_idx
+                                exit_price = None
+                                exit_reason = None
+                                exit_idx = None
+
+                                # Check for TP/SL hit (max 200 candles = 50h ~2 days)
+                                for k in range(entry_idx, min(entry_idx + 200, len(df_15m))):
+                                    candle = df_15m.iloc[k]
+
+                                    if setup.direction == 'LONG':
+                                        # Check SL first
+                                        if candle['low'] <= setup.sl:
+                                            exit_price = setup.sl
+                                            exit_reason = 'SL'
+                                            exit_idx = k
+                                            break
+                                        # Check TP
+                                        if candle['high'] >= setup.tp:
+                                            exit_price = setup.tp
+                                            exit_reason = 'TP'
+                                            exit_idx = k
+                                            break
+                                    else:  # SHORT
+                                        # Check SL first
+                                        if candle['high'] >= setup.sl:
+                                            exit_price = setup.sl
+                                            exit_reason = 'SL'
+                                            exit_idx = k
+                                            break
+                                        # Check TP
+                                        if candle['low'] <= setup.tp:
+                                            exit_price = setup.tp
+                                            exit_reason = 'TP'
+                                            exit_idx = k
+                                            break
+
+                                # If still no exit, close at timeout
+                                if exit_price is None:
+                                    last_idx = min(entry_idx + 199, len(df_15m) - 1)
+                                    exit_price = df_15m.iloc[last_idx]['close']
+                                    exit_reason = 'TIMEOUT'
+                                    exit_idx = last_idx
+
+                                # Calculate PnL
+                                if setup.direction == 'LONG':
+                                    pnl = (exit_price - setup.entry_price) * setup.size
+                                else:
+                                    pnl = (setup.entry_price - exit_price) * setup.size
+
+                                # Apply fees
+                                entry_fee = setup.entry_price * setup.size * MAKER_FEE
+                                if exit_reason == 'SL':
+                                    exit_fee = exit_price * setup.size * TAKER_FEE
+                                else:
+                                    exit_fee = exit_price * setup.size * MAKER_FEE
+
+                                pnl -= (entry_fee + exit_fee)
+
+                                # Record trade
+                                trade = {
+                                    'trade_id': trade_counter,
+                                    'entry_time': df_15m.index[fill_idx],
+                                    'entry_price': setup.entry_price,
+                                    'exit_time': df_15m.index[exit_idx],
+                                    'exit_price': exit_price,
+                                    'exit_reason': exit_reason,
+                                    'direction': setup.direction,
+                                    'size': setup.size,
+                                    'sl': setup.sl,
+                                    'tp': setup.tp,
+                                    'pnl': pnl,
+                                    'pnl_pct': (pnl / (setup.entry_price * setup.size)) * 100,
+                                    'result': 'WIN' if pnl > 0 else 'LOSS'
+                                }
+
+                                trades_history.append(trade)
+                                bot.balance += pnl
+                                trade_counter += 1
+
+                                # Mark parent FVG
+                                rejected_fvg.has_filled_trade = True
+                                bot.rejected_4h_fvgs.remove(rejected_fvg)
+
+                                # Clear active trade
+                                bot.active_trade = None
+
+                                # Print trade
+                                emoji = "✅" if trade['result'] == 'WIN' else "❌"
+                                print(f"\n{'='*80}")
+                                print(f"{emoji} TRADE #{trade_counter} - {trade['direction']}")
+                                print(f"{'='*80}")
+                                print(f"Entry:  {trade['entry_time']} @ ${trade['entry_price']:.2f}")
+                                print(f"Exit:   {trade['exit_time']} @ ${trade['exit_price']:.2f}")
+                                print(f"Reason: {trade['exit_reason']}")
+                                print(f"PnL:    ${trade['pnl']:+.2f} ({trade['pnl_pct']:+.2f}%)")
+                                print(f"Balance: ${bot.balance:.2f}")
+                                print(f"{'='*80}\n")
+
+                                # Continue from next candle
+                                current_15m_idx = fill_idx + 1
+                                break  # Only one trade at a time
+                            else:
+                                # Setup expired - set cooldown
+                                rejected_fvg.pending_expiry_time = setup.expiry_time + timedelta(hours=4)
+
+                            break  # Only one setup at a time
+
+            current_15m_idx += 1
+
+    # Print results
+    print("\n" + "="*80)
+    print("SIMULATION RESULTS")
+    print("="*80)
+    print(f"Period: {start_date} to {end_date}")
+    print(f"Initial Balance: ${bot.initial_balance:,.2f}")
+    print(f"Final Balance:   ${bot.balance:,.2f}")
+    print(f"Total PnL:       ${bot.balance - bot.initial_balance:+,.2f}")
+    print(f"Return:          {((bot.balance - bot.initial_balance) / bot.initial_balance * 100):+.2f}%")
+    print(f"\nTotal Trades:    {len(trades_history)}")
+
+    if trades_history:
+        wins = sum(1 for t in trades_history if t['pnl'] > 0)
+        losses = len(trades_history) - wins
+        win_rate = wins / len(trades_history) * 100
+
+        avg_win = np.mean([t['pnl'] for t in trades_history if t['pnl'] > 0]) if wins > 0 else 0
+        avg_loss = np.mean([t['pnl'] for t in trades_history if t['pnl'] < 0]) if losses > 0 else 0
+
+        print(f"Wins:            {wins}")
+        print(f"Losses:          {losses}")
+        print(f"Win Rate:        {win_rate:.2f}%")
+        print(f"Avg Win:         ${avg_win:.2f}")
+        print(f"Avg Loss:        ${avg_loss:.2f}")
+
+        if avg_loss != 0:
+            profit_factor = abs(avg_win * wins / (avg_loss * losses))
+            print(f"Profit Factor:   {profit_factor:.2f}")
+
+    print("="*80)
+
+    # Save results
+    results = {
+        'period': f"{start_date} to {end_date}",
+        'initial_balance': bot.initial_balance,
+        'final_balance': bot.balance,
+        'total_pnl': bot.balance - bot.initial_balance,
+        'return_pct': ((bot.balance - bot.initial_balance) / bot.initial_balance * 100),
+        'total_trades': len(trades_history),
+        'trades': trades_history
+    }
+
+    output_file = f'4HFVG_BOT/live_bot_simulation_{start_date}_to_{end_date}.json'
+    with open(output_file, 'w') as f:
+        # Convert datetime objects to strings
+        def serialize(obj):
+            if isinstance(obj, (datetime, pd.Timestamp)):
+                return obj.isoformat()
+            raise TypeError(f"Type {type(obj)} not serializable")
+
+        json.dump(results, f, indent=2, default=serialize)
+
+    print(f"\n✅ Results saved to {output_file}")
+
+    return results
 
 
 if __name__ == '__main__':
