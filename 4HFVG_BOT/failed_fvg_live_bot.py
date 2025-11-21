@@ -1032,9 +1032,10 @@ class FailedFVGLiveBot:
     def check_pending_setups(self):
         """Check status of pending setups"""
         if not self.pending_setups:
+            logger.info("  No pending setups to check")
             return
 
-        logger.info(f"Checking {len(self.pending_setups)} pending setup(s)...")
+        logger.info(f"  Checking {len(self.pending_setups)} pending setup(s)...")
 
         for setup in self.pending_setups[:]:
             try:
@@ -1166,7 +1167,10 @@ class FailedFVGLiveBot:
     def monitor_active_trade(self):
         """Monitor active trade"""
         if not self.active_trade:
+            logger.info("  No active trade to monitor")
             return
+
+        logger.info(f"  Monitoring active trade: {self.active_trade.direction} @ ${self.active_trade.entry_price:.2f}")
 
         try:
             # Check SL order
@@ -1283,17 +1287,40 @@ class FailedFVGLiveBot:
         if rejections_count > 0 or invalidations_count > 0:
             logger.info(f"4H FVG update: {rejections_count} new rejections, {invalidations_count} invalidations")
 
+    def cleanup_rejected_fvgs(self):
+        """Clean up rejected FVGs that are no longer valid"""
+        if not self.rejected_4h_fvgs:
+            return
+
+        if self.df_15m is None or len(self.df_15m) == 0:
+            return
+
+        current_candle_15m = self.df_15m.iloc[-1]
+        initial_count = len(self.rejected_4h_fvgs)
+        removed_count = 0
+
+        for rejected_fvg in self.rejected_4h_fvgs[:]:
+            # Check if invalidated (price fully passed through)
+            if rejected_fvg.is_fully_passed(float(current_candle_15m['high']), float(current_candle_15m['low'])):
+                logger.info(f"  ❌ Cleaning up invalidated rejected FVG: {rejected_fvg.type} ${rejected_fvg.bottom:.2f}-${rejected_fvg.top:.2f}")
+                rejected_fvg.invalidated = True
+                self.rejected_4h_fvgs.remove(rejected_fvg)
+                removed_count += 1
+
+        if removed_count > 0:
+            logger.info(f"  Cleaned up {removed_count} invalidated rejected FVG(s) ({initial_count} → {len(self.rejected_4h_fvgs)})")
+
     def look_for_setups(self):
         """Look for setup opportunities"""
         if self.active_trade:
-            logger.debug(f"Active trade exists, skipping setup search")
+            logger.info(f"  Active trade exists, skipping setup search")
             return
 
         if not self.rejected_4h_fvgs:
-            logger.debug(f"No rejected 4H FVGs to check")
+            logger.info(f"  No rejected 4H FVGs available for setups")
             return
 
-        logger.info(f"Looking for setups from {len(self.rejected_4h_fvgs)} rejected FVG(s)...")
+        logger.info(f"  Looking for setups from {len(self.rejected_4h_fvgs)} rejected FVG(s)...")
 
         # Use already updated 15M data (no re-fetch needed)
         current_candle_15m = self.df_15m.iloc[-1]
@@ -1603,6 +1630,9 @@ class FailedFVGLiveBot:
                 if new_15m:
                     logger.info("Checking 15M logic...")
 
+                    # Clean up rejected FVGs that are no longer valid
+                    self.cleanup_rejected_fvgs()
+
                     # Check pending setups
                     self.check_pending_setups()
 
@@ -1612,6 +1642,9 @@ class FailedFVGLiveBot:
 
                     # Monitor active trade
                     self.monitor_active_trade()
+
+                    # Summary
+                    logger.info(f"✅ 15M logic complete | Active FVGs: {len(self.active_4h_fvgs)} | Rejected FVGs: {len(self.rejected_4h_fvgs)} | Pending: {len(self.pending_setups)} | Active Trade: {'Yes' if self.active_trade else 'No'}")
 
                 # Log statistics every 4 hours
                 if (now - last_stats_log).total_seconds() >= 14400:  # 4 hours
