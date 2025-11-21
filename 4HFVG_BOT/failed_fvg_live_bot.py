@@ -672,6 +672,64 @@ class FailedFVGLiveBot:
 
         self.running = False
 
+    def check_historical_rejections(self):
+        """Check historical data to determine if FVGs were already rejected"""
+        if self.df_4h is None or len(self.df_4h) == 0:
+            return
+
+        df_4h_closed = self.df_4h.iloc[:-1]  # Exclude last open candle
+
+        # Check each active FVG against historical candles
+        for fvg in self.active_4h_fvgs[:]:
+            # Find the index where this FVG was formed
+            try:
+                fvg_idx = df_4h_closed.index.get_loc(fvg.formed_time)
+            except (KeyError, TypeError):
+                # Try to find closest candle
+                time_diffs = [(i, abs((df_4h_closed.index[i] - fvg.formed_time).total_seconds()))
+                             for i in range(len(df_4h_closed))]
+                if time_diffs:
+                    closest_idx, min_diff = min(time_diffs, key=lambda x: x[1])
+                    if min_diff <= 7200:  # Within 2 hours tolerance
+                        fvg_idx = closest_idx
+                    else:
+                        continue
+                else:
+                    continue
+
+            # Check all candles after FVG formation
+            for i in range(fvg_idx + 1, len(df_4h_closed)):
+                candle_row = df_4h_closed.iloc[i]
+                candle_time = df_4h_closed.index[i]
+                candle_close_time = candle_time + timedelta(hours=4)
+
+                candle_dict = {
+                    'open': float(candle_row['open']),
+                    'high': float(candle_row['high']),
+                    'low': float(candle_row['low']),
+                    'close': float(candle_row['close']),
+                    'close_time': int(candle_close_time.timestamp() * 1000)
+                }
+
+                # Check rejection
+                if not fvg.rejected:
+                    was_rejected = fvg.check_rejection(candle_dict)
+                    if fvg.rejected:
+                        # Move to rejected list
+                        self.rejected_4h_fvgs.append(fvg)
+                        self.active_4h_fvgs.remove(fvg)
+                        logger.info(f"  ✅ Historical rejection found: {fvg.type} FVG ${fvg.bottom:.2f}-${fvg.top:.2f} @ {candle_time}")
+                        break
+
+                # Check invalidation
+                high = float(candle_dict['high'])
+                low = float(candle_dict['low'])
+                if fvg.is_fully_passed(high, low):
+                    fvg.invalidated = True
+                    self.active_4h_fvgs.remove(fvg)
+                    logger.info(f"  ❌ Historical invalidation: {fvg.type} FVG ${fvg.bottom:.2f}-${fvg.top:.2f} @ {candle_time}")
+                    break
+
     def initialize(self):
         """Initialize bot - fetch data, restore state"""
         logger.info("="*80)
@@ -703,6 +761,11 @@ class FailedFVGLiveBot:
         df_4h_closed = self.df_4h.iloc[:-1] if len(self.df_4h) > 0 else self.df_4h
         self.active_4h_fvgs = self.detector.detect_fvgs(df_4h_closed, '4h')
         logger.info(f"Found {len(self.active_4h_fvgs)} 4H FVGs (from closed candles only)")
+
+        # Check historical rejections
+        logger.info("Checking historical rejections for detected FVGs...")
+        self.check_historical_rejections()
+        logger.info(f"After rejection check: {len(self.active_4h_fvgs)} active, {len(self.rejected_4h_fvgs)} rejected")
 
         # Get balance
         self.balance = self.client.get_balance('USDT')
@@ -1678,6 +1741,12 @@ def run_simulation(start_date: str = '2024-01-01', end_date: str = '2024-12-31')
     init_lookback = min(50, len(df_4h))
     df_4h_init = df_4h.head(init_lookback)
     bot.active_4h_fvgs = bot.detector.detect_fvgs(df_4h_init, '4h')
+
+    # Apply same filtering as live bot - check for already rejected FVGs
+    bot.df_4h = df_4h_init  # Needed for check_historical_rejections
+    bot.check_historical_rejections()
+
+    print(f"After filtering: {len(bot.active_4h_fvgs)} active FVGs, {len(bot.rejected_4h_fvgs)} rejected FVGs")
 
     # Map 15M index to current position
     current_15m_idx = 0
