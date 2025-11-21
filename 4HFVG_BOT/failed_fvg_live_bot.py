@@ -755,25 +755,27 @@ class FailedFVGLiveBot:
         logger.info(f"Last 4H candle: {self.last_4h_candle_time} (still OPEN - will detect FVG when it closes)")
         logger.info(f"Last 15M candle: {self.last_15m_candle_time}")
 
-        # Detect initial FVGs
-        # IMPORTANT: Exclude last candle (still open) from initial detection
-        logger.info("Detecting initial FVGs...")
-        df_4h_closed = self.df_4h.iloc[:-1] if len(self.df_4h) > 0 else self.df_4h
-        self.active_4h_fvgs = self.detector.detect_fvgs(df_4h_closed, '4h')
-        logger.info(f"Found {len(self.active_4h_fvgs)} 4H FVGs (from closed candles only)")
+        # Try to restore state first
+        state_restored = self.restore_state()
 
-        # Check historical rejections
-        logger.info("Checking historical rejections for detected FVGs...")
-        self.check_historical_rejections()
-        logger.info(f"After rejection check: {len(self.active_4h_fvgs)} active, {len(self.rejected_4h_fvgs)} rejected")
+        # If no state was restored, detect initial FVGs
+        if not state_restored:
+            logger.info("Detecting initial FVGs...")
+            df_4h_closed = self.df_4h.iloc[:-1] if len(self.df_4h) > 0 else self.df_4h
+            self.active_4h_fvgs = self.detector.detect_fvgs(df_4h_closed, '4h')
+            logger.info(f"Found {len(self.active_4h_fvgs)} 4H FVGs (from closed candles only)")
+
+            # Check historical rejections
+            logger.info("Checking historical rejections for detected FVGs...")
+            self.check_historical_rejections()
+            logger.info(f"After rejection check: {len(self.active_4h_fvgs)} active, {len(self.rejected_4h_fvgs)} rejected")
+        else:
+            logger.info(f"State restored: {len(self.active_4h_fvgs)} active FVGs, {len(self.rejected_4h_fvgs)} rejected FVGs")
 
         # Get balance
         self.balance = self.client.get_balance('USDT')
         self.initial_balance = self.balance
         logger.info(f"Balance: ${self.balance:.2f} USDT")
-
-        # Try to restore state
-        self.restore_state()
 
         logger.info("✅ Initialization complete")
         logger.info("="*80)
@@ -826,8 +828,8 @@ class FailedFVGLiveBot:
 
         return all(passed for _, passed in checks)
 
-    def restore_state(self):
-        """Restore state from disk"""
+    def restore_state(self) -> bool:
+        """Restore state from disk. Returns True if state was restored, False otherwise"""
         try:
             with open('state.json', 'r') as f:
                 state = json.load(f)
@@ -863,10 +865,14 @@ class FailedFVGLiveBot:
                 if self.last_15m_candle_time:
                     logger.info(f"Last 15M candle: {self.last_15m_candle_time}")
 
+                return True  # State was restored
+
         except FileNotFoundError:
             logger.info("No state file found, starting fresh")
+            return False
         except Exception as e:
             logger.error(f"Error restoring state: {e}")
+            return False
 
     def save_state(self):
         """Save state to disk"""
@@ -1269,12 +1275,14 @@ class FailedFVGLiveBot:
             if not fvg.rejected:
                 was_rejected = fvg.check_rejection(candle)
 
-                # If rejected, add to rejected list
+                # If rejected, add to rejected list AND remove from active
                 if was_rejected and fvg.rejected:
                     self.rejected_4h_fvgs.append(fvg)
+                    self.active_4h_fvgs.remove(fvg)  # Remove from active list
                     rejections_count += 1
+                    continue  # Skip invalidation check for this FVG
 
-            # Check invalidation
+            # Check invalidation (only for non-rejected FVGs still in active list)
             high = float(candle['high'])
             low = float(candle['low'])
             if fvg.is_fully_passed(high, low):
@@ -1541,9 +1549,11 @@ class FailedFVGLiveBot:
                                     rejection_result = fvg.check_rejection(closed_candle_dict)
                                     if fvg.rejected:
                                         self.rejected_4h_fvgs.append(fvg)
+                                        self.active_4h_fvgs.remove(fvg)  # Remove from active list
                                         logger.info(f"   ✅ Rejection detected: {fvg.type} FVG ${fvg.bottom:.2f}-${fvg.top:.2f}")
+                                        continue  # Skip invalidation check for this FVG
 
-                                # Check invalidation
+                                # Check invalidation (only for non-rejected FVGs still in active list)
                                 high = float(closed_candle_dict['high'])
                                 low = float(closed_candle_dict['low'])
                                 if fvg.is_fully_passed(high, low):
