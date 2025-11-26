@@ -660,7 +660,7 @@ def load_data_from_binance(days: int = 7):
 if __name__ == "__main__":
 
     # Load data from Binance
-    df_4h, df_15m = load_data_from_binance(days=7)
+    df_4h, df_15m = load_data_from_binance(days=365)
 
     # Run simulation
     simulator = LiveBotSimulator(initial_balance=300.0)

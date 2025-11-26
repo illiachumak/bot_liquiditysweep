@@ -1,0 +1,203 @@
+{
+  "all_results": [
+    {
+      "entry_method": "4h_close",
+      "tp_method": "liquidity",
+      "total_trades": 0,
+      "winning_trades": 0,
+      "losing_trades": 0,
+      "win_rate": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "total_pnl": 0.0,
+      "final_balance": 300.0,
+      "max_drawdown": 0.0,
+      "profit_factor": 0.0,
+      "stats": {
+        "total_4h_fvgs": 0,
+        "total_holds": 0,
+        "setups_created": 0,
+        "fills": 0,
+        "no_fills": 0
+      },
+      "trades": []
+    },
+    {
+      "entry_method": "4h_close",
+      "tp_method": "rr_2.0",
+      "total_trades": 0,
+      "winning_trades": 0,
+      "losing_trades": 0,
+      "win_rate": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "total_pnl": 0.0,
+      "final_balance": 300.0,
+      "max_drawdown": 0.0,
+      "profit_factor": 0.0,
+      "stats": {
+        "total_4h_fvgs": 0,
+        "total_holds": 0,
+        "setups_created": 0,
+        "fills": 0,
+        "no_fills": 0
+      },
+      "trades": []
+    },
+    {
+      "entry_method": "4h_close",
+      "tp_method": "rr_3.0",
+      "total_trades": 0,
+      "winning_trades": 0,
+      "losing_trades": 0,
+      "win_rate": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "total_pnl": 0.0,
+      "final_balance": 300.0,
+      "max_drawdown": 0.0,
+      "profit_factor": 0.0,
+      "stats": {
+        "total_4h_fvgs": 0,
+        "total_holds": 0,
+        "setups_created": 0,
+        "fills": 0,
+        "no_fills": 0
+      },
+      "trades": []
+    },
+    {
+      "entry_method": "15m_fvg",
+      "tp_method": "liquidity",
+      "total_trades": 0,
+      "winning_trades": 0,
+      "losing_trades": 0,
+      "win_rate": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "total_pnl": 0.0,
+      "final_balance": 300.0,
+      "max_drawdown": 0.0,
+      "profit_factor": 0.0,
+      "stats": {
+        "total_4h_fvgs": 0,
+        "total_holds": 0,
+        "setups_created": 0,
+        "fills": 0,
+        "no_fills": 0
+      },
+      "trades": []
+    },
+    {
+      "entry_method": "15m_fvg",
+      "tp_method": "rr_2.0",
+      "total_trades": 0,
+      "winning_trades": 0,
+      "losing_trades": 0,
+      "win_rate": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "total_pnl": 0.0,
+      "final_balance": 300.0,
+      "max_drawdown": 0.0,
+      "profit_factor": 0.0,
+      "stats": {
+        "total_4h_fvgs": 0,
+        "total_holds": 0,
+        "setups_created": 0,
+        "fills": 0,
+        "no_fills": 0
+      },
+      "trades": []
+    },
+    {
+      "entry_method": "15m_fvg",
+      "tp_method": "rr_3.0",
+      "total_trades": 0,
+      "winning_trades": 0,
+      "losing_trades": 0,
+      "win_rate": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "total_pnl": 0.0,
+      "final_balance": 300.0,
+      "max_drawdown": 0.0,
+      "profit_factor": 0.0,
+      "stats": {
+        "total_4h_fvgs": 0,
+        "total_holds": 0,
+        "setups_created": 0,
+        "fills": 0,
+        "no_fills": 0
+      },
+      "trades": []
+    },
+    {
+      "entry_method": "15m_breakout",
+      "tp_method": "liquidity",
+      "total_trades": 0,
+      "winning_trades": 0,
+      "losing_trades": 0,
+      "win_rate": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "total_pnl": 0.0,
+      "final_balance": 300.0,
+      "max_drawdown": 0.0,
+      "profit_factor": 0.0,
+      "stats": {
+        "total_4h_fvgs": 0,
+        "total_holds": 0,
+        "setups_created": 0,
+        "fills": 0,
+        "no_fills": 0
+      },
+      "trades": []
+    },
+    {
+      "entry_method": "15m_breakout",
+      "tp_method": "rr_2.0",
+      "total_trades": 0,
+      "winning_trades": 0,
+      "losing_trades": 0,
+      "win_rate": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "total_pnl": 0.0,
+      "final_balance": 300.0,
+      "max_drawdown": 0.0,
+      "profit_factor": 0.0,
+      "stats": {
+        "total_4h_fvgs": 0,
+        "total_holds": 0,
+        "setups_created": 0,
+        "fills": 0,
+        "no_fills": 0
+      },
+      "trades": []
+    },
+    {
+      "entry_method": "15m_breakout",
+      "tp_method": "rr_3.0",
+      "total_trades": 0,
+      "winning_trades": 0,
+      "losing_trades": 0,
+      "win_rate": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0,
+      "total_pnl": 0.0,
+      "final_balance": 300.0,
+      "max_drawdown": 0.0,
+      "profit_factor": 0.0,
+      "stats": {
+        "total_4h_fvgs": 0,
+        "total_holds": 0,
+        "setups_created": 0,
+        "fills": 0,
+        "no_fills": 0
+      },
+      "trades": []
+    }
+  ],
+  "best": null
+}
