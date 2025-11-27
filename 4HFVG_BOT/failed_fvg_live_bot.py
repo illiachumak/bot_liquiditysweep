@@ -661,6 +661,59 @@ class FailedFVGLiveBot:
 
         self.running = False
 
+    def _check_single_fvg_historical(self, fvg: LiveFVG, df_4h_closed: pd.DataFrame):
+        """
+        Check if a single FVG already had rejection or invalidation in historical data.
+        This is used when a new FVG is detected to ensure we don't add FVGs that already had rejections.
+        """
+        if df_4h_closed is None or len(df_4h_closed) == 0:
+            return
+
+        # Find the index where this FVG was formed
+        try:
+            fvg_idx = df_4h_closed.index.get_loc(fvg.formed_time)
+        except (KeyError, TypeError):
+            # Try to find closest candle
+            time_diffs = [(i, abs((df_4h_closed.index[i] - fvg.formed_time).total_seconds()))
+                         for i in range(len(df_4h_closed))]
+            if time_diffs:
+                closest_idx, min_diff = min(time_diffs, key=lambda x: x[1])
+                if min_diff <= 7200:  # Within 2 hours tolerance
+                    fvg_idx = closest_idx
+                else:
+                    return  # FVG formed outside our data range, can't check
+            else:
+                return  # No data available
+
+        # Check all candles after FVG formation
+        for i in range(fvg_idx + 1, len(df_4h_closed)):
+            candle_row = df_4h_closed.iloc[i]
+            candle_time = df_4h_closed.index[i]
+            candle_close_time = candle_time + timedelta(hours=4)
+
+            candle_dict = {
+                'open': float(candle_row['open']),
+                'high': float(candle_row['high']),
+                'low': float(candle_row['low']),
+                'close': float(candle_row['close']),
+                'close_time': int(candle_close_time.timestamp() * 1000)
+            }
+
+            # Check rejection first
+            if not fvg.rejected:
+                was_rejected = fvg.check_rejection(candle_dict)
+                if fvg.rejected:
+                    logger.debug(f"  ✅ Historical rejection found for new FVG: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f} @ {candle_time}")
+                    return  # Stop checking, FVG is rejected
+
+            # Check invalidation
+            high = float(candle_dict['high'])
+            low = float(candle_dict['low'])
+            if fvg.is_fully_passed(high, low):
+                fvg.invalidated = True
+                logger.debug(f"  ❌ Historical invalidation found for new FVG: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f} @ {candle_time}")
+                return  # Stop checking, FVG is invalidated
+
     def check_historical_rejections(self):
         """Check historical data to determine if FVGs were already rejected"""
         if self.df_4h is None or len(self.df_4h) == 0:
@@ -760,6 +813,16 @@ class FailedFVGLiveBot:
             logger.info(f"After rejection check: {len(self.active_4h_fvgs)} active, {len(self.rejected_4h_fvgs)} rejected")
         else:
             logger.info(f"State restored: {len(self.active_4h_fvgs)} active FVGs, {len(self.rejected_4h_fvgs)} rejected FVGs")
+            # CRITICAL: Even when state is restored, we should re-check historical rejections
+            # because FVGs might have been rejected while bot was offline
+            logger.info("Re-checking historical rejections for restored FVGs...")
+            initial_active = len(self.active_4h_fvgs)
+            initial_rejected = len(self.rejected_4h_fvgs)
+            self.check_historical_rejections()
+            newly_rejected = len(self.rejected_4h_fvgs) - initial_rejected
+            if newly_rejected > 0:
+                logger.info(f"Found {newly_rejected} FVG(s) that were rejected while bot was offline")
+                logger.info(f"After re-check: {len(self.active_4h_fvgs)} active, {len(self.rejected_4h_fvgs)} rejected")
 
         # Get balance
         self.balance = self.client.get_balance('USDT')
@@ -1521,8 +1584,17 @@ class FailedFVGLiveBot:
                                     timeframe='4h'
                                 )
                                 if not any(existing.id == fvg.id for existing in self.active_4h_fvgs):
-                                    self.active_4h_fvgs.append(fvg)
-                                    logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
+                                    # CRITICAL: Check if this FVG already had rejection in historical data
+                                    # before adding it to active list
+                                    self._check_single_fvg_historical(fvg, df_closed)
+                                    if not fvg.rejected and not fvg.invalidated:
+                                        self.active_4h_fvgs.append(fvg)
+                                        logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
+                                    elif fvg.rejected:
+                                        self.rejected_4h_fvgs.append(fvg)
+                                        logger.info(f"✅ New 4H FVG detected but already rejected historically: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
+                                    elif fvg.invalidated:
+                                        logger.info(f"✅ New 4H FVG detected but already invalidated historically: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
 
                             # Detect Bearish FVG
                             elif row['high'] < row_i2['low']:
@@ -1535,8 +1607,17 @@ class FailedFVGLiveBot:
                                     timeframe='4h'
                                 )
                                 if not any(existing.id == fvg.id for existing in self.active_4h_fvgs):
-                                    self.active_4h_fvgs.append(fvg)
-                                    logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
+                                    # CRITICAL: Check if this FVG already had rejection in historical data
+                                    # before adding it to active list
+                                    self._check_single_fvg_historical(fvg, df_closed)
+                                    if not fvg.rejected and not fvg.invalidated:
+                                        self.active_4h_fvgs.append(fvg)
+                                        logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
+                                    elif fvg.rejected:
+                                        self.rejected_4h_fvgs.append(fvg)
+                                        logger.info(f"✅ New 4H FVG detected but already rejected historically: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
+                                    elif fvg.invalidated:
+                                        logger.info(f"✅ New 4H FVG detected but already invalidated historically: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
                             else:
                                 logger.debug(f"No FVG on closed candle at index {closed_idx}")
                         else:
