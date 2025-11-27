@@ -757,10 +757,11 @@ class FailedFVGLiveBot:
                 if not fvg.rejected:
                     was_rejected = fvg.check_rejection(candle_dict)
                     if fvg.rejected:
-                        # Move to rejected list
-                        self.rejected_4h_fvgs.append(fvg)
+                        # CRITICAL: Historical rejections should NOT be added to rejected_4h_fvgs
+                        # because they may have already had trades. Only remove from active.
+                        # Only real-time rejections (after bot start) should be in rejected_4h_fvgs
                         self.active_4h_fvgs.remove(fvg)
-                        logger.info(f"  ✅ Historical rejection found: {fvg.type} FVG ${fvg.bottom:.2f}-${fvg.top:.2f} @ {candle_time}")
+                        logger.info(f"  ✅ Historical rejection found (removed from active, NOT added to rejected): {fvg.type} FVG ${fvg.bottom:.2f}-${fvg.top:.2f} @ {candle_time}")
                         break
 
                 # Check invalidation
@@ -1591,8 +1592,9 @@ class FailedFVGLiveBot:
                                         self.active_4h_fvgs.append(fvg)
                                         logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
                                     elif fvg.rejected:
-                                        self.rejected_4h_fvgs.append(fvg)
-                                        logger.info(f"✅ New 4H FVG detected but already rejected historically: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
+                                        # CRITICAL: Historical rejections should NOT be added to rejected_4h_fvgs
+                                        # because they may have already had trades. Just skip this FVG.
+                                        logger.info(f"✅ New 4H FVG detected but already rejected historically (skipping): {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
                                     elif fvg.invalidated:
                                         logger.info(f"✅ New 4H FVG detected but already invalidated historically: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
 
@@ -1614,8 +1616,9 @@ class FailedFVGLiveBot:
                                         self.active_4h_fvgs.append(fvg)
                                         logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
                                     elif fvg.rejected:
-                                        self.rejected_4h_fvgs.append(fvg)
-                                        logger.info(f"✅ New 4H FVG detected but already rejected historically: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
+                                        # CRITICAL: Historical rejections should NOT be added to rejected_4h_fvgs
+                                        # because they may have already had trades. Just skip this FVG.
+                                        logger.info(f"✅ New 4H FVG detected but already rejected historically (skipping): {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
                                     elif fvg.invalidated:
                                         logger.info(f"✅ New 4H FVG detected but already invalidated historically: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
                             else:
