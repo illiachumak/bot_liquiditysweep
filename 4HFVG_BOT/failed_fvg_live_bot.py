@@ -88,7 +88,6 @@ class LiveFVG:
     formed_time: datetime
     timeframe: str
 
-    entered: bool = False
     rejected: bool = False
     invalidated: bool = False
     has_filled_trade: bool = False
@@ -116,46 +115,37 @@ class LiveFVG:
         low = float(candle['low'])
         close = float(candle['close'])
 
-        # Check if touched
+        # Track highs/lows when price touches the zone
         touched = not (high < self.bottom or low > self.top)
-        if not touched:
-            return False
+        if touched:
+            if high >= self.bottom:
+                self.highs_inside.append(high)
+            if low <= self.top:
+                self.lows_inside.append(low)
 
-        if not self.entered:
-            self.entered = True
-            logger.info(f"✅ FVG entered: {self.timeframe} {self.type} ${self.bottom:.2f}-${self.top:.2f}")
-
-        # Track highs/lows inside
-        if high >= self.bottom:
-            self.highs_inside.append(high)
-        if low <= self.top:
-            self.lows_inside.append(low)
-
-        # Check rejection
+        # Check rejection - close outside the zone
         if self.type == 'BULLISH':
-            if self.entered and close < self.bottom:
-                if not self.rejected:
-                    self.rejected = True
-                    self.rejection_time = datetime.fromtimestamp(candle['close_time'] / 1000)
-                    self.rejection_price = close
-                    expected_direction = "SHORT"
-                    expected_15m = "BEARISH"
-                    logger.info(f"🚫 REJECTION! Bullish FVG ${self.bottom:.2f}-${self.top:.2f} → {expected_direction} setup")
-                    logger.info(f"   Rejected @ ${close:.2f} (closed below bottom ${self.bottom:.2f})")
-                    logger.info(f"   Expected: {expected_direction} trade with 15M {expected_15m} FVG")
-                    return True
+            if close < self.bottom and not self.rejected:
+                self.rejected = True
+                self.rejection_time = datetime.fromtimestamp(candle['close_time'] / 1000)
+                self.rejection_price = close
+                expected_direction = "SHORT"
+                expected_15m = "BEARISH"
+                logger.info(f"🚫 REJECTION! Bullish FVG ${self.bottom:.2f}-${self.top:.2f} → {expected_direction} setup")
+                logger.info(f"   Rejected @ ${close:.2f} (closed below bottom ${self.bottom:.2f})")
+                logger.info(f"   Expected: {expected_direction} trade with 15M {expected_15m} FVG")
+                return True
         else:  # BEARISH
-            if self.entered and close > self.top:
-                if not self.rejected:
-                    self.rejected = True
-                    self.rejection_time = datetime.fromtimestamp(candle['close_time'] / 1000)
-                    self.rejection_price = close
-                    expected_direction = "LONG"
-                    expected_15m = "BULLISH"
-                    logger.info(f"🚫 REJECTION! Bearish FVG ${self.bottom:.2f}-${self.top:.2f} → {expected_direction} setup")
-                    logger.info(f"   Rejected @ ${close:.2f} (closed above top ${self.top:.2f})")
-                    logger.info(f"   Expected: {expected_direction} trade with 15M {expected_15m} FVG")
-                    return True
+            if close > self.top and not self.rejected:
+                self.rejected = True
+                self.rejection_time = datetime.fromtimestamp(candle['close_time'] / 1000)
+                self.rejection_price = close
+                expected_direction = "LONG"
+                expected_15m = "BULLISH"
+                logger.info(f"🚫 REJECTION! Bearish FVG ${self.bottom:.2f}-${self.top:.2f} → {expected_direction} setup")
+                logger.info(f"   Rejected @ ${close:.2f} (closed above top ${self.top:.2f})")
+                logger.info(f"   Expected: {expected_direction} trade with 15M {expected_15m} FVG")
+                return True
 
         return False
 
@@ -177,7 +167,6 @@ class LiveFVG:
             'bottom': self.bottom,
             'formed_time': self.formed_time.isoformat(),
             'timeframe': self.timeframe,
-            'entered': self.entered,
             'rejected': self.rejected,
             'invalidated': self.invalidated,
             'has_filled_trade': self.has_filled_trade,
@@ -915,12 +904,22 @@ class FailedFVGLiveBot:
         return True
 
     def calculate_position_size(self, entry: float, sl: float) -> float:
-        """Calculate position size based on risk"""
+        """Calculate position size based on risk (matches simulation exactly)"""
         risk_amount = self.balance * RISK_PER_TRADE
         risk_per_unit = abs(entry - sl)
         size = risk_amount / risk_per_unit
 
-        # Simple rounding to match simulation (no lot size or notional checks)
+        # Round to 3 decimals (match simulation)
+        size = round(size, 3)
+
+        # Check minimum notional (match simulation)
+        notional = size * entry
+        min_notional = 10.0
+        if notional < min_notional:
+            size = min_notional / entry
+            size = round(size, 3)
+
+        # Final rounding for Binance lot size compliance
         return round(size, 8)
 
     def validate_setup(self, entry: float, sl: float, tp: float) -> bool:
@@ -1357,8 +1356,9 @@ class FailedFVGLiveBot:
 
             logger.info(f"  Checking rejected {rejected_fvg.type} FVG ${rejected_fvg.bottom:.2f}-${rejected_fvg.top:.2f}")
 
-            # Look for 15M FVG
-            fvgs_15m = self.detector.detect_fvgs(self.df_15m.tail(10), '15m')
+            # Look for 15M FVG (only use closed candles)
+            df_15m_closed = self.df_15m.iloc[:-1] if len(self.df_15m) > 0 else self.df_15m
+            fvgs_15m = self.detector.detect_fvgs(df_15m_closed.tail(10), '15m')
 
             if fvgs_15m:
                 fvg_15m = fvgs_15m[-1]  # Most recent
@@ -1494,23 +1494,53 @@ class FailedFVGLiveBot:
                             actual_closed_time = df_closed.index[closed_candle_idx]
                             logger.warning(f"⚠️  Could not find close match for {self.last_4h_candle_time}, using last closed candle: {actual_closed_time} (diff: {min_diff:.0f}s)")
                     
-                    # FVG DETECTION - Use 10-candle lookback window (matches simulation)
+                    # FVG DETECTION - Only detect FVG on the newly closed candle (matches simulation)
                     if len(df_closed) >= 3:  # Need at least 3 candles for FVG detection
-                        lookback_start = max(0, len(df_closed) - 10)
-                        df_window = df_closed.iloc[lookback_start:]
+                        # Get the index of the candle that just closed (last_4h_candle_time)
+                        try:
+                            closed_idx = df_closed.index.get_loc(self.last_4h_candle_time)
+                        except (KeyError, TypeError):
+                            # Fallback to last candle if exact match not found
+                            closed_idx = len(df_closed) - 1
 
-                        logger.info(f"🔍 Detecting FVGs in window: {len(df_window)} candles (from index {lookback_start} to {len(df_closed)-1})")
-                        new_fvgs = self.detector.detect_fvgs(df_window, '4h')
+                        # Only detect FVG if we have enough history (need i-2 candle)
+                        if closed_idx >= 2:
+                            row = df_closed.iloc[closed_idx]
+                            row_i2 = df_closed.iloc[closed_idx - 2]
 
-                        # Add new FVGs
-                        for fvg in new_fvgs:
-                            if not any(existing.id == fvg.id for existing in self.active_4h_fvgs):
-                                self.active_4h_fvgs.append(fvg)
-                                logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
+                            logger.info(f"🔍 Checking FVG on closed candle at index {closed_idx}: {row.name}")
 
-                        # Log if no FVG found
-                        if not new_fvgs:
-                            logger.debug(f"No FVG detected in lookback window")
+                            # Detect Bullish FVG
+                            if row['low'] > row_i2['high']:
+                                fvg = LiveFVG(
+                                    id=f"4h_BULLISH_{row['low']:.2f}_{row_i2['high']:.2f}_{int(row.name.timestamp())}",
+                                    type='BULLISH',
+                                    top=row['low'],
+                                    bottom=row_i2['high'],
+                                    formed_time=row.name,
+                                    timeframe='4h'
+                                )
+                                if not any(existing.id == fvg.id for existing in self.active_4h_fvgs):
+                                    self.active_4h_fvgs.append(fvg)
+                                    logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
+
+                            # Detect Bearish FVG
+                            elif row['high'] < row_i2['low']:
+                                fvg = LiveFVG(
+                                    id=f"4h_BEARISH_{row_i2['low']:.2f}_{row['high']:.2f}_{int(row.name.timestamp())}",
+                                    type='BEARISH',
+                                    top=row_i2['low'],
+                                    bottom=row['high'],
+                                    formed_time=row.name,
+                                    timeframe='4h'
+                                )
+                                if not any(existing.id == fvg.id for existing in self.active_4h_fvgs):
+                                    self.active_4h_fvgs.append(fvg)
+                                    logger.info(f"✅ New 4H FVG detected: {fvg.type} ${fvg.bottom:.2f}-${fvg.top:.2f}")
+                            else:
+                                logger.debug(f"No FVG on closed candle at index {closed_idx}")
+                        else:
+                            logger.debug(f"Skipping FVG detection: closed_idx={closed_idx}, need >= 2")
                     else:
                         logger.info(f"⚠️  Skipping FVG detection: only {len(df_closed)} closed candles (need >= 3)")
 

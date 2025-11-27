@@ -400,6 +400,41 @@ class HeldFVGBacktester:
             else:
                 return entry - risk * 3.0
 
+        elif tp_method == 'rr_3.0_liq':
+            # 3RR WITH liquidity check
+            # Calculate 3RR TP
+            if direction == 'LONG':
+                tp_3rr = entry + risk * 3.0
+            else:
+                tp_3rr = entry - risk * 3.0
+
+            # Find liquidity
+            liquidity = self.find_liquidity(df_15m, current_idx, direction, lookback=50)
+
+            if not liquidity:
+                # No liquidity found - skip trade
+                return None
+
+            # Check if liquidity is in reasonable range (within 2.5-4.0 RR)
+            liquidity_rr = abs(liquidity - entry) / risk
+
+            if direction == 'LONG':
+                # For LONG, liquidity should be at or above 2.5RR
+                if liquidity < entry + risk * 2.5:
+                    return None
+                # Cap at 5RR
+                if liquidity > entry + risk * 5.0:
+                    liquidity = entry + risk * 5.0
+            else:  # SHORT
+                # For SHORT, liquidity should be at or below entry - 2.5*risk
+                if liquidity > entry - risk * 2.5:
+                    return None
+                # Cap at 5RR
+                if liquidity < entry - risk * 5.0:
+                    liquidity = entry - risk * 5.0
+
+            return liquidity
+
         return None
 
     def create_setup(self, held_fvg: HeldBacktestFVG, df_15m: pd.DataFrame,
@@ -788,7 +823,7 @@ class HeldFVGBacktester:
         print(f"{'='*80}\n")
 
         entry_methods = ['4h_close', '15m_fvg', '15m_breakout']
-        tp_methods = ['liquidity', 'rr_2.0', 'rr_3.0']
+        tp_methods = ['liquidity', 'rr_2.0', 'rr_3.0', 'rr_3.0_liq']
 
         all_results = []
 

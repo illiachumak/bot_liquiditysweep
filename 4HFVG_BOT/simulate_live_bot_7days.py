@@ -42,7 +42,6 @@ class LiveFVG:
     formed_time: datetime
     timeframe: str
 
-    entered: bool = False
     rejected: bool = False
     invalidated: bool = False
     has_filled_trade: bool = False
@@ -70,34 +69,27 @@ class LiveFVG:
         low = float(candle['low'])
         close = float(candle['close'])
 
+        # Track highs/lows when price touches the zone
         touched = not (high < self.bottom or low > self.top)
-        if not touched:
-            return False
+        if touched:
+            if high >= self.bottom:
+                self.highs_inside.append(high)
+            if low <= self.top:
+                self.lows_inside.append(low)
 
-        if not self.entered:
-            self.entered = True
-
-        # Track highs/lows inside
-        if high >= self.bottom:
-            self.highs_inside.append(high)
-        if low <= self.top:
-            self.lows_inside.append(low)
-
-        # Check rejection
+        # Check rejection - close outside the zone
         if self.type == 'BULLISH':
-            if self.entered and close < self.bottom:
-                if not self.rejected:
-                    self.rejected = True
-                    self.rejection_time = candle.name
-                    self.rejection_price = close
-                    return True
+            if close < self.bottom and not self.rejected:
+                self.rejected = True
+                self.rejection_time = candle.name
+                self.rejection_price = close
+                return True
         else:  # BEARISH
-            if self.entered and close > self.top:
-                if not self.rejected:
-                    self.rejected = True
-                    self.rejection_time = candle.name
-                    self.rejection_price = close
-                    return True
+            if close > self.top and not self.rejected:
+                self.rejected = True
+                self.rejection_time = candle.name
+                self.rejection_price = close
+                return True
 
         return False
 
@@ -482,9 +474,9 @@ class LiveBotSimulator:
                         self.rejected_4h_fvgs.remove(rejected_fvg)
                         continue
 
-                    # Look for 15M FVG
+                    # Look for 15M FVG (only use closed candles)
                     lookback_start = max(0, current_15m_idx - 10)
-                    df_15m_lookback = df_15m.iloc[lookback_start:current_15m_idx+1]
+                    df_15m_lookback = df_15m.iloc[lookback_start:current_15m_idx]
                     fvgs_15m = self.detector.detect_fvgs(df_15m_lookback, '15m')
 
                     if fvgs_15m:
@@ -660,7 +652,7 @@ def load_data_from_binance(days: int = 7):
 if __name__ == "__main__":
 
     # Load data from Binance
-    df_4h, df_15m = load_data_from_binance(days=365)
+    df_4h, df_15m = load_data_from_binance(days=7)
 
     # Run simulation
     simulator = LiveBotSimulator(initial_balance=300.0)
