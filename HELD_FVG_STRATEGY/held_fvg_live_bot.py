@@ -33,15 +33,6 @@ class HeldFVGBot:
     def __init__(self):
         self.config = config
 
-        # Use backtest class directly!
-        self.backtester = HeldFVGBacktester(
-            min_sl_pct=config.MIN_SL_PCT,
-            max_sl_pct=config.MAX_SL_PCT,
-            risk_per_trade=config.RISK_PER_TRADE,
-            initial_balance=config.INITIAL_BALANCE,
-            enable_fees=True
-        )
-
         self.balance = config.INITIAL_BALANCE
 
         # Stats (for display only)
@@ -54,12 +45,30 @@ class HeldFVGBot:
             'total_pnl': 0.0
         }
 
-        # Simulation mode data
-        if config.SIMULATION_MODE:
-            self.load_simulation_data()
+        # Initialize attributes needed for both modes
+        self.candle_history_4h = []
+        self.active_trade = None
 
-        print(f"✅ Bot initialized (using BACKTEST logic)")
-        print(f"Mode: {'SIMULATION' if config.SIMULATION_MODE else 'LIVE'}")
+        # Simulation mode data - ONLY load if in simulation mode
+        if config.SIMULATION_MODE:
+            # Use backtest class for simulation
+            self.backtester = HeldFVGBacktester(
+                min_sl_pct=config.MIN_SL_PCT,
+                max_sl_pct=config.MAX_SL_PCT,
+                risk_per_trade=config.RISK_PER_TRADE,
+                initial_balance=config.INITIAL_BALANCE,
+                enable_fees=True
+            )
+            self.load_simulation_data()
+            print(f"✅ Bot initialized in SIMULATION mode")
+        else:
+            # Live mode - initialize strategy without backtest data
+            self.strategy = HeldFVGStrategy(
+                min_sl_pct=config.MIN_SL_PCT,
+                max_sl_pct=config.MAX_SL_PCT
+            )
+            print(f"✅ Bot initialized in LIVE mode")
+
         print(f"Balance: ${self.balance:,.2f}")
         print()
 
@@ -67,24 +76,33 @@ class HeldFVGBot:
         """Load historical data for simulation"""
         print("📊 Loading simulation data...")
 
-        # Load 4H data
-        df_4h = pd.read_csv(config.DATA_PATH_4H)
-        df_4h['Open time'] = pd.to_datetime(df_4h['Open time'])
-        df_4h.set_index('Open time', inplace=True)
-        df_4h = df_4h.loc[config.SIMULATION_START_DATE:config.SIMULATION_END_DATE]
+        try:
+            # Load 4H data
+            df_4h = pd.read_csv(config.DATA_PATH_4H)
+            df_4h['Open time'] = pd.to_datetime(df_4h['Open time'])
+            df_4h.set_index('Open time', inplace=True)
+            df_4h = df_4h.loc[config.SIMULATION_START_DATE:config.SIMULATION_END_DATE]
 
-        # Load 15M data
-        df_15m = pd.read_csv(config.DATA_PATH_15M)
-        df_15m['Open time'] = pd.to_datetime(df_15m['Open time'])
-        df_15m.set_index('Open time', inplace=True)
-        df_15m = df_15m.loc[config.SIMULATION_START_DATE:config.SIMULATION_END_DATE]
+            # Load 15M data
+            df_15m = pd.read_csv(config.DATA_PATH_15M)
+            df_15m['Open time'] = pd.to_datetime(df_15m['Open time'])
+            df_15m.set_index('Open time', inplace=True)
+            df_15m = df_15m.loc[config.SIMULATION_START_DATE:config.SIMULATION_END_DATE]
 
-        self.sim_df_4h = df_4h
-        self.sim_df_15m = df_15m
-        self.sim_current_idx_4h = 2  # Start from index 2 (need 3 candles for FVG)
-        self.sim_current_idx_15m = 0
+            self.sim_df_4h = df_4h
+            self.sim_df_15m = df_15m
+            self.sim_current_idx_4h = 2  # Start from index 2 (need 3 candles for FVG)
+            self.sim_current_idx_15m = 0
 
-        print(f"✅ Loaded {len(df_4h)} 4H candles, {len(df_15m)} 15M candles")
+            print(f"✅ Loaded {len(df_4h)} 4H candles, {len(df_15m)} 15M candles")
+        except FileNotFoundError as e:
+            print(f"❌ ERROR: Cannot find data files for simulation mode!")
+            print(f"   Missing file: {e.filename}")
+            print(f"   Expected paths:")
+            print(f"     4H: {config.DATA_PATH_4H}")
+            print(f"     15M: {config.DATA_PATH_15M}")
+            print(f"\n💡 TIP: Set SIMULATION_MODE=False in .env for live trading")
+            raise
 
     def fetch_current_candle_4h(self) -> Optional[Dict]:
         """
