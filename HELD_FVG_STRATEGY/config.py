@@ -42,8 +42,8 @@ MAX_SL_PCT = 5.0         # Max SL distance (%)
 
 # Strategy settings
 ENTRY_METHOD = '4h_close'  # Immediate entry on 4H close
-TP_METHOD = 'rr_2.0'       # Fixed RR 2.0
-FIXED_RR = 2.0
+TP_METHOD = 'rr_3.0_liq'   # 3RR with liquidity check (OPTIMIZED!)
+FIXED_RR = 3.0
 
 # Fees (Binance futures maker/taker)
 MAKER_FEE = 0.00018  # 0.018%
@@ -74,8 +74,8 @@ SIMULATION_END_DATE = '2024-12-31'
 SIMULATION_SPEED = 1  # 1 = real-time, >1 = faster
 
 # Data source for simulation
-DATA_PATH_4H = '/Users/illiachumak/trading/backtest/data/btc_4h_data_2018_to_2025.csv'
-DATA_PATH_15M = '/Users/illiachumak/trading/backtest/data/btc_15m_data_2018_to_2025.csv'
+DATA_PATH_4H = os.getenv('DATA_PATH_4H', '/Users/illiachumak/trading/backtest/data/btc_4h_data_2018_to_2025.csv')
+DATA_PATH_15M = os.getenv('DATA_PATH_15M', '/Users/illiachumak/trading/backtest/data/btc_15m_data_2018_to_2025.csv')
 
 # =============================================================================
 # VALIDATION

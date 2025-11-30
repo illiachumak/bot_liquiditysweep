@@ -1,0 +1,43 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Data files (mounted as volumes)
+*.csv
+*.json
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Test files
+test_*.py
+debug_*.py
+*_test.py
+
+# Backtest results
+backtest_held_fvg_all_combinations_*.json
+backtest_shared_logic_*.json
+simulation_*.log

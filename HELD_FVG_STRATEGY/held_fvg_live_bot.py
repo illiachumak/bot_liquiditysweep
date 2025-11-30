@@ -22,8 +22,9 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Import BACKTEST classes and logic (to ensure 1-to-1 match!)
-from backtest_held_fvg import HeldBacktestFVG, HeldFVGBacktester
+from backtest_held_fvg import HeldBacktestFVG as HeldFVG, HeldFVGBacktester
 import config
+from core.strategy import HeldFVGStrategy
 
 
 class HeldFVGBot:
@@ -38,9 +39,7 @@ class HeldFVGBot:
             max_sl_pct=config.MAX_SL_PCT,
             risk_per_trade=config.RISK_PER_TRADE,
             initial_balance=config.INITIAL_BALANCE,
-            enable_fees=True,
-            maker_fee=config.MAKER_FEE,
-            taker_fee=config.TAKER_FEE
+            enable_fees=True
         )
 
         self.balance = config.INITIAL_BALANCE
@@ -357,11 +356,13 @@ class HeldFVGBot:
         print(f"{'='*80}\n")
 
         # Simply run the backtest!
-        results = self.backtester.run_backtest_combination(
+        results = self.backtester.run_single_combination(
             df_4h=self.sim_df_4h,
             df_15m=self.sim_df_15m,
-            entry_method='4h_close',
-            tp_method='rr_2.0'
+            start_date=config.SIMULATION_START_DATE,
+            end_date=config.SIMULATION_END_DATE,
+            entry_method=config.ENTRY_METHOD,
+            tp_method=config.TP_METHOD
         )
 
         # Update our stats from backtest results
