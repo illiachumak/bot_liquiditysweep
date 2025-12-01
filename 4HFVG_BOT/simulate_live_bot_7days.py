@@ -605,7 +605,7 @@ def fetch_binance_klines(symbol: str, interval: str, start_time: int, end_time: 
     return all_klines
 
 
-def load_data_from_binance(days: int = 7):
+def load_data_from_binance(days: int = 300):
     """Load data from Binance for last N days"""
 
     print(f"\n📊 Loading data from Binance for last {days} days...")
@@ -652,7 +652,7 @@ def load_data_from_binance(days: int = 7):
 if __name__ == "__main__":
 
     # Load data from Binance
-    df_4h, df_15m = load_data_from_binance(days=7)
+    df_4h, df_15m = load_data_from_binance(days=300)
 
     # Run simulation
     simulator = LiveBotSimulator(initial_balance=300.0)

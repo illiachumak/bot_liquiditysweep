@@ -4,35 +4,37 @@ Docker configuration for running HELD FVG trading bot in containerized environme
 
 ## Quick Start
 
-### 1. Configure Environment
+### For SIMULATION Mode (with historical data)
 
-Edit `.env` file:
+1. Uncomment volume mounts in `docker-compose.yml`
+2. Set `SIMULATION_MODE=True` in `.env`
+3. Run: `docker compose up -d`
 
-```bash
-# SIMULATION MODE: True = backtest mode, False = live trading
-SIMULATION_MODE=True
+### For LIVE Trading (on server)
 
-# Binance API (only needed for live trading)
-BINANCE_API_KEY=your_api_key_here
-BINANCE_API_SECRET=your_api_secret_here
-BINANCE_TESTNET=False
+1. Copy .env from 4HFVG_BOT:
+   ```bash
+   cp ../4HFVG_BOT/.env .env
+   ```
 
-# Logging
-LOG_LEVEL=INFO
-```
+2. Edit `.env` - ensure:
+   ```bash
+   SIMULATION_MODE=False
+   BINANCE_API_KEY=your_real_key
+   BINANCE_API_SECRET=your_real_secret
+   ```
 
-### 2. Build and Run
+3. Use live compose file:
+   ```bash
+   # Start
+   docker compose -f docker-compose.live.yml up -d
 
-```bash
-# Build and start the bot
-docker compose up -d
+   # View logs
+   docker compose -f docker-compose.live.yml logs -f
 
-# View logs
-docker compose logs -f
-
-# Stop the bot
-docker compose down
-```
+   # Stop
+   docker compose -f docker-compose.live.yml down
+   ```
 
 ### 3. Quick Rebuild (after code changes)
 

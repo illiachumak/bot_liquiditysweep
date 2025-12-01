@@ -1754,8 +1754,9 @@ class FailedFVGLiveBot:
                 if new_15m:
                     logger.info("Checking 15M logic...")
 
-                    # Clean up rejected FVGs that are no longer valid
-                    self.cleanup_rejected_fvgs()
+                    # REMOVED: cleanup_rejected_fvgs() - invalidation check already happens in look_for_setups()
+                    # This was causing rejected FVGs to be removed BEFORE setup creation
+                    # self.cleanup_rejected_fvgs()
 
                     # Check pending setups
                     self.check_pending_setups()

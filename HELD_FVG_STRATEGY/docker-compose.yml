@@ -12,19 +12,20 @@ services:
     env_file:
       - .env
 
-    # Mount volumes for persistence and data access
+    # Mount volumes for persistence
     volumes:
       # Logs directory
       - ./logs:/app/logs
 
-      # Historical data (required for simulation mode)
-      # Mount the backtest data directory from host
-      - /Users/illiachumak/trading/backtest/data:/app/backtest_data:ro
+      # Historical data (ONLY needed for simulation mode)
+      # Uncomment lines below if running in SIMULATION_MODE=True
+      # - /Users/illiachumak/trading/backtest/data:/app/backtest_data:ro
 
-    # Environment variable to point to mounted data
-    environment:
-      - DATA_PATH_4H=/app/backtest_data/btc_4h_data_2018_to_2025.csv
-      - DATA_PATH_15M=/app/backtest_data/btc_15m_data_2018_to_2025.csv
+    # Environment variables
+    # Uncomment DATA_PATH variables if running in SIMULATION_MODE=True
+    # environment:
+      # - DATA_PATH_4H=/app/backtest_data/btc_4h_data_2018_to_2025.csv
+      # - DATA_PATH_15M=/app/backtest_data/btc_15m_data_2018_to_2025.csv
 
     # Resource limits (optional, adjust as needed)
     deploy:
