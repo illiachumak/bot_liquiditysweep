@@ -1393,8 +1393,13 @@ class FailedFVGLiveBot:
 
         logger.info(f"  Looking for setups from {len(self.rejected_4h_fvgs)} rejected FVG(s)...")
 
-        # Use already updated 15M data (no re-fetch needed)
-        current_candle_15m = self.df_15m.iloc[-1]
+        # Use already updated 15M data - CRITICAL: Use only CLOSED candles (exclude last open candle)
+        # Match simulation logic: only check invalidation on CLOSED candles, not open candles
+        df_15m_closed = self.df_15m.iloc[:-1] if len(self.df_15m) > 1 else self.df_15m
+        if df_15m_closed.empty:
+            logger.warning("  No closed 15M candles available yet, skipping setup search")
+            return
+        current_candle_15m = df_15m_closed.iloc[-1]
 
         setups_checked = 0
         setups_created = 0
@@ -1420,8 +1425,7 @@ class FailedFVGLiveBot:
 
             logger.info(f"  Checking rejected {rejected_fvg.type} FVG ${rejected_fvg.bottom:.2f}-${rejected_fvg.top:.2f}")
 
-            # Look for 15M FVG (only use closed candles)
-            df_15m_closed = self.df_15m.iloc[:-1] if len(self.df_15m) > 0 else self.df_15m
+            # Look for 15M FVG (use already filtered closed candles from above)
             fvgs_15m = self.detector.detect_fvgs(df_15m_closed.tail(10), '15m')
 
             if fvgs_15m:

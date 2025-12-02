@@ -388,6 +388,89 @@ class LiveBotSimulator:
 
         return trade
 
+    def clear_historical_rejected_fvgs(self, df_4h: pd.DataFrame, warmup_days: int = 7):
+        """
+        Clear FVGs that were rejected/invalidated in historical data BEFORE the live period.
+        This ensures simulation starts with clean state, matching live bot behavior.
+
+        Process:
+        1. Detect all FVGs from historical data (for context)
+        2. Process all candles BEFORE live period to update FVG states
+        3. Remove any rejected/invalidated FVGs from historical period
+        4. Keep only active FVGs that can still be used in live period
+        """
+        if len(df_4h) < warmup_days * 6:  # Need enough data (6 candles per day for 4H)
+            print(f"⚠️  Not enough data for warmup period ({warmup_days} days)")
+            return
+
+        # Calculate split point: last N days are "live", everything before is "historical"
+        split_idx = len(df_4h) - (warmup_days * 6)
+        split_time = df_4h.index[split_idx]
+
+        print(f"\n📊 Processing historical context (before {split_time.strftime('%Y-%m-%d')})")
+        print(f"   Historical period: {df_4h.index[0]} to {df_4h.index[split_idx-1]}")
+        print(f"   Live period: {split_time} to {df_4h.index[-1]}")
+
+        # Process historical period to build FVG context
+        historical_active = []
+        historical_rejected = []
+
+        for i in range(split_idx):
+            current_candle = df_4h.iloc[i]
+
+            # Detect FVGs from closed candles
+            if i >= 2:
+                row = df_4h.iloc[i]
+                row_i2 = df_4h.iloc[i-2]
+
+                # Bullish FVG
+                if row['low'] > row_i2['high']:
+                    fvg = LiveFVG(
+                        id=f"4h_BULLISH_{row['low']:.2f}_{row_i2['high']:.2f}_{int(row.name.timestamp())}",
+                        type='BULLISH',
+                        top=row['low'],
+                        bottom=row_i2['high'],
+                        formed_time=row.name,
+                        timeframe='4h'
+                    )
+                    if not any(f.id == fvg.id for f in historical_active):
+                        historical_active.append(fvg)
+
+                # Bearish FVG
+                elif row['high'] < row_i2['low']:
+                    fvg = LiveFVG(
+                        id=f"4h_BEARISH_{row_i2['low']:.2f}_{row['high']:.2f}_{int(row.name.timestamp())}",
+                        type='BEARISH',
+                        top=row_i2['low'],
+                        bottom=row['high'],
+                        formed_time=row.name,
+                        timeframe='4h'
+                    )
+                    if not any(f.id == fvg.id for f in historical_active):
+                        historical_active.append(fvg)
+
+            # Check rejections and invalidations
+            for fvg in historical_active[:]:
+                # Check rejection (pass pandas Series, not dict)
+                if not fvg.rejected:
+                    if fvg.check_rejection(current_candle):
+                        historical_rejected.append(fvg)
+                        historical_active.remove(fvg)
+                        continue
+
+                # Check invalidation
+                if fvg.is_fully_passed(current_candle['high'], current_candle['low']):
+                    fvg.invalidated = True
+                    historical_active.remove(fvg)
+
+        # Now only keep FVGs that are still active at the start of live period
+        self.active_4h_fvgs = historical_active
+
+        print(f"✅ Historical context processed:")
+        print(f"   - Active FVGs carried forward: {len(self.active_4h_fvgs)}")
+        print(f"   - Historical rejected FVGs cleared: {len(historical_rejected)}")
+        print(f"   - Starting live simulation with clean state\n")
+
     def run_simulation(self, df_4h: pd.DataFrame, df_15m: pd.DataFrame):
         """Run simulation using live bot logic"""
 
@@ -398,8 +481,14 @@ class LiveBotSimulator:
         print(f"Initial Balance: ${self.initial_balance:.2f}")
         print(f"{'='*80}\n")
 
+        # CRITICAL: Clear historical rejected FVGs before starting live simulation
+        # This matches live bot behavior where it starts fresh without historical rejected FVGs
+        self.clear_historical_rejected_fvgs(df_4h, warmup_days=7)
+
         # Iterate through 4H candles (excluding last open candle)
-        for i in range(len(df_4h) - 1):  # Exclude last open candle
+        # Start from the live period (last 7 days)
+        start_idx = max(0, len(df_4h) - (7 * 6))  # 7 days * 6 candles per day
+        for i in range(start_idx, len(df_4h) - 1):  # Exclude last open candle
             current_4h_candle = df_4h.iloc[i]
             current_4h_time = df_4h.index[i]
 
