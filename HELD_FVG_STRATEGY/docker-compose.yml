@@ -1,11 +1,14 @@
 version: '3.8'
 
+# Docker Compose for LIVE TRADING MODE
+# No data files needed - connects to Binance API
+
 services:
   held-fvg-bot:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: held-fvg-bot
+    container_name: held-fvg-bot-live
     restart: unless-stopped
 
     # Environment variables from .env file
@@ -17,25 +20,15 @@ services:
       # Logs directory
       - ./logs:/app/logs
 
-      # Historical data (ONLY needed for simulation mode)
-      # Uncomment lines below if running in SIMULATION_MODE=True
-      # - /Users/illiachumak/trading/backtest/data:/app/backtest_data:ro
-
-    # Environment variables
-    # Uncomment DATA_PATH variables if running in SIMULATION_MODE=True
-    # environment:
-      # - DATA_PATH_4H=/app/backtest_data/btc_4h_data_2018_to_2025.csv
-      # - DATA_PATH_15M=/app/backtest_data/btc_15m_data_2018_to_2025.csv
-
-    # Resource limits (optional, adjust as needed)
+    # Resource limits
     deploy:
       resources:
         limits:
           cpus: '1.0'
-          memory: 1024M
+          memory: 512M
         reservations:
           cpus: '0.5'
-          memory: 512M
+          memory: 256M
 
     # Logging configuration
     logging:
