@@ -270,8 +270,8 @@ class LiveBotSimulator:
         # Calculate size
         size = self.calculate_position_size(entry_price, sl)
 
-        # Calculate expiry time
-        expiry_time = current_time + timedelta(minutes=15 * LIMIT_EXPIRY_CANDLES)
+        # Calculate expiry time (matches live bot: 4 hours = LIMIT_EXPIRY_CANDLES * 15 minutes)
+        expiry_time = current_time + timedelta(hours=4)
 
         setup = {
             'setup_id': f"setup_{int(current_time.timestamp())}",
@@ -388,32 +388,47 @@ class LiveBotSimulator:
 
         return trade
 
-    def clear_historical_rejected_fvgs(self, df_4h: pd.DataFrame, warmup_days: int = 7):
+    def clear_historical_rejected_fvgs(self, df_4h: pd.DataFrame, simulation_days: int = 7):
         """
-        Clear FVGs that were rejected/invalidated in historical data BEFORE the live period.
+        Clear FVGs that were rejected/invalidated in historical data BEFORE the simulation period.
         This ensures simulation starts with clean state, matching live bot behavior.
+        
+        CRITICAL: Historical rejections should NOT be added to rejected_4h_fvgs
+        (matching live bot behavior - only real-time rejections go to rejected_4h_fvgs)
 
         Process:
         1. Detect all FVGs from historical data (for context)
-        2. Process all candles BEFORE live period to update FVG states
+        2. Process all candles BEFORE simulation period to update FVG states
         3. Remove any rejected/invalidated FVGs from historical period
-        4. Keep only active FVGs that can still be used in live period
+        4. Keep only active FVGs that can still be used in simulation period
         """
-        if len(df_4h) < warmup_days * 6:  # Need enough data (6 candles per day for 4H)
-            print(f"⚠️  Not enough data for warmup period ({warmup_days} days)")
-            return
+        # Calculate split point: last N days are "simulation", everything before is "historical"
+        # Use approximately 6 candles per day for 4H timeframe
+        candles_per_day = 6
+        split_idx = len(df_4h) - (simulation_days * candles_per_day)
+        
+        if split_idx < 0:
+            split_idx = 0
+        
+        if len(df_4h) < simulation_days * candles_per_day:
+            print(f"⚠️  Not enough data for simulation period ({simulation_days} days)")
+            print(f"   Available: {len(df_4h)} candles, Need: {simulation_days * candles_per_day} candles")
+            split_idx = max(0, len(df_4h) - (simulation_days * candles_per_day))
+        
+        split_time = df_4h.index[split_idx] if split_idx < len(df_4h) else df_4h.index[-1]
 
-        # Calculate split point: last N days are "live", everything before is "historical"
-        split_idx = len(df_4h) - (warmup_days * 6)
-        split_time = df_4h.index[split_idx]
-
-        print(f"\n📊 Processing historical context (before {split_time.strftime('%Y-%m-%d')})")
-        print(f"   Historical period: {df_4h.index[0]} to {df_4h.index[split_idx-1]}")
-        print(f"   Live period: {split_time} to {df_4h.index[-1]}")
+        print(f"\n📊 Processing historical context (before {split_time.strftime('%Y-%m-%d %H:%M')})")
+        if split_idx > 0:
+            print(f"   Historical period: {df_4h.index[0]} to {df_4h.index[split_idx-1]}")
+        else:
+            print(f"   Historical period: None (all data used for simulation)")
+        print(f"   Simulation period: {split_time} to {df_4h.index[-1]}")
 
         # Process historical period to build FVG context
+        # CRITICAL: Match live bot behavior - historical rejections are NOT added to rejected_4h_fvgs
         historical_active = []
-        historical_rejected = []
+        historical_rejected_count = 0
+        historical_invalidated_count = 0
 
         for i in range(split_idx):
             current_candle = df_4h.iloc[i]
@@ -454,41 +469,54 @@ class LiveBotSimulator:
                 # Check rejection (pass pandas Series, not dict)
                 if not fvg.rejected:
                     if fvg.check_rejection(current_candle):
-                        historical_rejected.append(fvg)
+                        # CRITICAL: Historical rejections are NOT added to rejected_4h_fvgs
+                        # (matching live bot behavior - only real-time rejections go to rejected_4h_fvgs)
                         historical_active.remove(fvg)
+                        historical_rejected_count += 1
                         continue
 
                 # Check invalidation
                 if fvg.is_fully_passed(current_candle['high'], current_candle['low']):
                     fvg.invalidated = True
                     historical_active.remove(fvg)
+                    historical_invalidated_count += 1
 
-        # Now only keep FVGs that are still active at the start of live period
+        # Now only keep FVGs that are still active at the start of simulation period
         self.active_4h_fvgs = historical_active
 
         print(f"✅ Historical context processed:")
         print(f"   - Active FVGs carried forward: {len(self.active_4h_fvgs)}")
-        print(f"   - Historical rejected FVGs cleared: {len(historical_rejected)}")
-        print(f"   - Starting live simulation with clean state\n")
+        print(f"   - Historical rejected FVGs cleared (not added to rejected list): {historical_rejected_count}")
+        print(f"   - Historical invalidated FVGs: {historical_invalidated_count}")
+        print(f"   - Starting simulation with clean state\n")
 
-    def run_simulation(self, df_4h: pd.DataFrame, df_15m: pd.DataFrame):
+    def run_simulation(self, df_4h: pd.DataFrame, df_15m: pd.DataFrame, simulation_days: int = 7):
         """Run simulation using live bot logic"""
 
         print(f"\n{'='*80}")
-        print(f"LIVE BOT SIMULATION - Last 7 Days")
+        print(f"LIVE BOT SIMULATION - Last {simulation_days} Days")
         print(f"{'='*80}")
-        print(f"Period: {df_4h.index[0]} to {df_4h.index[-1]}")
+        print(f"Data period: {df_4h.index[0]} to {df_4h.index[-1]}")
         print(f"Initial Balance: ${self.initial_balance:.2f}")
         print(f"{'='*80}\n")
 
-        # CRITICAL: Clear historical rejected FVGs before starting live simulation
+        # CRITICAL: Clear historical rejected FVGs before starting simulation
         # This matches live bot behavior where it starts fresh without historical rejected FVGs
-        self.clear_historical_rejected_fvgs(df_4h, warmup_days=7)
+        self.clear_historical_rejected_fvgs(df_4h, simulation_days=simulation_days)
 
-        # Iterate through 4H candles (excluding last open candle)
-        # Start from the live period (last 7 days)
-        start_idx = max(0, len(df_4h) - (7 * 6))  # 7 days * 6 candles per day
-        for i in range(start_idx, len(df_4h) - 1):  # Exclude last open candle
+        # Iterate through 4H candles up to current time
+        # Start from the simulation period (last N days)
+        candles_per_day = 6
+        start_idx = max(0, len(df_4h) - (simulation_days * candles_per_day))
+        
+        # Process all closed candles up to the last one (exclude only the currently open candle)
+        # For 4H timeframe, we process all candles that are closed
+        end_idx = len(df_4h) - 1  # Exclude last open candle
+        
+        print(f"📈 Simulation period: {df_4h.index[start_idx]} to {df_4h.index[end_idx]}")
+        print(f"   Processing {end_idx - start_idx + 1} closed 4H candles\n")
+        
+        for i in range(start_idx, end_idx + 1):  # Include end_idx to process all closed candles
             current_4h_candle = df_4h.iloc[i]
             current_4h_time = df_4h.index[i]
 
@@ -537,15 +565,43 @@ class LiveBotSimulator:
                     self.active_4h_fvgs.remove(fvg)
 
             # Find corresponding 15M candles for this 4H period
-            next_4h_time = df_4h.index[i+1] if i+1 < len(df_4h) else df_15m.index[-1]
-            df_15m_period = df_15m[(df_15m.index >= current_4h_time) & (df_15m.index < next_4h_time)]
-
-            # Process 15M candles
-            for j in range(len(df_15m_period)):
-                current_15m_time = df_15m_period.index[j]
+            # CRITICAL: current_4h_time (16:00) is the OPEN time, the candle CLOSES at next_4h_time (20:00)
+            if i + 1 < len(df_4h):
+                next_4h_time = df_4h.index[i+1]
+            else:
+                # For the last closed 4H candle, process 15M candles up to current time
+                next_4h_time = df_15m.index[-1] if len(df_15m) > 0 else current_4h_time
+            
+            # Phase 1: Process 15M candles DURING current 4H period (only invalidation check)
+            # This matches live bot: during 4H period, we only check for invalidation, not setup creation
+            df_15m_during_4h = df_15m[(df_15m.index >= current_4h_time) & (df_15m.index < next_4h_time)]
+            
+            for j in range(len(df_15m_during_4h)):
+                current_15m_candle = df_15m_during_4h.iloc[j]
+                
+                # Only check invalidation during 4H period, do NOT create setup
+                for rejected_fvg in self.rejected_4h_fvgs[:]:
+                    if rejected_fvg.is_fully_passed(current_15m_candle['high'], current_15m_candle['low']):
+                        rejected_fvg.invalidated = True
+                        self.rejected_4h_fvgs.remove(rejected_fvg)
+            
+            # Phase 2: Create setups AFTER 4H candle closes (next_4h_time+)
+            # Process 15M candles from next_4h_time (when current 4H closes) to next 4H period end
+            if i + 1 < len(df_4h):
+                # Process 15M candles after current 4H closes (next_4h_time to next 4H period end)
+                next_4h_end = df_4h.index[i+2] if i+2 < len(df_4h) else df_15m.index[-1] if len(df_15m) > 0 else next_4h_time
+            else:
+                # For the last closed 4H candle, process 15M candles up to current time
+                next_4h_end = df_15m.index[-1] if len(df_15m) > 0 else next_4h_time
+            
+            df_15m_after_close = df_15m[(df_15m.index >= next_4h_time) & (df_15m.index < next_4h_end)]
+            
+            for j in range(len(df_15m_after_close)):
+                current_15m_time = df_15m_after_close.index[j]
                 current_15m_idx = df_15m.index.get_loc(current_15m_time)
+                current_15m_candle = df_15m_after_close.iloc[j]
 
-                # Check for setups from rejected FVGs
+                # Check for setups from rejected FVGs (after current 4H closes)
                 for rejected_fvg in self.rejected_4h_fvgs[:]:
                     # Skip if already has filled trade
                     if rejected_fvg.has_filled_trade:
@@ -557,7 +613,6 @@ class LiveBotSimulator:
                             continue
 
                     # Check if invalidated on 15M
-                    current_15m_candle = df_15m_period.iloc[j]
                     if rejected_fvg.is_fully_passed(current_15m_candle['high'], current_15m_candle['low']):
                         rejected_fvg.invalidated = True
                         self.rejected_4h_fvgs.remove(rejected_fvg)
@@ -571,7 +626,7 @@ class LiveBotSimulator:
                     if fvgs_15m:
                         fvg_15m = fvgs_15m[-1]
 
-                        # Create setup
+                        # Create setup (after 4H candle closes)
                         setup = self.create_setup_from_rejection(rejected_fvg, fvg_15m, current_15m_time)
 
                         if setup:
@@ -606,8 +661,8 @@ class LiveBotSimulator:
                                 break
                             else:
                                 print(f"⏰ Limit NOT filled, expired")
-                                # Set cooldown
-                                rejected_fvg.pending_expiry_time = current_15m_time + timedelta(minutes=15 * COOLDOWN_CANDLES)
+                                # Set cooldown (matches live bot: 4 hours after expiry)
+                                rejected_fvg.pending_expiry_time = setup['expiry_time'] + timedelta(hours=4)
 
         # Calculate metrics
         self.print_results()
@@ -694,16 +749,20 @@ def fetch_binance_klines(symbol: str, interval: str, start_time: int, end_time: 
     return all_klines
 
 
-def load_data_from_binance(days: int = 300):
-    """Load data from Binance for last N days"""
+def load_data_from_binance(historical_days: int = 7, simulation_days: int = 300):
+    """Load data from Binance for historical context + simulation period"""
 
-    print(f"\n📊 Loading data from Binance for last {days} days...")
+    total_days = historical_days + simulation_days
+    print(f"\n📊 Loading data from Binance:")
+    print(f"   Historical context: {historical_days} days")
+    print(f"   Simulation period: {simulation_days} days")
+    print(f"   Total: {total_days} days")
 
     end_time = int(datetime.utcnow().timestamp() * 1000)
-    start_time = int((datetime.utcnow() - timedelta(days=days)).timestamp() * 1000)
+    start_time = int((datetime.utcnow() - timedelta(days=total_days)).timestamp() * 1000)
 
     print(f"Start: {datetime.fromtimestamp(start_time/1000)}")
-    print(f"End: {datetime.fromtimestamp(end_time/1000)}\n")
+    print(f"End: {datetime.fromtimestamp(end_time/1000)} (current time)\n")
 
     # Fetch 4H
     print("Fetching 4H data...")
@@ -741,11 +800,15 @@ def load_data_from_binance(days: int = 300):
 if __name__ == "__main__":
 
     # Load data from Binance
-    df_4h, df_15m = load_data_from_binance(days=300)
+    # historical_days: для контексту FVG detection (7 днів)
+    # simulation_days: період симуляції (300 днів до поточного моменту)
+    historical_days = 7
+    simulation_days = 356
+    df_4h, df_15m = load_data_from_binance(historical_days=historical_days, simulation_days=simulation_days)
 
     # Run simulation
     simulator = LiveBotSimulator(initial_balance=300.0)
-    simulator.run_simulation(df_4h, df_15m)
+    simulator.run_simulation(df_4h, df_15m, simulation_days=simulation_days)
 
     # Save results
     if simulator.trades:

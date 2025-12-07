@@ -1,0 +1,74 @@
+/Users/illiachumak/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Loading data from local CSV files...
+Loading 4h data from /Users/illiachumak/trading/backtest/data/btc_4h_data_2018_to_2025.csv...
+4H candles: 17193
+Loading 15m data from /Users/illiachumak/trading/backtest/data/btc_15m_data_2018_to_2025.csv...
+15M candles: 274797
+
+================================================================================
+HELD 4H FVG BACKTEST - ALL COMBINATIONS
+================================================================================
+Period: 2023-01-01 to 2025-12-31
+Initial Balance: $300.00
+Risk per Trade: 2.0%
+================================================================================
+
+
+▶ Testing: Entry=4h_close, TP=liquidity
+  Index 0: detected 0 FVGs
+  Index 1: detected 0 FVGs
+  Index 2: detected 0 FVGs
+  Index 3: detected 0 FVGs
+  Index 4: detected 1 FVGs
+    Added BULLISH FVG: $16557-$16558
+  Index 5: detected 2 FVGs
+    Added BULLISH FVG: $16573-$16586
+  Index 6: detected 2 FVGs
+  Index 7: detected 2 FVGs
+  Index 8: detected 2 FVGs
+  Index 9: detected 2 FVGs
+  Index 10: detected 2 FVGs
+  Index 11: detected 2 FVGs
+  Index 12: detected 3 FVGs
+    Added BEARISH FVG: $16706-$16707
+  Index 13: detected 2 FVGs
+  Index 14: detected 1 FVGs
+  Index 15: detected 1 FVGs
+  Index 16: detected 2 FVGs
+    Added BEARISH FVG: $16688-$16698
+  Index 17: detected 2 FVGs
+  Index 18: detected 2 FVGs
+  Index 19: detected 3 FVGs
+    Added BULLISH FVG: $16695-$16840
+  Debug: 4H FVGs=1136, Holds=406, Setups=150, Fills=150, NoFills=0
+  Trades: 150, Win Rate: 63.3%, Total PnL: $3355.57
+
+▶ Testing: Entry=4h_close, TP=rr_3.0
+  Debug: 4H FVGs=1136, Holds=406, Setups=275, Fills=275, NoFills=0
+  Trades: 275, Win Rate: 30.5%, Total PnL: $31.96
+
+▶ Testing: Entry=4h_close, TP=rr_3.0_liq
+  Debug: 4H FVGs=1136, Holds=406, Setups=102, Fills=102, NoFills=0
+  Trades: 102, Win Rate: 69.6%, Total PnL: $7902.83
+
+================================================================================
+COMPARISON TABLE
+================================================================================
+
+ID   Entry           TP           Trades   Win%     PnL        Final      MaxDD%   PF    
+----------------------------------------------------------------------------------------------------
+1    4h_close        liquidity    150      63.3     $3355.57   $3655.57   8.8      2.64  
+2    4h_close        rr_3.0       275      30.5     $31.96     $331.96    40.7     1.02  
+3    4h_close        rr_3.0_liq   102      69.6     $7902.83   $8202.83   8.9      5.66  
+
+================================================================================
+
+🏆 BEST COMBINATION:
+   Entry: 4h_close
+   TP: rr_3.0_liq
+   Total PnL: $7902.83
+   Win Rate: 69.6%
+   Profit Factor: 5.66
+
+✅ Results saved to: backtest_held_fvg_profitable_2023-2025_20251208_002334.json

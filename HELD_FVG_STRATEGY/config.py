@@ -1,5 +1,6 @@
 """
-Configuration for HELD FVG Live Bot
+Configuration for HELD FVG Live Trading Bot
+Strategy: 4h_close + rr_3.0_liq (Binance Futures)
 """
 
 import os
@@ -9,132 +10,121 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # =============================================================================
-# FEATURE FLAGS
+# BINANCE API CREDENTIALS
 # =============================================================================
 
-# SIMULATION MODE: True = use historical data, False = live trading
-SIMULATION_MODE = os.getenv('SIMULATION_MODE', 'True').lower() == 'true'
+BINANCE_API_KEY = os.getenv('BINANCE_API_KEY', '')
+BINANCE_API_SECRET = os.getenv('BINANCE_API_SECRET', '')
+
+if not BINANCE_API_KEY or not BINANCE_API_SECRET:
+    raise ValueError("BINANCE_API_KEY and BINANCE_API_SECRET must be set in .env file!")
 
 # =============================================================================
-# BINANCE API
+# TRADING CONFIGURATION
 # =============================================================================
 
-API_KEY = os.getenv('BINANCE_API_KEY', '')
-API_SECRET = os.getenv('BINANCE_API_SECRET', '')
-TESTNET = os.getenv('BINANCE_TESTNET', 'False').lower() == 'true'
+# Symbol
+SYMBOL = "BTCUSDT"
+
+# Leverage (1x-125x)
+LEVERAGE = 5
+
+# Risk per trade (% of balance)
+RISK_PER_TRADE = 0.02  # 2%
+
+# Stop Loss limits
+MIN_SL_PCT = 0.003  # 0.3% minimum SL distance
+MAX_SL_PCT = 0.05   # 5.0% maximum SL distance
 
 # =============================================================================
-# STRATEGY PARAMETERS (Same as backtest!)
+# STRATEGY CONFIGURATION
 # =============================================================================
 
-# Trading pair
-SYMBOL = 'BTCUSDT'
+# Entry method (fixed for this bot)
+ENTRY_METHOD = "4h_close"
 
-# Timeframes
-TIMEFRAME_4H = '4h'
-TIMEFRAME_15M = '15m'
+# TP method (fixed for this bot)
+TP_METHOD = "rr_3.0_liq"
 
-# Risk management
-INITIAL_BALANCE = 300.0  # Starting balance
-RISK_PER_TRADE = 0.02    # 2% risk per trade
-MIN_SL_PCT = 0.3         # Min SL distance (%)
-MAX_SL_PCT = 5.0         # Max SL distance (%)
+# Liquidity detection parameters
+LIQUIDITY_LOOKBACK = 50  # Number of candles to look back for liquidity
+LIQUIDITY_MIN_RR = 2.5   # Minimum risk-reward ratio
+LIQUIDITY_MAX_RR = 5.0   # Maximum risk-reward ratio (cap)
 
-# Strategy settings
-ENTRY_METHOD = '4h_close'  # Immediate entry on 4H close
-TP_METHOD = 'rr_3.0_liq'   # 3RR with liquidity check (OPTIMIZED!)
-FIXED_RR = 3.0
-
-# Fees (Binance futures maker/taker)
-MAKER_FEE = 0.00018  # 0.018%
-TAKER_FEE = 0.00045  # 0.045%
+# Minimum notional
+MIN_NOTIONAL_USDT = 10.0
 
 # =============================================================================
-# BOT SETTINGS
+# SAFETY LIMITS
 # =============================================================================
 
-# Update intervals
-CHECK_INTERVAL_4H = 60  # Check 4H candles every 60 seconds
-CHECK_INTERVAL_15M = 15  # Check trades every 15 seconds
+# Maximum position size (USDT)
+MAX_POSITION_SIZE_USDT = 1000.0
 
-# Logging
-LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
-LOG_FILE = 'logs/held_fvg_bot.log'
+# Maximum number of concurrent positions
+MAX_CONCURRENT_POSITIONS = 1
 
-# Database (for trade history)
-DB_FILE = 'data/held_fvg_trades.db'
+# Maximum trades per day (to prevent spam in case of bugs)
+MAX_TRADES_PER_DAY = 5
 
 # =============================================================================
-# SIMULATION MODE SETTINGS
+# BOT BEHAVIOR
 # =============================================================================
 
-# Historical data for simulation
-SIMULATION_START_DATE = '2024-01-01'
-SIMULATION_END_DATE = '2024-12-31'
-SIMULATION_SPEED = 1  # 1 = real-time, >1 = faster
+# Polling interval (seconds)
+POLL_INTERVAL = 60  # Check every 60 seconds for 4H candle close
 
-# Data source for simulation
-DATA_PATH_4H = os.getenv('DATA_PATH_4H', '/Users/illiachumak/trading/backtest/data/btc_4h_data_2018_to_2025.csv')
-DATA_PATH_15M = os.getenv('DATA_PATH_15M', '/Users/illiachumak/trading/backtest/data/btc_15m_data_2018_to_2025.csv')
+# Candle interval
+CANDLE_INTERVAL = "4h"
 
-# =============================================================================
-# VALIDATION
-# =============================================================================
+# Historical candles to fetch for FVG detection
+HISTORICAL_CANDLES_4H = 100  # Last 100 x 4H candles (~16 days)
 
-def validate_config():
-    """Validate configuration"""
-    errors = []
-
-    if not SIMULATION_MODE:
-        if not API_KEY or not API_SECRET:
-            errors.append("API_KEY and API_SECRET required for live trading")
-
-    if RISK_PER_TRADE <= 0 or RISK_PER_TRADE > 0.1:
-        errors.append("RISK_PER_TRADE should be between 0 and 0.1 (10%)")
-
-    if FIXED_RR < 1.0:
-        errors.append("FIXED_RR should be >= 1.0")
-
-    if errors:
-        raise ValueError(f"Configuration errors:\\n" + "\\n".join(errors))
-
-    return True
-
-
-# Validate on import
-validate_config()
-
+# Historical 15M candles for liquidity detection
+HISTORICAL_CANDLES_15M = 200  # Last 200 x 15M candles (~50 hours)
 
 # =============================================================================
-# CONFIG SUMMARY
+# LOGGING
+# =============================================================================
+
+LOG_LEVEL = "INFO"  # INFO, WARNING, ERROR
+
+# Log format
+LOG_FORMAT = "%(asctime)s [%(levelname)s] %(message)s"
+LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+# =============================================================================
+# PERSISTENCE
+# =============================================================================
+
+# State file for tracking trades (in case of restart)
+STATE_FILE = "bot_state.json"
+
+# =============================================================================
+# HELPER FUNCTIONS
 # =============================================================================
 
 def print_config():
-    """Print configuration summary"""
-    print("=" * 80)
-    print("HELD FVG BOT - CONFIGURATION")
-    print("=" * 80)
-    print(f"")
-    print(f"🎯 MODE: {'SIMULATION' if SIMULATION_MODE else 'LIVE TRADING'}")
-    print(f"")
+    """Print configuration (hide sensitive data)"""
+    print("="*80)
+    print("HELD FVG LIVE BOT CONFIGURATION")
+    print("="*80)
     print(f"Symbol: {SYMBOL}")
-    print(f"Initial Balance: ${INITIAL_BALANCE:,.2f}")
-    print(f"Risk per Trade: {RISK_PER_TRADE * 100}%")
+    print(f"Leverage: {LEVERAGE}x")
+    print(f"Risk per Trade: {RISK_PER_TRADE*100}%")
+    print(f"SL Range: {MIN_SL_PCT*100}% - {MAX_SL_PCT*100}%")
     print(f"")
     print(f"Strategy: {ENTRY_METHOD} + {TP_METHOD}")
-    print(f"Fixed RR: {FIXED_RR}")
-    print(f"SL Range: {MIN_SL_PCT}% - {MAX_SL_PCT}%")
+    print(f"Liquidity RR Range: {LIQUIDITY_MIN_RR} - {LIQUIDITY_MAX_RR}")
     print(f"")
+    print(f"Max Position Size: ${MAX_POSITION_SIZE_USDT}")
+    print(f"Max Concurrent Positions: {MAX_CONCURRENT_POSITIONS}")
+    print(f"Max Trades/Day: {MAX_TRADES_PER_DAY}")
+    print(f"")
+    print(f"Poll Interval: {POLL_INTERVAL}s")
+    print(f"API Key: {'*' * 20}{BINANCE_API_KEY[-4:] if len(BINANCE_API_KEY) > 4 else '****'}")
+    print("="*80)
 
-    if SIMULATION_MODE:
-        print(f"📊 Simulation Settings:")
-        print(f"  Period: {SIMULATION_START_DATE} to {SIMULATION_END_DATE}")
-        print(f"  Speed: {SIMULATION_SPEED}x")
-        print(f"  Data: Local CSV files")
-    else:
-        print(f"🔴 LIVE TRADING:")
-        print(f"  Testnet: {TESTNET}")
-        print(f"  ⚠️  REAL MONEY AT RISK!")
 
-    print("=" * 80)
-    print()
+if __name__ == "__main__":
+    print_config()

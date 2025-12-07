@@ -49,6 +49,9 @@ class HeldBacktestFVG:
         self.has_filled_trade = False
         self.pending_setup_expiry_time = None
 
+        # CRITICAL: Track when hold information becomes available (4H candle close time)
+        self.hold_available_time = None
+
         self.id = f"{timeframe}_{fvg_type}_{top:.2f}_{bottom:.2f}_{int(formed_time.timestamp())}"
 
     def is_inside(self, price: float) -> bool:
@@ -63,12 +66,17 @@ class HeldBacktestFVG:
             # Bearish FVG invalidated якщо ціна пройшла ВИЩЕ
             return candle_high > self.top
 
-    def check_hold(self, candle: pd.Series, debug: bool = False) -> bool:
+    def check_hold(self, candle: pd.Series, candle_close_time: pd.Timestamp = None, debug: bool = False) -> bool:
         """
         Check if FVG is HELD (opposite of rejection)
 
         Bullish FVG held: price entered and closed INSIDE or ABOVE
         Bearish FVG held: price entered and closed INSIDE or BELOW
+
+        Args:
+            candle: The candle data
+            candle_close_time: When this candle closes (when hold info becomes available)
+            debug: Debug logging
         """
         candle_high = candle['High']
         candle_low = candle['Low']
@@ -98,8 +106,11 @@ class HeldBacktestFVG:
                     self.held = True
                     self.hold_time = candle.name
                     self.hold_price = candle_close
+                    # CRITICAL: Store when this information becomes available
+                    self.hold_available_time = candle_close_time if candle_close_time else candle.name
                     if debug:
                         print(f"  💚 BULLISH FVG HELD! Close ${candle_close:.2f} inside zone ${self.bottom:.2f}-${self.top:.2f}")
+                        print(f"     Available for trading at: {self.hold_available_time}")
                     return True
             elif self.entered and debug:
                 if candle_close < self.bottom:
@@ -113,8 +124,11 @@ class HeldBacktestFVG:
                     self.held = True
                     self.hold_time = candle.name
                     self.hold_price = candle_close
+                    # CRITICAL: Store when this information becomes available
+                    self.hold_available_time = candle_close_time if candle_close_time else candle.name
                     if debug:
                         print(f"  💚 BEARISH FVG HELD! Close ${candle_close:.2f} inside zone ${self.bottom:.2f}-${self.top:.2f}")
+                        print(f"     Available for trading at: {self.hold_available_time}")
                     return True
             elif self.entered and debug:
                 if candle_close > self.top:
@@ -282,8 +296,16 @@ class HeldFVGBacktester:
 
         return fvgs
 
-    def update_4h_fvgs(self, df_4h: pd.DataFrame, current_idx: int, debug: bool = False) -> Tuple[int, int]:
-        """Update 4H FVGs - detect new ones and check for holds"""
+    def update_4h_fvgs(self, df_4h: pd.DataFrame, current_idx: int, candle_close_time: pd.Timestamp = None, debug: bool = False) -> Tuple[int, int]:
+        """
+        Update 4H FVGs - detect new ones and check for holds
+
+        Args:
+            df_4h: 4H dataframe
+            current_idx: Current candle index
+            candle_close_time: When this candle closes (when information becomes available)
+            debug: Debug logging
+        """
         newly_added = 0
         newly_held = 0
 
@@ -308,8 +330,8 @@ class HeldFVGBacktester:
         for fvg in self.active_4h_fvgs[:]:
             candle = df_4h.iloc[current_idx]
 
-            # Check hold
-            if fvg.check_hold(candle):
+            # Check hold (pass candle_close_time to track when info becomes available)
+            if fvg.check_hold(candle, candle_close_time=candle_close_time):
                 self.held_4h_fvgs.append(fvg)
                 self.active_4h_fvgs.remove(fvg)
                 newly_held += 1
@@ -336,7 +358,8 @@ class HeldFVGBacktester:
                 is_swing_high = True
 
                 # Check if this high is higher than surrounding candles
-                for j in range(max(0, i-2), min(len(df), i+3)):
+                # FIXED: Only look backward (i+1 instead of i+3) to avoid forward-looking bias
+                for j in range(max(0, i-2), min(len(df), i+1)):
                     if j != i and df.iloc[j]['High'] > candle['High']:
                         is_swing_high = False
                         break
@@ -354,7 +377,8 @@ class HeldFVGBacktester:
                 is_swing_low = True
 
                 # Check if this low is lower than surrounding candles
-                for j in range(max(0, i-2), min(len(df), i+3)):
+                # FIXED: Only look backward (i+1 instead of i+3) to avoid forward-looking bias
+                for j in range(max(0, i-2), min(len(df), i+1)):
                     if j != i and df.iloc[j]['Low'] < candle['Low']:
                         is_swing_low = False
                         break
@@ -538,8 +562,20 @@ class HeldFVGBacktester:
         }
 
     def simulate_trade(self, setup: Dict, df_15m: pd.DataFrame, entry_idx: int,
-                      entry_method: str) -> BacktestTrade:
+                      entry_method: str, held_fvg: HeldBacktestFVG = None) -> BacktestTrade:
         """Simulate trade execution"""
+
+        entry_time = df_15m.index[entry_idx]
+
+        # CRITICAL: Verify no lookahead bias!
+        if held_fvg and held_fvg.hold_available_time:
+            if entry_time < held_fvg.hold_available_time:
+                raise ValueError(
+                    f"LOOKAHEAD BIAS DETECTED!\n"
+                    f"Entry time: {entry_time}\n"
+                    f"Hold available: {held_fvg.hold_available_time}\n"
+                    f"Cannot trade before hold information is available!"
+                )
 
         trade = BacktestTrade(
             direction=setup['direction'],
@@ -547,7 +583,7 @@ class HeldFVGBacktester:
             sl=setup['sl'],
             tp=setup['tp'],
             size=setup['size'],
-            entry_time=df_15m.index[entry_idx],
+            entry_time=entry_time,
             entry_method=entry_method,
             tp_method=setup['tp_method']
         )
@@ -666,16 +702,18 @@ class HeldFVGBacktester:
         # Iterate through 4H candles
         debug_mode = (entry_method == '4h_close' and tp_method == 'liquidity')  # Only debug first combo
 
-        for i in range(len(df_4h_filtered)):
+        # CRITICAL FIX: Exclude last candle (it may be unclosed)
+        for i in range(len(df_4h_filtered) - 1):
             current_4h_time = df_4h_filtered.index[i]
 
-            # Update 4H FVGs
-            newly_added, newly_held = self.update_4h_fvgs(df_4h_filtered, i, debug=debug_mode)
+            # Find corresponding 15M candles
+            next_4h_time = df_4h_filtered.index[i+1]  # When this 4H candle closes
+
+            # CRITICAL FIX: Update 4H FVGs with close time
+            # This ensures hold_available_time is set correctly
+            newly_added, newly_held = self.update_4h_fvgs(df_4h_filtered, i, candle_close_time=next_4h_time, debug=debug_mode)
             stats['total_4h_fvgs'] += newly_added
             stats['total_holds'] += newly_held
-
-            # Find corresponding 15M candles
-            next_4h_time = df_4h_filtered.index[i+1] if i+1 < len(df_4h_filtered) else df_15m_filtered.index[-1]
 
             # Process 15M candles in this 4H period
             while current_15m_idx < len(df_15m_filtered) and df_15m_filtered.index[current_15m_idx] < next_4h_time:
@@ -691,6 +729,11 @@ class HeldFVGBacktester:
                         # Skip if already had filled trade
                         if held_fvg.has_filled_trade:
                             continue
+
+                        # CRITICAL FIX: Skip if hold information not yet available!
+                        # This prevents lookahead bias
+                        if held_fvg.hold_available_time and current_time < held_fvg.hold_available_time:
+                            continue  # Can't trade on information from the future!
 
                         # Check invalidation
                         if held_fvg.is_fully_passed(current_candle['High'], current_candle['Low']):
@@ -715,8 +758,8 @@ class HeldFVGBacktester:
                                 expiry_idx = min(current_15m_idx + 16, len(df_15m_filtered) - 1)
                                 held_fvg.pending_setup_expiry_time = df_15m_filtered.index[expiry_idx]
 
-                            # Simulate trade
-                            trade = self.simulate_trade(setup, df_15m_filtered, current_15m_idx, entry_method)
+                            # Simulate trade (pass held_fvg for bias check)
+                            trade = self.simulate_trade(setup, df_15m_filtered, current_15m_idx, entry_method, held_fvg=held_fvg)
 
                             # Track trade
                             if trade.exit_reason != 'EXPIRED':
@@ -822,8 +865,9 @@ class HeldFVGBacktester:
         print(f"Risk per Trade: {self.risk_per_trade*100}%")
         print(f"{'='*80}\n")
 
-        entry_methods = ['4h_close', '15m_fvg', '15m_breakout']
-        tp_methods = ['liquidity', 'rr_2.0', 'rr_3.0', 'rr_3.0_liq']
+        # Only profitable strategies (based on 2024 results)
+        entry_methods = ['4h_close']  # Only immediate entry works
+        tp_methods = ['liquidity', 'rr_3.0', 'rr_3.0_liq']  # Skip rr_2.0 (was negative)
 
         all_results = []
 
@@ -915,9 +959,9 @@ if __name__ == "__main__":
     df_15m = load_data_from_csv("15m")
     print(f"15M candles: {len(df_15m)}")
 
-    # Test 2024 data
-    start_date = "2024-01-01"
-    end_date = "2024-12-31"
+    # Test 2023-2025 data
+    start_date = "2023-01-01"
+    end_date = "2025-12-31"
 
     # Run backtest
     backtester = HeldFVGBacktester(
@@ -929,7 +973,7 @@ if __name__ == "__main__":
     results = backtester.run_all_combinations(df_4h, df_15m, start_date, end_date)
 
     # Save results
-    output_file = f"backtest_held_fvg_all_combinations_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    output_file = f"backtest_held_fvg_profitable_2023-2025_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
 
     with open(output_file, 'w') as f:
         json.dump(results, f, indent=2)
