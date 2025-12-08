@@ -59,7 +59,7 @@ MIN_NOTIONAL_USDT = 10.0
 # =============================================================================
 
 # Maximum position size (USDT)
-MAX_POSITION_SIZE_USDT = 1000.0
+MAX_POSITION_SIZE_USDT = 10000.0
 
 # Maximum number of concurrent positions
 MAX_CONCURRENT_POSITIONS = 1
