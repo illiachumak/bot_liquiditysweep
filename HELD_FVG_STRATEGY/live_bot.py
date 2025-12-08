@@ -381,14 +381,15 @@ class FVGTracker:
         self.held_fvgs: List[HeldFVG] = []
 
     def detect_fvg(self, df: pd.DataFrame) -> List[HeldFVG]:
-        """Detect FVGs in recent candles"""
+        """Detect FVGs in recent CLOSED candles only"""
         fvgs = []
 
-        if len(df) < 3:
+        if len(df) < 4:
             return fvgs
 
-        # Check last candle for FVG formation
-        i = len(df) - 1
+        # IMPORTANT: Use iloc[-2] as last CLOSED candle
+        # iloc[-1] is the current (potentially unclosed) candle from Binance API
+        i = len(df) - 2
 
         candle = df.iloc[i]
         candle_prev2 = df.iloc[i-2]
@@ -422,27 +423,35 @@ class FVGTracker:
         """
         newly_held = []
 
-        if len(df) < 3:
+        if len(df) < 4:
             return newly_held
 
         # Detect new FVGs
         new_fvgs = self.detect_fvg(df)
+        newly_added_ids = set()
         for fvg in new_fvgs:
             if not any(existing.id == fvg.id for existing in self.active_fvgs):
                 self.active_fvgs.append(fvg)
+                newly_added_ids.add(fvg.id)
                 logger.info(f"New FVG detected: {fvg.type} at ${fvg.bottom:.2f}-${fvg.top:.2f}")
 
         # Check active FVGs for holds/invalidations
-        last_candle = df.iloc[-1]
+        # IMPORTANT: Use iloc[-2] as last CLOSED candle (iloc[-1] may be unclosed)
+        # Skip FVGs that were just detected on this candle to avoid look-ahead bias
+        last_closed_candle = df.iloc[-2]
         candle_dict = {
-            'high': last_candle['high'],
-            'low': last_candle['low'],
-            'close': last_candle['close'],
-            'close_time': int(last_candle['close_time'].timestamp() * 1000)
+            'high': last_closed_candle['high'],
+            'low': last_closed_candle['low'],
+            'close': last_closed_candle['close'],
+            'close_time': int(last_closed_candle['close_time'].timestamp() * 1000)
         }
-        candle_close_time = last_candle['close_time']
+        candle_close_time = last_closed_candle['close_time']
 
         for fvg in self.active_fvgs[:]:
+            # Skip newly added FVGs - they should only be checked starting from next candle
+            if fvg.id in newly_added_ids:
+                continue
+
             # Check hold
             if fvg.check_hold(candle_dict, candle_close_time):
                 self.held_fvgs.append(fvg)
@@ -451,7 +460,7 @@ class FVGTracker:
                 logger.info(f"FVG HELD: {fvg.type} at ${fvg.hold_price:.2f}")
 
             # Check invalidation
-            elif fvg.is_fully_passed(last_candle['high'], last_candle['low']):
+            elif fvg.is_fully_passed(last_closed_candle['high'], last_closed_candle['low']):
                 fvg.invalidated = True
                 self.active_fvgs.remove(fvg)
 

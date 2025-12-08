@@ -317,17 +317,24 @@ class HeldFVGBacktester:
         if debug and current_idx < 20:
             print(f"  Index {current_idx}: detected {len(new_fvgs)} FVGs")
 
+        newly_added_ids = set()
         for fvg in new_fvgs:
             # Only add FVGs formed at current index
             if fvg.index == current_idx:
                 if not any(existing.id == fvg.id for existing in self.active_4h_fvgs):
                     self.active_4h_fvgs.append(fvg)
+                    newly_added_ids.add(fvg.id)
                     newly_added += 1
                     if debug and current_idx < 20:
                         print(f"    Added {fvg.type} FVG: ${fvg.bottom:.0f}-${fvg.top:.0f}")
 
         # Check active FVGs for hold/invalidation
+        # IMPORTANT: Skip FVGs that were just detected at current_idx to avoid look-ahead bias
         for fvg in self.active_4h_fvgs[:]:
+            # Skip newly added FVGs - they should only be checked starting from next candle
+            if fvg.id in newly_added_ids:
+                continue
+
             candle = df_4h.iloc[current_idx]
 
             # Check hold (pass candle_close_time to track when info becomes available)
