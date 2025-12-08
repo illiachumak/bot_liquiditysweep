@@ -27,7 +27,7 @@ if not BINANCE_API_KEY or not BINANCE_API_SECRET:
 SYMBOL = "BTCUSDT"
 
 # Leverage (1x-125x)
-LEVERAGE = 5
+LEVERAGE = 100
 
 # Risk per trade (% of balance)
 RISK_PER_TRADE = 0.02  # 2%
