@@ -502,7 +502,9 @@ class TradeManager:
             return None
 
         # Find liquidity for TP (rr_3.0_liq method)
-        current_idx = len(df_15m) - 1
+        # IMPORTANT: Use len-2 to point to last CLOSED candle
+        # len-1 would be the current unclosed candle from Binance API
+        current_idx = len(df_15m) - 2
         liquidity = LiquidityDetector.find_liquidity(
             df_15m, current_idx, direction,
             lookback=config.LIQUIDITY_LOOKBACK
@@ -665,16 +667,18 @@ class HeldFVGBot:
                 df_4h = self.client.get_4h_candles(limit=config.HISTORICAL_CANDLES_4H)
 
                 # Check if new 4H candle closed
-                latest_candle_time = df_4h.iloc[-1]['close_time']
+                # IMPORTANT: Use iloc[-2] for last CLOSED candle
+                # iloc[-1] is the current UNCLOSED candle from Binance API
+                latest_closed_candle_time = df_4h.iloc[-2]['close_time']
 
                 if self.last_4h_candle_time is None:
-                    self.last_4h_candle_time = latest_candle_time
-                    logger.info(f"Initial 4H candle time set: {latest_candle_time}")
+                    self.last_4h_candle_time = latest_closed_candle_time
+                    logger.info(f"Initial 4H candle time set: {latest_closed_candle_time}")
 
-                if latest_candle_time > self.last_4h_candle_time:
+                if latest_closed_candle_time > self.last_4h_candle_time:
                     # New 4H candle closed!
-                    logger.info(f"4H candle closed at {latest_candle_time}")
-                    self.last_4h_candle_time = latest_candle_time
+                    logger.info(f"4H candle closed at {latest_closed_candle_time}")
+                    self.last_4h_candle_time = latest_closed_candle_time
 
                     # Update FVGs
                     newly_held = self.fvg_tracker.update_fvgs(df_4h)
@@ -687,7 +691,8 @@ class HeldFVGBot:
                         # Fetch 15M candles for liquidity detection
                         df_15m = self.client.get_15m_candles(limit=config.HISTORICAL_CANDLES_15M)
 
-                        current_price = df_15m.iloc[-1]['close']
+                        # Use last CLOSED candle for current price
+                        current_price = df_15m.iloc[-2]['close']
 
                         # Create setup
                         setup = self.trade_manager.create_setup(held_fvg, df_15m, current_price)

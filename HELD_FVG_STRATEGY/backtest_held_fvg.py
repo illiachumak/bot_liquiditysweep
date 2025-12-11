@@ -598,6 +598,10 @@ class HeldFVGBacktester:
         # For immediate entry (4h_close), fill immediately
         if entry_method == '4h_close':
             trade.entry_time = df_15m.index[entry_idx]
+            # Start monitoring from the SAME candle where entry happened
+            # A 15M candle represents a 15-minute period (e.g., 16:00-16:15)
+            # Entry can happen at 16:00, and SL can trigger at 16:06 within the same candle
+            # Both will have the same timestamp (16:00), which is the candle's timestamp
             start_idx = entry_idx
 
         # For limit orders (15m_fvg, 15m_breakout), check if filled within 16 candles
@@ -765,8 +769,21 @@ class HeldFVGBacktester:
                                 expiry_idx = min(current_15m_idx + 16, len(df_15m_filtered) - 1)
                                 held_fvg.pending_setup_expiry_time = df_15m_filtered.index[expiry_idx]
 
+                            # CRITICAL: For 4h_close method, find first 15M candle >= hold_available_time
+                            # This ensures entry happens as soon as hold info is available
+                            entry_idx_for_trade = current_15m_idx
+                            if entry_method == '4h_close' and held_fvg.hold_available_time:
+                                # Find first 15M candle at or after hold_available_time
+                                # hold_available_time = next_4h_time (when 4H candle closes)
+                                # We need to find the first 15M candle >= hold_available_time
+                                # Search from beginning to ensure we find the earliest possible entry
+                                for idx in range(len(df_15m_filtered)):
+                                    if df_15m_filtered.index[idx] >= held_fvg.hold_available_time:
+                                        entry_idx_for_trade = idx
+                                        break
+
                             # Simulate trade (pass held_fvg for bias check)
-                            trade = self.simulate_trade(setup, df_15m_filtered, current_15m_idx, entry_method, held_fvg=held_fvg)
+                            trade = self.simulate_trade(setup, df_15m_filtered, entry_idx_for_trade, entry_method, held_fvg=held_fvg)
 
                             # Track trade
                             if trade.exit_reason != 'EXPIRED':
