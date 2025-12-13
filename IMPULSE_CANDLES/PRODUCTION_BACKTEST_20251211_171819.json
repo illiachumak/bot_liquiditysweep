@@ -1,0 +1,136 @@
+{
+  "btc": {
+    "config": "{'name': 'PRODUCTION_Q3_DynamicRR_VariableRisk', 'min_score': 3, 'rr_mapping': {(8, 10): 8.0, (6, 7): 3.5, (4, 5): 3.0, (3, 3): 2.5, (0, 2): None}, 'risk_by_category': {'8-10': 2.0, '6-7': 1.5, '4-5': 1.5, '3': 2.0}}",
+    "total_trades": 89,
+    "impulses_found": 157,
+    "win_rate": 46.07,
+    "wins": 41,
+    "losses": 48,
+    "ev_per_r": 1.295,
+    "avg_r_win": 3.98,
+    "avg_r_loss": 1.0,
+    "total_pnl": 45112.36,
+    "total_pnl_pct": 451.12,
+    "avg_win": 1623.69,
+    "avg_loss": 447.06,
+    "profit_factor": 3.1,
+    "max_drawdown_pct": -7.62,
+    "final_capital": 55112.36,
+    "category_stats": {
+      "8-10": {
+        "trades": 9,
+        "wins": 4,
+        "losses": 5,
+        "wr": 44.44,
+        "avg_r_win": 6.71,
+        "avg_r_loss": 1.0,
+        "ev": 2.429,
+        "avg_risk_pct": 2.0
+      },
+      "6-7": {
+        "trades": 43,
+        "wins": 17,
+        "losses": 26,
+        "wr": 39.53,
+        "avg_r_win": 4.11,
+        "avg_r_loss": 1.0,
+        "ev": 1.022,
+        "avg_risk_pct": 1.5
+      },
+      "4-5": {
+        "trades": 31,
+        "wins": 16,
+        "losses": 15,
+        "wr": 51.61,
+        "avg_r_win": 3.45,
+        "avg_r_loss": 1.0,
+        "ev": 1.295,
+        "avg_risk_pct": 1.5
+      },
+      "3": {
+        "trades": 6,
+        "wins": 4,
+        "losses": 2,
+        "wr": 66.67,
+        "avg_r_win": 2.82,
+        "avg_r_loss": 1.0,
+        "ev": 1.546,
+        "avg_risk_pct": 2.0
+      }
+    },
+    "execution_stats": {
+      "total_fees": 1944.27,
+      "total_entry_slippage": 0,
+      "trades_with_slippage": 0,
+      "avg_fee_per_trade": 21.85
+    },
+    "asset": "btc"
+  },
+  "eth": {
+    "config": "{'name': 'PRODUCTION_Q3_DynamicRR_VariableRisk', 'min_score': 3, 'rr_mapping': {(8, 10): 8.0, (6, 7): 3.5, (4, 5): 3.0, (3, 3): 2.5, (0, 2): None}, 'risk_by_category': {'8-10': 2.0, '6-7': 1.5, '4-5': 1.5, '3': 2.0}}",
+    "total_trades": 80,
+    "impulses_found": 139,
+    "win_rate": 42.5,
+    "wins": 34,
+    "losses": 46,
+    "ev_per_r": 1.267,
+    "avg_r_win": 4.33,
+    "avg_r_loss": 1.0,
+    "total_pnl": 32926.93,
+    "total_pnl_pct": 329.27,
+    "avg_win": 1399.58,
+    "avg_loss": 318.67,
+    "profit_factor": 3.25,
+    "max_drawdown_pct": -13.88,
+    "final_capital": 42926.93,
+    "category_stats": {
+      "8-10": {
+        "trades": 3,
+        "wins": 1,
+        "losses": 2,
+        "wr": 33.33,
+        "avg_r_win": 6.58,
+        "avg_r_loss": 1.0,
+        "ev": 1.525,
+        "avg_risk_pct": 2.0
+      },
+      "6-7": {
+        "trades": 40,
+        "wins": 17,
+        "losses": 23,
+        "wr": 42.5,
+        "avg_r_win": 4.11,
+        "avg_r_loss": 1.0,
+        "ev": 1.173,
+        "avg_risk_pct": 1.5
+      },
+      "4-5": {
+        "trades": 28,
+        "wins": 12,
+        "losses": 16,
+        "wr": 42.86,
+        "avg_r_win": 4.56,
+        "avg_r_loss": 1.0,
+        "ev": 1.381,
+        "avg_risk_pct": 1.5
+      },
+      "3": {
+        "trades": 9,
+        "wins": 4,
+        "losses": 5,
+        "wr": 44.44,
+        "avg_r_win": 4.05,
+        "avg_r_loss": 1.0,
+        "ev": 1.245,
+        "avg_risk_pct": 2.0
+      }
+    },
+    "execution_stats": {
+      "total_fees": 995.93,
+      "total_entry_slippage": 0,
+      "trades_with_slippage": 0,
+      "avg_fee_per_trade": 12.45
+    },
+    "asset": "eth"
+  }
+}

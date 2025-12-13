@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  production-q3-bot:
+    build: .
+    container_name: production_q3_live_bot
+    restart: unless-stopped
+    environment:
+      - BINANCE_API_KEY=${BINANCE_API_KEY}
+      - BINANCE_API_SECRET=${BINANCE_API_SECRET}
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+      - ./bot_state.json:/app/bot_state.json
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

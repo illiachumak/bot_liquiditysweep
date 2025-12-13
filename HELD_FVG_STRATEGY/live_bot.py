@@ -688,6 +688,19 @@ class HeldFVGBot:
                         if held_fvg.has_filled_trade:
                             continue
 
+                        # CRITICAL: Verify hold_available_time is set and current time >= hold_available_time
+                        if not held_fvg.hold_available_time:
+                            logger.warning(f"FVG {held_fvg.id} has no hold_available_time, skipping")
+                            continue
+
+                        current_time = datetime.now()
+                        if current_time < held_fvg.hold_available_time:
+                            logger.warning(
+                                f"LOOKAHEAD BIAS PREVENTION: Current time {current_time} < "
+                                f"hold_available_time {held_fvg.hold_available_time}, skipping trade"
+                            )
+                            continue
+
                         # Fetch 15M candles for liquidity detection
                         df_15m = self.client.get_15m_candles(limit=config.HISTORICAL_CANDLES_15M)
 
